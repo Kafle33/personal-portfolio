@@ -198,7 +198,7 @@ export default function Home() {
             <div className="hidden lg:block">
               <div className="relative">
                 <img 
-                  src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600" 
+                  src="https://media.licdn.com/dms/image/v2/D5603AQE9XlaQy9wBiA/profile-displayphoto-shrink_400_400/B56ZSniMOEHwAk-/0/1737977546506?e=1756944000&v=beta&t=MVBs8BVjRq7SSKwB6nEpgQ3UCaybskyi6nVfLYIkuYg" 
                   alt="GIS mapping and technology visualization" 
                   className="rounded-2xl shadow-2xl w-full h-auto transform hover:scale-105 transition-transform duration-500" 
                 />
