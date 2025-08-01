@@ -199,10 +199,10 @@ export default function Home() {
               <div className="relative">
                 <img 
                   src="https://media.licdn.com/dms/image/v2/D5603AQE9XlaQy9wBiA/profile-displayphoto-shrink_400_400/B56ZSniMOEHwAk-/0/1737977546506?e=1756944000&v=beta&t=MVBs8BVjRq7SSKwB6nEpgQ3UCaybskyi6nVfLYIkuYg" 
-                  alt="GIS mapping and technology visualization" 
+                  alt="RoshanKafle_profile_picture" 
                   className="rounded-2xl shadow-2xl w-full h-auto transform hover:scale-105 transition-transform duration-500" 
                 />
-                <div className="absolute -inset-1 bg-gradient-to-r from-yellow-300 via-blue-300 to-green-300 rounded-2xl blur-sm opacity-30 animate-pulse"></div>
+                <div className="absolute -inset-1 rounded-2xl blur-sm opacity-30 animate-pulse"></div>
               </div>
             </div>
           </div>
