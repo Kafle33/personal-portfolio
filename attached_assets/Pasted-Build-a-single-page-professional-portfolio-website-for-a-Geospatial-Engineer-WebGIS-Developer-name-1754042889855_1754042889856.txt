@@ -1,0 +1,72 @@
+Build a single-page professional portfolio website for a Geospatial Engineer & WebGIS Developer named Roshan Kafle.
+
+Content Sections:
+Hero Section:
+
+Name: Roshan Kafle
+
+Title: Geospatial Engineer | WebGIS & Backend Developer
+
+Location: Pokhara, Gandaki, Nepal
+
+Contact: roshankafle33@gmail.com | +977 9806520880
+
+Links: GitHub, LinkedIn
+
+About Me:
+
+A short paragraph summarizing: “Geomatics Engineer with expertise in WebGIS, backend development, and Earth observation data processing. Passionate about integrating AI/ML in geospatial solutions for environmental monitoring and sustainable development.”
+
+Skills:
+
+Programming: Python, Django, FastAPI, Flask, JavaScript, HTML, CSS
+
+Geospatial Tools: ArcGIS, QGIS, GeoServer, PostGIS, UAV, SAR, LiDAR
+
+Cloud: AWS (EC2, ECS, S3, Lambda, RDS)
+
+Version Control: Git, GitHub
+
+Professional Experience (Brief Highlights):
+
+Naxa GeoICT Company (2023-Present): WebGIS development, GeoServer tile services, AI-based classification on raster datasets.
+
+Geonadir Project (Dec 2023 - Present): Real-time COG visualization, WebSocket integration, DEM/DTM processing.
+
+Khaderi-Alert (2023): Drought monitoring system using SPI & SPEI indices.
+
+Changu-Metric Addressing (2023): Developed a digital house numbering system using Django and FastAPI.
+
+Research Project:
+
+Precision Farming: Developed a deep learning model to classify nutrient levels in tomato leaves with a Flask web app.
+
+Achievements & Certifications:
+
+Merit-based Scholarship for Bachelors in Geomatics Engineering.
+
+Trainings in GNSS, DGPS, LiDAR (with University of Tokyo & CSSGS).
+
+Projects & Links:
+
+Changu-Metric Addressing: [GitHub Link]
+
+Geonadir: geonadir.com
+
+Design Guidelines:
+Clean, minimal, and professional layout.
+
+Responsive (mobile & desktop-friendly).
+
+Use a color theme with Earth tones (greens, blues).
+
+Interactive links/buttons for GitHub, LinkedIn.
+
+Smooth scroll navigation to each section.
+
+Tech Stack:
+HTML5, CSS3 (or TailwindCSS), JavaScript
+
+No backend is required; static site.
+
+Output: A fully working single-page portfolio site with structured, clean code.

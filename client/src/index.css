@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dark theme only - no light theme */
+  --background: hsl(76, 44%, 8%);
+  --foreground: hsl(120, 13%, 94%);
+  --muted: hsl(76, 20%, 12%);
+  --muted-foreground: hsl(120, 8%, 65%);
+  --popover: hsl(76, 44%, 8%);
+  --popover-foreground: hsl(120, 13%, 94%);
+  --card: hsl(76, 30%, 10%);
+  --card-foreground: hsl(120, 13%, 94%);
+  --border: hsl(76, 20%, 18%);
+  --input: hsl(76, 20%, 18%);
+  --primary: hsl(156, 81%, 29%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(76, 20%, 12%);
+  --secondary-foreground: hsl(120, 13%, 94%);
+  --accent: hsl(219, 79%, 36%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(156, 81%, 29%);
+  --radius: 0.5rem;
+  
+  /* Earth tones */
+  --forest: hsl(76, 44%, 15%);
+  --ocean: hsl(219, 79%, 36%);
+  --emerald-custom: hsl(156, 81%, 29%);
+  --earth-light: hsl(76, 20%, 12%);
+  --earth-gray: hsl(215, 25%, 65%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  .gradient-bg {
+    background: linear-gradient(135deg, hsl(76, 44%, 8%) 0%, hsl(219, 79%, 25%) 100%);
+  }
+  
+  .card-hover {
+    @apply transition-all duration-500 ease-in-out transform;
+  }
+  
+  .card-hover:hover {
+    @apply -translate-y-2 shadow-2xl scale-105;
+  }
+
+  .experience-card {
+    @apply relative overflow-hidden;
+  }
+
+  .experience-card::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent;
+    transform: translateX(-100%);
+    transition: transform 0.6s ease-in-out;
+  }
+
+  .experience-card:hover::before {
+    transform: translateX(100%);
+  }
+
+  .experience-tooltip {
+    @apply absolute -top-2 left-4 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-3 py-1 rounded-full text-sm font-medium opacity-0 transform -translate-y-2 transition-all duration-300;
+    z-index: 10;
+  }
+
+  .experience-card:hover .experience-tooltip {
+    @apply opacity-100 translate-y-0;
+  }
+
+  .skill-badge {
+    @apply transition-all duration-300 transform hover:scale-110 hover:shadow-lg;
+  }
+
+  .floating-animation {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .geospatial-grid {
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+}
