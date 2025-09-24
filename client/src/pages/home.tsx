@@ -198,7 +198,7 @@ export default function Home() {
             <div className="hidden lg:block">
               <div className="relative">
                 <img 
-                  src="https://media.licdn.com/dms/image/v2/D5603AQE9XlaQy9wBiA/profile-displayphoto-shrink_400_400/B56ZSniMOEHwAk-/0/1737977546506?e=1756944000&v=beta&t=MVBs8BVjRq7SSKwB6nEpgQ3UCaybskyi6nVfLYIkuYg" 
+                  src="https://media.licdn.com/dms/image/v2/D5603AQGQBEZPXAo9gA/profile-displayphoto-crop_800_800/B56Zj7k_IdHQAQ-/0/1756567441019?e=1761782400&v=beta&t=Vr--YWr1zRpfICGmLAa4XyAMbePVO1yAwYXI8dq1sXQ" 
                   alt="RoshanKafle_profile_picture" 
                   className="rounded-2xl shadow-2xl w-full h-auto transform hover:scale-105 transition-transform duration-500" 
                 />
