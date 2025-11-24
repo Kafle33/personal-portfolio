@@ -1,25 +1,164 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { GeospatialPreloader } from "@/components/ui/geospatial-preloader";
-import RoshanImg from "../assets/roshan.jpeg";
-import FarmingImg from "../assets/precision_farming.jpeg";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import RoshanImg from "../assets/roshan.png"
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedItem, setSelectedItem] = useState<{
+    title: string;
+    description: string;
+    images: string[];
+    details: string[];
+    technologies: string[];
+  } | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const experiencesData = [
+    {
+      id: "naxa",
+      title: "Naxa GeoICT Company",
+      period: "2023 - Present",
+      description: "WebGIS development, GeoServer tile services, AI-based classification on raster datasets.",
+      images: [
+        "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
+        "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
+        "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
+      ],
+      details: [
+        "Developed and maintained WebGIS applications for real-time geospatial data visualization",
+        "Implemented GeoServer tile services for efficient map rendering and data distribution",
+        "Applied AI/ML algorithms for automated classification of raster datasets",
+        "Collaborated with cross-functional teams to deliver geospatial solutions"
+      ],
+      technologies: ["WebGIS", "GeoServer", "AI Classification", "Python", "JavaScript"]
+    },
+    {
+      id: "geonadir",
+      title: "Geonadir Project",
+      period: "Dec 2023 - Present",
+      description: "Real-time COG visualization, WebSocket integration, DEM/DTM processing.",
+      images: [
+        "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
+        "https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
+        "https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
+      ],
+      details: [
+        "Built real-time Cloud Optimized GeoTIFF (COG) visualization platform",
+        "Integrated WebSocket technology for live data streaming and updates",
+        "Processed Digital Elevation Models (DEM) and Digital Terrain Models (DTM)",
+        "Developed interactive 3D terrain visualization features"
+      ],
+      technologies: ["Real-time Visualization", "WebSocket", "DEM/DTM", "COG", "FastAPI"]
+    },
+    {
+      id: "khaderi",
+      title: "Khaderi-Alert",
+      period: "2023",
+      description: "Drought monitoring system using SPI & SPEI indices.",
+      images: [
+        "https://images.unsplash.com/photo-1592861956120-e524fc739696?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
+        "https://images.unsplash.com/photo-1534389668058-9a88c37f2a79?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
+        "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
+      ],
+      details: [
+        "Developed drought monitoring and early warning system",
+        "Implemented Standardized Precipitation Index (SPI) calculations",
+        "Applied Standardized Precipitation Evapotranspiration Index (SPEI) analysis",
+        "Created automated alert system for drought risk assessment"
+      ],
+      technologies: ["Drought Monitoring", "SPI & SPEI", "Environmental Analysis", "Python"]
+    },
+    {
+      id: "changu",
+      title: "Changu-Metric Addressing",
+      period: "2023",
+      description: "Digital house numbering system using Django and FastAPI.",
+      images: [
+        "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
+        "https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
+      ],
+      details: [
+        "Developed comprehensive digital house numbering system",
+        "Built backend API using Django and FastAPI frameworks",
+        "Implemented geospatial database for address management",
+        "Created user-friendly interface for address lookup and navigation"
+      ],
+      technologies: ["Django", "FastAPI", "Digital Addressing", "PostGIS", "React"]
+    }
+  ];
+
+  const projectsData = [
+    {
+      id: "precision-farming",
+      title: "Precision Farming Research",
+      description: "Developed a deep learning model to classify nutrient levels in tomato leaves with a Flask web application interface.",
+      images: [
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
+        "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
+        "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
+      ],
+      details: [
+        "Developed deep learning model for automated nutrient deficiency detection in tomato plants",
+        "Collected and annotated dataset of tomato leaf images with various nutrient conditions",
+        "Built Flask web application for farmers to upload images and get instant analysis",
+        "Achieved 92% accuracy in classifying nitrogen, phosphorus, and potassium deficiencies",
+        "Integrated recommendations system for fertilizer application based on detected deficiencies"
+      ],
+      technologies: ["Deep Learning", "Flask", "Agriculture", "Computer Vision", "TensorFlow"]
+    },
+    {
+      id: "changu-metric",
+      title: "Changu-Metric Addressing",
+      description: "Digital house numbering system for efficient urban planning and logistics.",
+      images: [
+        "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
+        "https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
+        "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
+      ],
+      details: [
+        "Developed comprehensive digital addressing solution for urban areas",
+        "Created unique identification system for every building and location",
+        "Implemented spatial indexing for fast address lookup and geocoding",
+        "Built admin dashboard for address management and validation",
+        "Integrated with mapping services for navigation support"
+      ],
+      technologies: ["Django", "FastAPI", "PostGIS", "React", "Leaflet"]
+    },
+    {
+      id: "geonadir-platform",
+      title: "Geonadir Platform",
+      description: "Real-time geospatial data visualization and analysis platform.",
+      images: [
+        "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
+        "https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
+        "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
+      ],
+      details: [
+        "Built cloud-based platform for geospatial data visualization and analysis",
+        "Implemented real-time data streaming using WebSocket technology",
+        "Developed interactive mapping interface with multiple data layers",
+        "Created tools for DEM/DTM processing and 3D terrain visualization",
+        "Optimized performance for handling large raster datasets using COG format"
+      ],
+      technologies: ["React", "WebSocket", "COG", "Three.js", "FastAPI"]
+    }
+  ];
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = [
-        "hero",
-        "about",
-        "skills",
-        "experience",
-        "projects",
-        "contact",
-      ];
-      const current = sections.find((section) => {
+      const sections = ["hero", "about", "skills", "experience", "projects", "contact"];
+      const current = sections.find(section => {
         const element = document.getElementById(section);
         if (element) {
           const rect = element.getBoundingClientRect();
@@ -34,13 +173,19 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (selectedItem) {
+      setCurrentImageIndex(0);
+    }
+  }, [selectedItem]);
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       const offsetTop = element.offsetTop - 80;
       window.scrollTo({
         top: offsetTop,
-        behavior: "smooth",
+        behavior: "smooth"
       });
     }
     setIsMobileMenuOpen(false);
@@ -52,7 +197,7 @@ export default function Home() {
     { id: "skills", label: "Skills" },
     { id: "experience", label: "Experience" },
     { id: "projects", label: "Projects" },
-    { id: "contact", label: "Contact" },
+    { id: "contact", label: "Contact" }
   ];
 
   if (isLoading) {
@@ -85,7 +230,7 @@ export default function Home() {
               ))}
             </div>
             <div className="md:hidden flex items-center">
-              <button
+              <button 
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
@@ -117,57 +262,36 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section
-        id="hero"
-        className="gradient-bg geospatial-grid min-h-screen flex items-center pt-16 relative overflow-hidden"
-      >
+      <section id="hero" className="gradient-bg geospatial-grid min-h-screen flex items-center pt-16 relative overflow-hidden">
         {/* Enhanced Floating elements with geospatial themes */}
         <div className="absolute inset-0">
           {/* Satellites */}
           <div className="absolute top-20 left-10 w-6 h-6 text-white/40 floating-animation">
             <i className="fas fa-satellite text-xl"></i>
           </div>
-          <div
-            className="absolute top-40 right-20 w-5 h-5 text-yellow-300/50 floating-animation"
-            style={{ animationDelay: "0.5s" }}
-          >
+          <div className="absolute top-40 right-20 w-5 h-5 text-yellow-300/50 floating-animation" style={{ animationDelay: '0.5s' }}>
             <i className="fas fa-broadcast-tower text-lg"></i>
           </div>
           {/* Drones */}
-          <div
-            className="absolute bottom-32 left-1/4 w-4 h-4 text-blue-300/60 floating-animation"
-            style={{ animationDelay: "1s" }}
-          >
+          <div className="absolute bottom-32 left-1/4 w-4 h-4 text-blue-300/60 floating-animation" style={{ animationDelay: '1s' }}>
             <i className="fas fa-helicopter text-sm"></i>
           </div>
-          <div
-            className="absolute top-1/3 right-1/3 w-5 h-5 text-green-300/40 floating-animation"
-            style={{ animationDelay: "1.5s" }}
-          >
+          <div className="absolute top-1/3 right-1/3 w-5 h-5 text-green-300/40 floating-animation" style={{ animationDelay: '1.5s' }}>
             <i className="fas fa-plane text-lg"></i>
           </div>
           {/* AI and Data nodes */}
-          <div
-            className="absolute top-1/2 left-1/6 w-3 h-3 text-purple-300/50 floating-animation"
-            style={{ animationDelay: "2s" }}
-          >
+          <div className="absolute top-1/2 left-1/6 w-3 h-3 text-purple-300/50 floating-animation" style={{ animationDelay: '2s' }}>
             <i className="fas fa-brain text-xs"></i>
           </div>
-          <div
-            className="absolute bottom-1/4 right-1/6 w-4 h-4 text-cyan-300/40 floating-animation"
-            style={{ animationDelay: "2.5s" }}
-          >
+          <div className="absolute bottom-1/4 right-1/6 w-4 h-4 text-cyan-300/40 floating-animation" style={{ animationDelay: '2.5s' }}>
             <i className="fas fa-microchip text-sm"></i>
           </div>
           {/* GPS and Navigation */}
-          <div
-            className="absolute top-3/4 left-1/3 w-3 h-3 text-orange-300/50 floating-animation"
-            style={{ animationDelay: "3s" }}
-          >
+          <div className="absolute top-3/4 left-1/3 w-3 h-3 text-orange-300/50 floating-animation" style={{ animationDelay: '3s' }}>
             <i className="fas fa-location-dot text-xs"></i>
           </div>
         </div>
-
+        
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-white relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
@@ -180,21 +304,17 @@ export default function Home() {
                   Geospatial Engineer | WebGIS & Backend Developer
                 </h2>
               </div>
-
+              
               <div className="space-y-3 mb-8">
                 <div className="flex items-center space-x-3 hover:translate-x-1 transition-transform duration-300">
                   <i className="fas fa-map-marker-alt text-lg text-red-300"></i>
-                  <span className="text-white drop-shadow-lg">
-                    Pokhara, Gandaki, Nepal
-                  </span>
-                  <span className="text-xs text-white/90 font-mono drop-shadow-lg">
-                    28.2096°N, 83.9856°E
-                  </span>
+                  <span className="text-white drop-shadow-lg">Pokhara, Gandaki, Nepal</span>
+                  <span className="text-xs text-white/90 font-mono drop-shadow-lg">28.2096°N, 83.9856°E</span>
                 </div>
                 <div className="flex items-center space-x-3 hover:translate-x-1 transition-transform duration-300">
                   <i className="fas fa-envelope text-lg text-blue-300"></i>
-                  <a
-                    href="mailto:roshankafle33@gmail.com"
+                  <a 
+                    href="mailto:roshankafle33@gmail.com" 
                     className="text-white hover:text-blue-200 transition-colors hover:underline drop-shadow-lg"
                   >
                     roshankafle33@gmail.com
@@ -202,26 +322,32 @@ export default function Home() {
                 </div>
                 <div className="flex items-center space-x-3 hover:translate-x-1 transition-transform duration-300">
                   <i className="fas fa-phone text-lg text-green-300"></i>
-                  <a
-                    href="tel:+9779806520880"
+                  <a 
+                    href="tel:+9779806520880" 
                     className="text-white hover:text-green-200 transition-colors hover:underline drop-shadow-lg"
                   >
                     +977 9806520880
                   </a>
                 </div>
               </div>
-
+              
               <div className="flex space-x-4">
-                <a
-                  href="#"
+                <a 
+                  href="https://github.com/Kafle33" 
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="bg-white text-[hsl(76,44%,15%)] px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-300 flex items-center space-x-2 transform hover:scale-105 hover:shadow-lg"
+                  data-testid="link-github-hero"
                 >
                   <i className="fab fa-github"></i>
                   <span>GitHub</span>
                 </a>
-                <a
-                  href="#"
+                <a 
+                  href="https://www.linkedin.com/in/roshan-kafle-908101277/" 
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="bg-[hsl(219,79%,36%)] text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 flex items-center space-x-2 transform hover:scale-105 hover:shadow-lg"
+                  data-testid="link-linkedin-hero"
                 >
                   <i className="fab fa-linkedin"></i>
                   <span>LinkedIn</span>
@@ -230,12 +356,12 @@ export default function Home() {
             </div>
             <div className="hidden lg:block">
               <div className="relative">
-                <img
+                <img 
                   src={RoshanImg}
-                  alt="RoshanKafle_profile_picture"
-                  className="rounded-2xl shadow-2xl w-full h-auto transform hover:scale-105 transition-transform duration-500"
+                  alt="GIS mapping and technology visualization" 
+                  className="rounded-2xl shadow-2xl w-full h-auto transform hover:scale-105 transition-transform duration-500" 
                 />
-                <div className="absolute -inset-1 rounded-2xl blur-sm opacity-30 animate-pulse"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-yellow-300 via-blue-300 to-green-300 rounded-2xl blur-sm opacity-30 animate-pulse"></div>
               </div>
             </div>
           </div>
@@ -255,27 +381,20 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative">
               <div className="absolute -inset-2 bg-gradient-to-r from-primary/20 via-accent/20 to-emerald-custom/20 rounded-xl blur-lg opacity-50"></div>
-              <img
-                src={RoshanImg}
-                alt="Geospatial data analysis and satellite imagery"
-                className="rounded-xl shadow-lg w-full h-auto relative z-10 transform hover:scale-105 transition-transform duration-500"
+              <img 
+                src={RoshanImg} 
+                alt="Geospatial data analysis and satellite imagery" 
+                className="rounded-xl shadow-lg w-full h-auto relative z-10 transform hover:scale-105 transition-transform duration-500" 
               />
             </div>
             <div className="space-y-6">
               <p className="text-lg text-foreground leading-relaxed">
                 <i className="fas fa-satellite mr-2 text-primary"></i>
-                Geomatics Engineer with expertise in WebGIS, backend
-                development, and Earth observation data processing. Passionate
-                about integrating AI/ML in geospatial solutions for
-                environmental monitoring and sustainable development.
+                Geomatics Engineer with expertise in WebGIS, backend development, and Earth observation data processing. Passionate about integrating AI/ML in geospatial solutions for environmental monitoring and sustainable development.
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                <i className="fas fa-helicopter mr-2 text-accent"></i>I
-                specialize in creating innovative solutions that bridge the gap
-                between complex geospatial data and user-friendly web
-                applications. My experience spans from real-time data
-                visualization to advanced machine learning implementations in
-                agriculture and environmental monitoring.
+                <i className="fas fa-helicopter mr-2 text-accent"></i>
+                I specialize in creating innovative solutions that bridge the gap between complex geospatial data and user-friendly web applications. My experience spans from real-time data visualization to advanced machine learning implementations in agriculture and environmental monitoring.
               </p>
               <div className="flex flex-wrap gap-4">
                 <div className="bg-primary/10 dark:bg-primary/20 px-4 py-2 rounded-full hover:scale-105 transition-transform duration-300 relative overflow-hidden">
@@ -327,21 +446,11 @@ export default function Home() {
             <Card className="bg-card dark:bg-card p-6 rounded-xl shadow-md card-hover border border-border">
               <div className="flex items-center mb-4">
                 <i className="fas fa-code text-2xl text-primary mr-3 floating-animation"></i>
-                <h3 className="text-xl font-semibold text-card-foreground">
-                  Programming
-                </h3>
+                <h3 className="text-xl font-semibold text-card-foreground">Programming</h3>
               </div>
               <div className="space-y-2">
-                {[
-                  "Python",
-                  "Django",
-                  "FastAPI",
-                  "Flask",
-                  "JavaScript",
-                  "HTML",
-                  "CSS",
-                ].map((skill) => (
-                  <span
+                {["Python", "Django", "FastAPI", "Flask", "JavaScript", "HTML", "CSS"].map((skill) => (
+                  <span 
                     key={skill}
                     className="inline-block bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm mr-2 mb-2 skill-badge"
                   >
@@ -350,29 +459,16 @@ export default function Home() {
                 ))}
               </div>
             </Card>
-
+            
             {/* Geospatial Tools */}
             <Card className="bg-card dark:bg-card p-6 rounded-xl shadow-md card-hover border border-border">
               <div className="flex items-center mb-4">
-                <i
-                  className="fas fa-globe text-2xl text-accent mr-3 floating-animation"
-                  style={{ animationDelay: "0.5s" }}
-                ></i>
-                <h3 className="text-xl font-semibold text-card-foreground">
-                  Geospatial Tools
-                </h3>
+                <i className="fas fa-globe text-2xl text-accent mr-3 floating-animation" style={{ animationDelay: '0.5s' }}></i>
+                <h3 className="text-xl font-semibold text-card-foreground">Geospatial Tools</h3>
               </div>
               <div className="space-y-2">
-                {[
-                  "ArcGIS",
-                  "QGIS",
-                  "GeoServer",
-                  "PostGIS",
-                  "UAV",
-                  "SAR",
-                  "LiDAR",
-                ].map((skill) => (
-                  <span
+                {["ArcGIS", "QGIS", "GeoServer", "PostGIS", "UAV", "SAR", "LiDAR"].map((skill) => (
+                  <span 
                     key={skill}
                     className="inline-block bg-accent text-accent-foreground px-3 py-1 rounded-full text-sm mr-2 mb-2 skill-badge"
                   >
@@ -381,46 +477,34 @@ export default function Home() {
                 ))}
               </div>
             </Card>
-
+            
             {/* Cloud */}
             <Card className="bg-card dark:bg-card p-6 rounded-xl shadow-md card-hover border border-border">
               <div className="flex items-center mb-4">
-                <i
-                  className="fas fa-cloud text-2xl text-emerald-custom mr-3 floating-animation"
-                  style={{ animationDelay: "1s" }}
-                ></i>
-                <h3 className="text-xl font-semibold text-card-foreground">
-                  Cloud
-                </h3>
+                <i className="fas fa-cloud text-2xl text-emerald-custom mr-3 floating-animation" style={{ animationDelay: '1s' }}></i>
+                <h3 className="text-xl font-semibold text-card-foreground">Cloud</h3>
               </div>
               <div className="space-y-2">
-                {["AWS EC2", "AWS ECS", "AWS S3", "AWS Lambda", "AWS RDS"].map(
-                  (skill) => (
-                    <span
-                      key={skill}
-                      className="inline-block bg-emerald-custom text-white px-3 py-1 rounded-full text-sm mr-2 mb-2 skill-badge"
-                    >
-                      {skill}
-                    </span>
-                  )
-                )}
+                {["AWS EC2", "AWS ECS", "AWS S3", "AWS Lambda", "AWS RDS"].map((skill) => (
+                  <span 
+                    key={skill}
+                    className="inline-block bg-emerald-custom text-white px-3 py-1 rounded-full text-sm mr-2 mb-2 skill-badge"
+                  >
+                    {skill}
+                  </span>
+                ))}
               </div>
             </Card>
-
+            
             {/* Version Control */}
             <Card className="bg-card dark:bg-card p-6 rounded-xl shadow-md card-hover border border-border">
               <div className="flex items-center mb-4">
-                <i
-                  className="fas fa-code-branch text-2xl text-earth-gray mr-3 floating-animation"
-                  style={{ animationDelay: "1.5s" }}
-                ></i>
-                <h3 className="text-xl font-semibold text-card-foreground">
-                  Version Control
-                </h3>
+                <i className="fas fa-code-branch text-2xl text-earth-gray mr-3 floating-animation" style={{ animationDelay: '1.5s' }}></i>
+                <h3 className="text-xl font-semibold text-card-foreground">Version Control</h3>
               </div>
               <div className="space-y-2">
                 {["Git", "GitHub"].map((skill) => (
-                  <span
+                  <span 
                     key={skill}
                     className="inline-block bg-earth-gray text-white px-3 py-1 rounded-full text-sm mr-2 mb-2 skill-badge"
                   >
@@ -429,29 +513,16 @@ export default function Home() {
                 ))}
               </div>
             </Card>
-
+            
             {/* AI/ML & Drone Technologies */}
             <Card className="bg-card dark:bg-card p-6 rounded-xl shadow-md card-hover border border-border lg:col-span-2 xl:col-span-1">
               <div className="flex items-center mb-4">
-                <i
-                  className="fas fa-robot text-2xl text-purple-600 mr-3 floating-animation"
-                  style={{ animationDelay: "2s" }}
-                ></i>
-                <h3 className="text-xl font-semibold text-card-foreground">
-                  AI/ML & Drones
-                </h3>
+                <i className="fas fa-robot text-2xl text-purple-600 mr-3 floating-animation" style={{ animationDelay: '2s' }}></i>
+                <h3 className="text-xl font-semibold text-card-foreground">AI/ML & Drones</h3>
               </div>
               <div className="space-y-2">
-                {[
-                  "TensorFlow",
-                  "PyTorch",
-                  "Scikit-learn",
-                  "OpenCV",
-                  "UAV Photogrammetry",
-                  "Drone Mapping",
-                  "Computer Vision",
-                ].map((skill) => (
-                  <span
+                {["TensorFlow", "PyTorch", "Scikit-learn", "OpenCV", "UAV Photogrammetry", "Drone Mapping", "Computer Vision"].map((skill) => (
+                  <span 
                     key={skill}
                     className="inline-block bg-purple-600 text-white px-3 py-1 rounded-full text-sm mr-2 mb-2 skill-badge"
                   >
@@ -475,132 +546,52 @@ export default function Home() {
             <div className="w-24 h-1 bg-primary mx-auto rounded"></div>
           </div>
           <div className="space-y-8">
-            {/* Naxa GeoICT Company */}
-            <div className="experience-card bg-gradient-to-r from-primary/5 to-accent/5 dark:from-primary/10 dark:to-accent/10 p-8 rounded-xl border-l-4 border-primary card-hover relative">
-              <div className="experience-tooltip">Click to expand details</div>
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
-                <h3 className="text-2xl font-bold text-foreground flex items-center">
-                  <i className="fas fa-building mr-3 text-primary"></i>
-                  Naxa GeoICT Company
-                </h3>
-                <span className="bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-medium">
-                  <i className="fas fa-calendar mr-1"></i>
-                  2023 - Present
-                </span>
-              </div>
-              <p className="text-muted-foreground mb-4">
-                <i className="fas fa-map mr-2 text-accent"></i>
-                WebGIS development, GeoServer tile services, AI-based
-                classification on raster datasets.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="bg-accent/20 text-accent px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform duration-300">
-                  <i className="fas fa-globe mr-1"></i>WebGIS
-                </span>
-                <span className="bg-emerald-custom/20 text-emerald-custom px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform duration-300">
-                  <i className="fas fa-server mr-1"></i>GeoServer
-                </span>
-                <span className="bg-primary/20 text-primary px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform duration-300">
-                  <i className="fas fa-brain mr-1"></i>AI Classification
-                </span>
-              </div>
-            </div>
-
-            {/* Geonadir Project */}
-            <div className="experience-card bg-gradient-to-r from-accent/5 to-emerald-custom/5 dark:from-accent/10 dark:to-emerald-custom/10 p-8 rounded-xl border-l-4 border-accent card-hover relative">
-              <div className="experience-tooltip">
-                Real-time geospatial visualization project
-              </div>
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
-                <h3 className="text-2xl font-bold text-foreground flex items-center">
-                  <i className="fas fa-satellite-dish mr-3 text-accent"></i>
-                  Geonadir Project
-                </h3>
-                <span className="bg-accent text-accent-foreground px-4 py-2 rounded-full text-sm font-medium">
-                  <i className="fas fa-calendar mr-1"></i>
-                  Dec 2023 - Present
-                </span>
-              </div>
-              <p className="text-muted-foreground mb-4">
-                <i className="fas fa-chart-line mr-2 text-emerald-custom"></i>
-                Real-time COG visualization, WebSocket integration, DEM/DTM
-                processing.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="bg-accent/20 text-accent px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform duration-300">
-                  <i className="fas fa-eye mr-1"></i>Real-time Visualization
-                </span>
-                <span className="bg-emerald-custom/20 text-emerald-custom px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform duration-300">
-                  <i className="fas fa-plug mr-1"></i>WebSocket
-                </span>
-                <span className="bg-primary/20 text-primary px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform duration-300">
-                  <i className="fas fa-mountain mr-1"></i>DEM/DTM
-                </span>
-              </div>
-            </div>
-
-            {/* Khaderi-Alert */}
-            <div className="experience-card bg-gradient-to-r from-emerald-custom/5 to-primary/5 dark:from-emerald-custom/10 dark:to-primary/10 p-8 rounded-xl border-l-4 border-emerald-custom card-hover relative">
-              <div className="experience-tooltip">
-                Environmental monitoring system
-              </div>
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
-                <h3 className="text-2xl font-bold text-foreground flex items-center">
-                  <i className="fas fa-exclamation-triangle mr-3 text-emerald-custom"></i>
-                  Khaderi-Alert
-                </h3>
-                <span className="bg-emerald-custom text-white px-4 py-2 rounded-full text-sm font-medium">
-                  <i className="fas fa-calendar mr-1"></i>
-                  2023
-                </span>
-              </div>
-              <p className="text-muted-foreground mb-4">
-                <i className="fas fa-cloud-rain mr-2 text-primary"></i>
-                Drought monitoring system using SPI & SPEI indices.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="bg-red-500/20 text-red-600 dark:text-red-400 px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform duration-300">
-                  <i className="fas fa-thermometer-empty mr-1"></i>Drought
-                  Monitoring
-                </span>
-                <span className="bg-orange-500/20 text-orange-600 dark:text-orange-400 px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform duration-300">
-                  <i className="fas fa-chart-bar mr-1"></i>SPI & SPEI
-                </span>
-              </div>
-            </div>
-
-            {/* Changu-Metric Addressing */}
-            <div className="experience-card bg-gradient-to-r from-earth-gray/5 to-primary/5 dark:from-earth-gray/10 dark:to-primary/10 p-8 rounded-xl border-l-4 border-earth-gray card-hover relative">
-              <div className="experience-tooltip">
-                Digital addressing solution
-              </div>
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
-                <h3 className="text-2xl font-bold text-foreground flex items-center">
-                  <i className="fas fa-home mr-3 text-earth-gray"></i>
-                  Changu-Metric Addressing
-                </h3>
-                <span className="bg-earth-gray text-white px-4 py-2 rounded-full text-sm font-medium">
-                  <i className="fas fa-calendar mr-1"></i>
-                  2023
-                </span>
-              </div>
-              <p className="text-muted-foreground mb-4">
-                <i className="fas fa-hashtag mr-2 text-accent"></i>
-                Developed a digital house numbering system using Django and
-                FastAPI.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="bg-accent/20 text-accent px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform duration-300">
-                  <i className="fab fa-python mr-1"></i>Django
-                </span>
-                <span className="bg-emerald-custom/20 text-emerald-custom px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform duration-300">
-                  <i className="fas fa-rocket mr-1"></i>FastAPI
-                </span>
-                <span className="bg-primary/20 text-primary px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform duration-300">
-                  <i className="fas fa-map-signs mr-1"></i>Digital Addressing
-                </span>
-              </div>
-            </div>
+            {experiencesData.map((exp, index) => {
+              const borderColors = ['border-primary', 'border-accent', 'border-emerald-custom', 'border-earth-gray'];
+              const gradientColors = [
+                'from-primary/5 to-accent/5 dark:from-primary/10 dark:to-accent/10',
+                'from-accent/5 to-emerald-custom/5 dark:from-accent/10 dark:to-emerald-custom/10',
+                'from-emerald-custom/5 to-primary/5 dark:from-emerald-custom/10 dark:to-primary/10',
+                'from-earth-gray/5 to-primary/5 dark:from-earth-gray/10 dark:to-primary/10'
+              ];
+              const icons = ['fa-building', 'fa-satellite-dish', 'fa-exclamation-triangle', 'fa-home'];
+              const iconColors = ['text-primary', 'text-accent', 'text-emerald-custom', 'text-earth-gray'];
+              
+              return (
+                <div
+                  key={exp.id}
+                  onClick={() => setSelectedItem(exp)}
+                  className={`cursor-pointer experience-card bg-gradient-to-r ${gradientColors[index]} p-8 rounded-xl border-l-4 ${borderColors[index]} card-hover relative`}
+                  data-testid={`card-experience-${exp.id}`}
+                >
+                  <div className="experience-tooltip">Click to view details</div>
+                  <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4">
+                    <h3 className="text-2xl font-bold text-foreground flex items-center">
+                      <i className={`fas ${icons[index]} mr-3 ${iconColors[index]}`}></i>
+                      {exp.title}
+                    </h3>
+                    <span className={`${borderColors[index].replace('border', 'bg')} text-white px-4 py-2 rounded-full text-sm font-medium`}>
+                      <i className="fas fa-calendar mr-1"></i>
+                      {exp.period}
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground mb-4">
+                    <i className="fas fa-info-circle mr-2 text-accent"></i>
+                    {exp.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {exp.technologies.slice(0, 3).map((tech, i) => (
+                      <span
+                        key={i}
+                        className={`${i === 0 ? 'bg-accent/20 text-accent' : i === 1 ? 'bg-emerald-custom/20 text-emerald-custom' : 'bg-primary/20 text-primary'} px-3 py-1 rounded-full text-sm hover:scale-105 transition-transform duration-300`}
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -616,97 +607,74 @@ export default function Home() {
             <div className="w-24 h-1 bg-primary mx-auto rounded"></div>
           </div>
           <div className="grid lg:grid-cols-2 gap-12">
-            {/* Research Project */}
-            <Card className="bg-card dark:bg-card p-8 rounded-xl shadow-lg card-hover border border-border">
-              <div className="flex items-center mb-6">
-                <i className="fas fa-seedling text-3xl text-emerald-custom mr-4 floating-animation"></i>
-                <h3 className="text-2xl font-bold text-card-foreground">
-                  Precision Farming Research
-                </h3>
-              </div>
-              <div className="relative mb-6">
-                <img
-                  src={FarmingImg}
-                  alt="Precision farming technology in agricultural field"
-                  className="rounded-lg w-full h-48 object-cover transform hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-emerald-custom/20 to-transparent rounded-lg"></div>
-              </div>
-              <p className="text-muted-foreground mb-6">
-                <i className="fas fa-leaf mr-2 text-emerald-custom"></i>
-                Developed a deep learning model to classify nutrient levels in
-                tomato leaves with a Flask web application interface.
-              </p>
-              <div className="flex flex-wrap gap-2 mb-6">
-                <span className="bg-emerald-custom/20 text-emerald-custom px-3 py-1 rounded-full text-sm skill-badge">
-                  <i className="fas fa-brain mr-1"></i>Deep Learning
-                </span>
-                <span className="bg-accent/20 text-accent px-3 py-1 rounded-full text-sm skill-badge">
-                  <i className="fas fa-flask mr-1"></i>Flask
-                </span>
-                <span className="bg-primary/20 text-primary px-3 py-1 rounded-full text-sm skill-badge">
-                  <i className="fas fa-tractor mr-1"></i>Agriculture
-                </span>
-                <span className="bg-earth-gray/20 text-earth-gray px-3 py-1 rounded-full text-sm skill-badge">
-                  <i className="fas fa-eye mr-1"></i>Computer Vision
-                </span>
-              </div>
-            </Card>
-
-            {/* Featured Projects */}
-            <div className="space-y-8">
-              <Card className="bg-white p-6 rounded-xl shadow-md card-hover">
-                <h4 className="text-xl font-bold text-gray-900 mb-3">
-                  Changu-Metric Addressing
-                </h4>
-                <p className="text-gray-700 mb-4">
-                  Digital house numbering system for efficient urban planning
-                  and logistics.
-                </p>
-                <a
-                  href="#"
-                  className="inline-flex items-center text-[hsl(76,44%,15%)] font-semibold hover:text-[hsl(76,44%,25%)] transition-colors"
+            {/* Main Project Cards */}
+            {projectsData.map((project, index) => {
+              const icons = ['fa-seedling', 'fa-map-signs', 'fa-globe'];
+              const iconColors = ['text-emerald-custom', 'text-primary', 'text-accent'];
+              
+              return (
+                <Card 
+                  key={project.id}
+                  onClick={() => setSelectedItem(project)}
+                  className="bg-card dark:bg-card p-8 rounded-xl shadow-lg card-hover border border-border cursor-pointer"
+                  data-testid={`card-project-${project.id}`}
                 >
-                  <i className="fab fa-github mr-2"></i>
-                  View on GitHub
-                </a>
-              </Card>
+                  <div className="flex items-center mb-6">
+                    <i className={`fas ${icons[index]} text-3xl ${iconColors[index]} mr-4 floating-animation`}></i>
+                    <h3 className="text-2xl font-bold text-card-foreground">{project.title}</h3>
+                  </div>
+                  <div className="relative mb-6">
+                    <img 
+                      src={project.images[0]}
+                      alt={project.title}
+                      className="rounded-lg w-full h-48 object-cover transform hover:scale-105 transition-transform duration-500" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-emerald-custom/20 to-transparent rounded-lg"></div>
+                    <div className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-foreground">
+                      <i className="fas fa-images mr-1"></i>
+                      {project.images.length} photos
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground mb-6">
+                    <i className="fas fa-info-circle mr-2 text-emerald-custom"></i>
+                    {project.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {project.technologies.slice(0, 4).map((tech, i) => {
+                      const colors = [
+                        'bg-emerald-custom/20 text-emerald-custom',
+                        'bg-accent/20 text-accent',
+                        'bg-primary/20 text-primary',
+                        'bg-earth-gray/20 text-earth-gray'
+                      ];
+                      return (
+                        <span key={i} className={`${colors[i % 4]} px-3 py-1 rounded-full text-sm skill-badge`}>
+                          {tech}
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <div className="text-sm text-primary font-medium flex items-center mt-2">
+                    <i className="fas fa-hand-pointer mr-2 flex-shrink-0"></i>
+                    <span className="truncate">Click to view full details</span>
+                  </div>
+                </Card>
+              );
+            })}
 
-              <Card className="bg-white p-6 rounded-xl shadow-md card-hover">
-                <h4 className="text-xl font-bold text-gray-900 mb-3">
-                  Geonadir Platform
-                </h4>
-                <p className="text-gray-700 mb-4">
-                  Real-time geospatial data visualization and analysis platform.
-                </p>
-                <a
-                  href="https://geonadir.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center text-[hsl(219,79%,36%)] font-semibold hover:text-[hsl(219,79%,46%)] transition-colors"
-                >
-                  <i className="fas fa-external-link-alt mr-2"></i>
-                  Visit geonadir.com
-                </a>
-              </Card>
-
-              {/* Achievements */}
-              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl border-l-4 border-yellow-400">
-                <h4 className="text-xl font-bold text-gray-900 mb-4">
-                  Achievements & Certifications
-                </h4>
-                <ul className="space-y-2 text-gray-700">
-                  <li className="flex items-start">
-                    <i className="fas fa-award text-yellow-500 mr-3 mt-1"></i>
-                    Merit-based Scholarship for Bachelors in Geomatics
-                    Engineering
-                  </li>
-                  <li className="flex items-start">
-                    <i className="fas fa-certificate text-blue-500 mr-3 mt-1"></i>
-                    Trainings in GNSS, DGPS, LiDAR (University of Tokyo & CSSGS)
-                  </li>
-                </ul>
-              </div>
+            {/* Achievements */}
+            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl border-l-4 border-yellow-400 h-fit">
+              <h4 className="text-xl font-bold text-gray-900 mb-4">Achievements & Certifications</h4>
+              <ul className="space-y-2 text-gray-700">
+                <li className="flex items-start">
+                  <i className="fas fa-award text-yellow-500 mr-3 mt-1"></i>
+                  Merit-based Scholarship for Bachelors in Geomatics Engineering
+                </li>
+                <li className="flex items-start">
+                  <i className="fas fa-certificate text-blue-500 mr-3 mt-1"></i>
+                  Trainings in GNSS, DGPS, LiDAR (University of Tokyo & CSSGS)
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -723,8 +691,7 @@ export default function Home() {
             <div className="w-24 h-1 bg-primary mx-auto rounded"></div>
             <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
               <i className="fas fa-satellite mr-2 text-emerald-custom"></i>
-              Ready to collaborate on innovative geospatial solutions? Let's
-              discuss how we can work together.
+              Ready to collaborate on innovative geospatial solutions? Let's discuss how we can work together.
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -733,54 +700,51 @@ export default function Home() {
                 <i className="fas fa-envelope text-2xl text-primary"></i>
               </div>
               <h3 className="font-semibold text-foreground mb-2">Email</h3>
-              <a
-                href="mailto:roshankafle33@gmail.com"
+              <a 
+                href="mailto:roshankafle33@gmail.com" 
                 className="text-muted-foreground hover:text-primary transition-colors hover:underline"
               >
                 roshankafle33@gmail.com
               </a>
             </div>
             <div className="text-center card-hover">
-              <div
-                className="bg-accent/10 dark:bg-accent/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 floating-animation"
-                style={{ animationDelay: "0.5s" }}
-              >
+              <div className="bg-accent/10 dark:bg-accent/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 floating-animation" style={{ animationDelay: '0.5s' }}>
                 <i className="fas fa-phone text-2xl text-accent"></i>
               </div>
               <h3 className="font-semibold text-foreground mb-2">Phone</h3>
-              <a
-                href="tel:+9779806520880"
+              <a 
+                href="tel:+9779806520880" 
                 className="text-muted-foreground hover:text-accent transition-colors hover:underline"
               >
                 +977 9806520880
               </a>
             </div>
             <div className="text-center card-hover">
-              <div
-                className="bg-earth-gray/10 dark:bg-earth-gray/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 floating-animation"
-                style={{ animationDelay: "1s" }}
-              >
+              <div className="bg-earth-gray/10 dark:bg-earth-gray/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 floating-animation" style={{ animationDelay: '1s' }}>
                 <i className="fab fa-github text-2xl text-earth-gray"></i>
               </div>
               <h3 className="font-semibold text-foreground mb-2">GitHub</h3>
-              <a
-                href="#"
+              <a 
+                href="https://github.com/Kafle33" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-earth-gray transition-colors hover:underline"
+                data-testid="link-github-contact"
               >
                 View Projects
               </a>
             </div>
             <div className="text-center card-hover">
-              <div
-                className="bg-emerald-custom/10 dark:bg-emerald-custom/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 floating-animation"
-                style={{ animationDelay: "1.5s" }}
-              >
+              <div className="bg-emerald-custom/10 dark:bg-emerald-custom/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 floating-animation" style={{ animationDelay: '1.5s' }}>
                 <i className="fab fa-linkedin text-2xl text-emerald-custom"></i>
               </div>
               <h3 className="font-semibold text-foreground mb-2">LinkedIn</h3>
-              <a
-                href="#"
+              <a 
+                href="https://www.linkedin.com/in/roshan-kafle-908101277/" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-emerald-custom transition-colors hover:underline"
+                data-testid="link-linkedin-contact"
               >
                 Connect
               </a>
@@ -802,34 +766,149 @@ export default function Home() {
               Geospatial Engineer | WebGIS & Backend Developer
             </p>
             <div className="flex justify-center space-x-6 mb-8">
-              <a
-                href="#"
-                className="text-primary-foreground/60 hover:text-white transition-all duration-300 transform hover:scale-110"
-              >
+              <a href="https://github.com/Kafle33" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/60 hover:text-white transition-all duration-300 transform hover:scale-110" data-testid="link-github-footer">
                 <i className="fab fa-github text-2xl"></i>
               </a>
-              <a
-                href="#"
-                className="text-primary-foreground/60 hover:text-white transition-all duration-300 transform hover:scale-110"
-              >
+              <a href="https://www.linkedin.com/in/roshan-kafle-908101277/" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/60 hover:text-white transition-all duration-300 transform hover:scale-110" data-testid="link-linkedin-footer">
                 <i className="fab fa-linkedin text-2xl"></i>
               </a>
-              <a
-                href="mailto:roshankafle33@gmail.com"
-                className="text-primary-foreground/60 hover:text-white transition-all duration-300 transform hover:scale-110"
-              >
+              <a href="mailto:roshankafle33@gmail.com" className="text-primary-foreground/60 hover:text-white transition-all duration-300 transform hover:scale-110" data-testid="link-email-footer">
                 <i className="fas fa-envelope text-2xl"></i>
               </a>
             </div>
             <div className="border-t border-primary-foreground/20 pt-6">
               <p className="text-primary-foreground/60 text-sm flex items-center justify-center">
-                <i className="fas fa-map-pin mr-2"></i>© 2024 Roshan Kafle. All
-                rights reserved. | Pokhara, Nepal
+                <i className="fas fa-map-pin mr-2"></i>
+                © 2024 Roshan Kafle. All rights reserved. | Pokhara, Nepal
               </p>
             </div>
           </div>
         </div>
       </footer>
+
+      {/* Details Dialog */}
+      <Dialog open={selectedItem !== null} onOpenChange={(open) => !open && setSelectedItem(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-foreground flex items-center">
+              <i className="fas fa-info-circle mr-3 text-primary"></i>
+              {selectedItem?.title}
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              {selectedItem?.description}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Image Carousel */}
+            <div className="relative rounded-lg overflow-hidden group">
+              <img 
+                src={selectedItem?.images[currentImageIndex]}
+                alt={`${selectedItem?.title} - Image ${currentImageIndex + 1}`}
+                className="w-full h-80 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+              
+              {/* Navigation Buttons */}
+              {selectedItem && selectedItem.images.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setCurrentImageIndex((prev) => 
+                      prev === 0 ? selectedItem.images.length - 1 : prev - 1
+                    )}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm hover:bg-background/95 text-foreground p-3 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100"
+                    data-testid="button-prev-image"
+                  >
+                    <i className="fas fa-chevron-left"></i>
+                  </button>
+                  <button
+                    onClick={() => setCurrentImageIndex((prev) => 
+                      prev === selectedItem.images.length - 1 ? 0 : prev + 1
+                    )}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm hover:bg-background/95 text-foreground p-3 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100"
+                    data-testid="button-next-image"
+                  >
+                    <i className="fas fa-chevron-right"></i>
+                  </button>
+                  
+                  {/* Image Counter */}
+                  <div className="absolute bottom-4 right-4 bg-background/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-foreground">
+                    <i className="fas fa-images mr-2"></i>
+                    {currentImageIndex + 1} / {selectedItem.images.length}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Thumbnail Navigation */}
+            {selectedItem && selectedItem.images.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {selectedItem.images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentImageIndex(idx)}
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${
+                      idx === currentImageIndex 
+                        ? 'border-primary ring-2 ring-primary/50' 
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                    data-testid={`thumbnail-${idx}`}
+                  >
+                    <img 
+                      src={img}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Detailed Information */}
+            <div>
+              <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+                <i className="fas fa-list-ul mr-2 text-accent"></i>
+                Key Highlights
+              </h3>
+              <ul className="space-y-2">
+                {selectedItem?.details.map((detail, index) => (
+                  <li key={index} className="flex items-start text-muted-foreground">
+                    <i className="fas fa-check-circle text-emerald-custom mr-3 mt-1 flex-shrink-0"></i>
+                    <span>{detail}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Technologies Used */}
+            <div>
+              <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+                <i className="fas fa-tools mr-2 text-primary"></i>
+                Technologies Used
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {selectedItem?.technologies.map((tech, index) => {
+                  const colors = [
+                    'bg-primary/20 text-primary',
+                    'bg-accent/20 text-accent',
+                    'bg-emerald-custom/20 text-emerald-custom',
+                    'bg-purple-600/20 text-purple-600',
+                    'bg-earth-gray/20 text-earth-gray'
+                  ];
+                  return (
+                    <span 
+                      key={index}
+                      className={`${colors[index % colors.length]} px-4 py-2 rounded-full text-sm font-medium`}
+                    >
+                      {tech}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
