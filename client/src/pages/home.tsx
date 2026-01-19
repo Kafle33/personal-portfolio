@@ -855,7 +855,7 @@ export default function Home() {
 
       {/* Details Dialog */}
       <Dialog open={selectedItem !== null} onOpenChange={(open) => !open && setSelectedItem(null)}>
-        <DialogContent className="max-w-6xl h-[85vh] p-0 gap-0 bg-card border-border overflow-hidden flex flex-col md:grid md:grid-cols-[1.2fr_0.8fr]">
+        <DialogContent className="max-w-6xl h-[85vh] p-0 gap-0 bg-card border-border overflow-hidden flex flex-col md:grid md:grid-cols-2">
 
           {/* Left Column: Images (Fixed) */}
           <div className="relative h-[40vh] md:h-full bg-black/5 dark:bg-black/20 flex flex-col justify-center p-4 md:p-6 order-1 border-b md:border-b-0 md:border-r border-border/50">
@@ -937,7 +937,7 @@ export default function Home() {
           </div>
 
           {/* Right Column: Details (Scrollable) */}
-          <div className="flex flex-col h-full overflow-y-auto p-6 md:p-8 order-2 bg-card">
+          <div className="flex flex-col h-full overflow-y-auto p-6 order-2 bg-card">
             <DialogHeader className="p-0 mb-6 text-left">
               <DialogTitle className="text-2xl md:text-3xl font-bold text-foreground flex items-start gap-3">
                 <i className="fas fa-info-circle mt-1 text-primary shrink-0"></i>
@@ -945,14 +945,14 @@ export default function Home() {
               </DialogTitle>
             </DialogHeader>
 
-            <div className="space-y-8">
+            <div className="space-y-6">
               {/* Description */}
               <div>
                 <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
                   <i className="fas fa-align-left mr-2 text-primary"></i>
                   Overview
                 </h3>
-                <DialogDescription className="text-muted-foreground text-base leading-relaxed">
+                <DialogDescription className="text-foreground/90 text-base leading-relaxed">
                   {selectedItem?.description}
                 </DialogDescription>
               </div>
