@@ -12,6 +12,10 @@ import RoshanImg from "../assets/roshan.png"
 import precision1 from '../assets/precision_agriculture1.png';
 import precision2 from '../assets/precision_agriculture2.png';
 import precision3 from '../assets/precision_agriculture3.png';
+import khaderi1 from '../assets/khaderi_alert1.png';
+import khaderi2 from '../assets/khaderi_alert2.png';
+import khaderi3 from '../assets/khaderi_alert3.png';
+import khaderi4 from '../assets/khaderi_alert4.png';
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
@@ -91,9 +95,10 @@ export default function Home() {
       title: "Khaderi-Alert (Drought Monitoring System)",
       description: "Automated drought early warning system using SPI and SPEI indices for agricultural risk assessment across Nepal.",
       images: [
-        "https://images.unsplash.com/photo-1592861956120-e524fc739696?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
-        "https://images.unsplash.com/photo-1534389668058-9a88c37f2a79?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
-        "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
+        khaderi1,
+        khaderi2,
+        khaderi3,
+        khaderi4
       ],
       details: [
         "Developed automated drought monitoring system processing 20+ years of precipitation and evapotranspiration data",
