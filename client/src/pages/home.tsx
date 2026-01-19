@@ -69,19 +69,19 @@ export default function Home() {
       period: "Dec 2023 - Present",
       description: "International Earth Observation Platform - Backend Developer for real-time geospatial data processing and visualization.",
       images: [
+        randomForest,
+        randomForestSanky,
+        volume
         heatmap,
+        terrain,
         magicWand,
         multispec,
         multispec2,
         polygonSplits,
-        randomForest,
-        randomForestSanky,
         rasterStats,
         rasterStats2,
         satelliteBandCombo,
-        terrain,
         vectorStats,
-        volume
       ],
       details: [
         "Built high-performance backend for Cloud Optimized GeoTIFF (COG) processing and real-time visualization using FastAPI and AWS S3",
