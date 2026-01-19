@@ -60,19 +60,18 @@ export default function Home() {
         "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
       ],
       details: [
-        "Architected and deployed WebGIS applications using React, Django, and GeoServer for multi-client geospatial data platforms",
-        "Developed Docker-based microservices for Earth observation data processing, integrating Sentinel-2 and UAV imagery pipelines",
-        "Implemented GeoAI solutions for automated land classification using Random Forest and pixel-based analysis on raster datasets",
-        "Optimized PostGIS spatial queries and GeoServer tile services, reducing response times by 60% for large-scale datasets",
-        "Collaborated on international projects including HOT's FMTM and digital addressing initiatives across Nepal"
+        "01F 539 Khaderi-Alert (Drought Monitoring System): Integrated multi-source Earth Observation and meteorological data for real-time drought modeling; developed modular systems for drought severity assessment, hotspot mapping, and risk ranking; created interactive Web-GIS platform with real-time alerts.",
+        "01F 539 AI & Urban Planning Analyst – DMAPS: Used AI and EO data to digitize urban landscapes and generate spatial models; engineered backend systems using PostGIS and GIST indexing; developed geospatial tools for sustainable urban planning including Janakpur (8,932 buildings) and Bheemdatta (36,139 buildings).",
+        "01F 539 FMTM-HOTSOM (Open Source Contribution): Integrated geospatial data using Python and PostGIS; collaborated with international teams to improve system usability, reliability, and scalability for urban and disaster mapping.",
+        "Website: https://naxa.com.np"
       ],
       technologies: ["WebGIS", "Django", "FastAPI", "GeoServer", "PostGIS", "Docker", "AWS", "GeoAI", "React"]
     },
     {
       id: "geonadir",
-      title: "GeoNadir",
-      period: "Dec 2023 - Present",
-      description: "International Earth Observation Platform - Backend Developer for real-time geospatial data processing and visualization.",
+      title: "GeoNadir – Queensland, Australia",
+      period: "1 Jan 2024 – Current",
+      description: "Integrated Copernicus satellite data in GeoNadir’s drone mapping platform for a globally accessible EO system.",
       images: [
         randomForest,
         randomForestSanky,
@@ -89,11 +88,12 @@ export default function Home() {
         vectorStats,
       ],
       details: [
-        "Built high-performance backend for Cloud Optimized GeoTIFF (COG) processing and real-time visualization using FastAPI and AWS S3",
-        "Integrated WebSocket infrastructure for live UAV data streaming and terrain model updates across distributed clients",
-        "Developed DEM/DTM processing pipeline with GDAL for slope analysis, hillshade generation, and 3D terrain rendering",
-        "Implemented Celery-based task queue for asynchronous processing of large-scale satellite and drone imagery",
-        "Collaborated with international team on Copernicus data integration and multi-spectral analysis workflows"
+        "Applied AI-based classification using Object-Based and Pixel-Based Image Analysis for precise land cover mapping.",
+        "Developed features using zero-shot image segmentation (Segment Anything Model & Grounding DINO) to digitize features.",
+        "Predicted feature density in Sentinel-2 imagery using heatmaps and linear regression.",
+        "Performed geospatial processing and analysis on AWS (S3, EC2, Lambda, RDS) ensuring scalability and secure data handling.",
+        "Supported FAIR data mission by enabling scalable, interoperable drone-to-satellite datasets with open access and reproducible pipelines.",
+        "Website: https://geonadir.com/"
       ],
       technologies: ["FastAPI", "WebSocket", "COG", "AWS S3", "Docker", "GDAL", "Celery", "DEM/DTM", "UAV Processing"]
     }
@@ -102,19 +102,18 @@ export default function Home() {
   const projectsData = [
     {
       id: "precision-farming",
-      title: "Precision Agriculture AI (Tomato Nutrient Classification)",
-      description: "Deep learning-based nutrient deficiency detection system achieving 92% accuracy, enabling data-driven fertilizer management for farmers.",
+      title: "Precision Agriculture",
+      period: "1 May 2022 – 3 Apr 2023",
+      description: "Developed an image classification model using TensorFlow and MobileNetV2 to detect nutrient deficiencies in tomato leaves, trained with 1,500+ labeled images.",
       images: [
         precision1,
         precision2,
         precision3
       ],
       details: [
-        "Developed CNN-based deep learning model achieving 92% accuracy in classifying nitrogen, phosphorus, and potassium deficiencies in tomato leaves",
-        "Curated and annotated custom dataset of 2000+ tomato leaf images representing various nutrient stress conditions",
-        "Built production-ready Flask web application with Docker deployment for real-time image classification",
-        "Implemented fertilizer recommendation engine with dosage calculations based on deficiency severity",
-        "Reduced fertilizer waste by 30% through targeted nutrient management in pilot farms"
+        "Used transfer learning, CNNs, and dropout layers to enhance model performance and reduce overfitting.",
+        "Model deployed for real-world smart agriculture applications.",
+        "GitHub link: https://github.com/Kafle33/fastapi-tomato-classifier"
       ],
       technologies: ["TensorFlow", "CNN", "Flask", "Docker", "Computer Vision", "OpenCV", "NumPy"]
     },
