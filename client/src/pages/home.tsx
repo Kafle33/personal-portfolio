@@ -353,10 +353,10 @@ export default function Home() {
                 <div className="flex items-center space-x-3 hover:translate-x-1 transition-transform duration-300">
                   <i className="fas fa-phone text-lg text-green-300"></i>
                   <a
-                    href="tel:+9779806520880"
+                    href="tel:+9779766453290"
                     className="text-white hover:text-green-200 transition-colors hover:underline drop-shadow-lg"
                   >
-                    +977 9806520880
+                    +977 9766453290
                   </a>
                 </div>
               </div>
@@ -923,10 +923,10 @@ export default function Home() {
               </div>
               <h3 className="font-semibold text-foreground mb-2">Phone</h3>
               <a
-                href="tel:+9779806520880"
+                href="tel:+9779766453290"
                 className="text-muted-foreground hover:text-accent transition-colors hover:underline"
               >
-                +977 9806520880
+                +977 9766453290
               </a>
             </div>
             <div className="text-center card-hover">
