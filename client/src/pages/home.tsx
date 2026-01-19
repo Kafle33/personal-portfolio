@@ -60,9 +60,9 @@ export default function Home() {
         "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
       ],
       details: [
-        "01F 539 Khaderi-Alert (Drought Monitoring System): Integrated multi-source Earth Observation and meteorological data for real-time drought modeling; developed modular systems for drought severity assessment, hotspot mapping, and risk ranking; created interactive Web-GIS platform with real-time alerts.",
-        "01F 539 AI & Urban Planning Analyst – DMAPS: Used AI and EO data to digitize urban landscapes and generate spatial models; engineered backend systems using PostGIS and GIST indexing; developed geospatial tools for sustainable urban planning including Janakpur (8,932 buildings) and Bheemdatta (36,139 buildings).",
-        "01F 539 FMTM-HOTSOM (Open Source Contribution): Integrated geospatial data using Python and PostGIS; collaborated with international teams to improve system usability, reliability, and scalability for urban and disaster mapping.",
+        "Khaderi-Alert (Drought Monitoring System): Integrated multi-source Earth Observation and meteorological data for real-time drought modeling; developed modular systems for drought severity assessment, hotspot mapping, and risk ranking; created interactive Web-GIS platform with real-time alerts.",
+        "AI & Urban Planning Analyst – DMAPS: Used AI and EO data to digitize urban landscapes and generate spatial models; engineered backend systems using PostGIS and GIST indexing; developed geospatial tools for sustainable urban planning including Janakpur (8,932 buildings) and Bheemdatta (36,139 buildings).",
+        "FMTM-HOTSOM (Open Source Contribution): Integrated geospatial data using Python and PostGIS; collaborated with international teams to improve system usability, reliability, and scalability for urban and disaster mapping.",
         "Website: https://naxa.com.np"
       ],
       technologies: ["WebGIS", "Django", "FastAPI", "GeoServer", "PostGIS", "Docker", "AWS", "GeoAI", "React"]
