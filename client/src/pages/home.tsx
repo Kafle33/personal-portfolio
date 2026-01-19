@@ -131,7 +131,7 @@ export default function Home() {
         "Integrated multi-source Earth Observation and meteorological data for real-time drought modeling.",
         "Developed modular systems for drought severity assessment, hotspot mapping, and risk ranking.",
         "Created interactive Web-GIS platform with real-time alerts.",
-        "Website: https://naxa.com.np"
+        "Website: https://khaderi.anticipatoryaction.org/"
       ],
       technologies: ["Python", "GeoPandas", "PostGIS", "Django", "Leaflet", "AWS", "Time-Series Analysis"]
     },
@@ -148,7 +148,7 @@ export default function Home() {
         "Used AI and EO data to digitize urban landscapes and generate spatial models.",
         "Engineered backend systems using PostGIS and GIST indexing.",
         "Developed geospatial tools for sustainable urban planning including Janakpur (8,932 buildings) and Bheemdatta (36,139 buildings).",
-        "Website: https://naxa.com.np"
+        "Website: https://dmaps.org/"
       ],
       technologies: ["GeoAI", "Random Forest", "Sentinel-2", "FastAPI", "GDAL", "PostGIS", "React", "Celery"]
     },
@@ -164,7 +164,7 @@ export default function Home() {
       details: [
         "Integrated geospatial data using Python and PostGIS.",
         "Collaborated with international teams to improve system usability, reliability, and scalability for urban and disaster mapping.",
-        "Website: https://naxa.com.np"
+        "Website: https://fmtm.hotosm.org/"
       ],
       technologies: ["FastAPI", "PostGIS", "OpenStreetMap", "ODK", "Docker", "PostgreSQL", "Python"]
     },
