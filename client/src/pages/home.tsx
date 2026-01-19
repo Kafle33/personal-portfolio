@@ -31,6 +31,9 @@ import terrain from '../assets/terrain.gif';
 import vectorStats from '../assets/vector_stats.gif';
 import volume from '../assets/volume.gif';
 import CV from '../assets/CV.pdf';
+import dmsps1 from '../assets/dmaps1.png';
+import dmaps2 from '../assets/dmaps2.png';
+import dmaps3 from '../assets/dmaps3.png';
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
@@ -139,9 +142,9 @@ export default function Home() {
       title: "DMAPS (AI & Urban Planning Analyst)",
       description: "Geospatial AI platform for urban analytics using machine learning on satellite imagery and cadastral data.",
       images: [
-        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
-        "https://images.unsplash.com/photo-1573164574472-797cdf4a583a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
-        "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
+        dmsps1,
+        dmaps2,
+        dmaps3
       ],
       details: [
         "Developed AI-powered urban planning analysis tool integrating Sentinel-2 satellite imagery with municipal cadastral data",
