@@ -286,7 +286,7 @@ export default function Home() {
                   href={CV}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-left py-2 transition-all duration-300 hover:scale-105 text-muted-foreground hover:text-primary font-medium"
+                  className="px-4 py-2 rounded-full bg-emerald-custom text-white hover:bg-emerald-600 transition-all duration-300 font-medium text-left flex items-center justify-start"
                 >
                   View CV
                 </a>
