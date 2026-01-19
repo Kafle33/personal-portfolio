@@ -778,18 +778,115 @@ export default function Home() {
             })}
 
             {/* Achievements */}
-            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl border-l-4 border-yellow-400 h-fit">
-              <h4 className="text-xl font-bold text-gray-900 mb-4">Achievements & Certifications</h4>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-start">
-                  <i className="fas fa-award text-yellow-500 mr-3 mt-1"></i>
-                  Merit-based Scholarship for Bachelors in Geomatics Engineering
-                </li>
-                <li className="flex items-start">
-                  <i className="fas fa-certificate text-blue-500 mr-3 mt-1"></i>
-                  Trainings in GNSS, DGPS, LiDAR (University of Tokyo & CSSGS)
-                </li>
-              </ul>
+          </div>
+
+          <div className="mt-20">
+            <div className="text-center mb-12">
+              <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-4">
+                <i className="fas fa-award mr-3 text-yellow-500"></i>
+                Achievements & Certifications
+              </h3>
+              <div className="w-24 h-1 bg-yellow-500 mx-auto rounded"></div>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                {
+                  id: "scholarship",
+                  title: "Merit-based Scholarship",
+                  issuer: "Tribhuvan University",
+                  date: "2019",
+                  description: "Awarded full merit-based scholarship for Bachelors in Geomatics Engineering, recognizing academic excellence.",
+                  image: "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=800&q=80",
+                  tags: ["Academic", "Engineering"],
+                  details: [
+                    "Ranked top 5% in entrance examination",
+                    "Full tuition waiver for 4 years",
+                    "Consistently maintained high GPA"
+                  ]
+                },
+                {
+                  id: "training-gnss",
+                  title: "Advanced GNSS & LiDAR Training",
+                  issuer: "University of Tokyo & CSSGS",
+                  date: "2022",
+                  description: "Specialized training in Global Navigation Satellite Systems, DGPS, and LiDAR data processing technologies.",
+                  image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=800&q=80",
+                  tags: ["Technical", "Geospatial"],
+                  details: [
+                    "Hands-on training with high-precision GNSS receivers",
+                    "LiDAR point cloud processing and classification",
+                    "DGPS surveying techniques for centimeter-level accuracy"
+                  ]
+                },
+                {
+                  id: "leadership-club",
+                  title: "Geomatics Engineering Society",
+                  issuer: "Executive Member",
+                  date: "2021-2022",
+                  description: "Served as an executive member, organizing technical workshops and geospatial hackathons.",
+                  image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80",
+                  tags: ["Leadership", "Community"],
+                  details: [
+                    "Organized 'Geo-Hackathon' with 100+ participants",
+                    "Coordinated technical workshops on QGIS and Python",
+                    "Led a team of 10 volunteers for annual mapping event"
+                  ]
+                }
+              ].map((achievement) => (
+                <motion.div
+                  key={achievement.id}
+                  whileHover={{ y: -5 }}
+                  className="group cursor-pointer bg-card dark:bg-card rounded-xl overflow-hidden border border-border hover:border-yellow-500/50 shadow-sm hover:shadow-xl transition-all duration-300"
+                  onClick={() => setSelectedItem({
+                    ...achievement,
+                    images: [achievement.image],
+                    technologies: achievement.tags
+                  })}
+                >
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={achievement.image}
+                      alt={achievement.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300"></div>
+
+                    <div className="absolute top-3 right-3 flex gap-2">
+                      {achievement.tags.map((tag, i) => (
+                        <span key={i} className="px-2 py-1 rounded-full text-xs font-medium bg-black/50 backdrop-blur-sm text-white border border-white/20">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="text-lg font-bold text-foreground group-hover:text-yellow-500 transition-colors">
+                        {achievement.title}
+                      </h4>
+                    </div>
+
+                    <div className="flex items-center text-xs text-muted-foreground mb-3">
+                      <i className="fas fa-university mr-1.5"></i>
+                      <span>{achievement.issuer}</span>
+                      <span className="mx-2">•</span>
+                      <i className="fas fa-calendar-alt mr-1.5"></i>
+                      <span>{achievement.date}</span>
+                    </div>
+
+                    <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
+                      {achievement.description}
+                    </p>
+
+                    <div className="flex items-center text-yellow-500 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
+                      <span>View Details</span>
+                      <i className="fas fa-arrow-right ml-2"></i>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>
