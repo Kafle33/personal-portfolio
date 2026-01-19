@@ -855,143 +855,148 @@ export default function Home() {
 
       {/* Details Dialog */}
       <Dialog open={selectedItem !== null} onOpenChange={(open) => !open && setSelectedItem(null)}>
-        <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto p-0 gap-0 bg-card border-border">
-          <DialogHeader className="p-6 pb-2">
-            <DialogTitle className="text-2xl font-bold text-foreground flex items-center">
-              <i className="fas fa-info-circle mr-3 text-primary"></i>
-              {selectedItem?.title}
-            </DialogTitle>
-          </DialogHeader>
+        <DialogContent className="max-w-6xl h-[85vh] p-0 gap-0 bg-card border-border overflow-hidden flex flex-col md:grid md:grid-cols-[1.2fr_0.8fr]">
 
-          <div className="space-y-6 p-6 pt-2">
-            {/* Image Carousel */}
-            <div className="relative rounded-xl overflow-hidden group bg-black/5 dark:bg-black/20 border border-border/50 aspect-video flex items-center justify-center">
-              <AnimatePresence mode="wait">
-                <motion.img
-                  key={currentImageIndex}
-                  src={selectedItem?.images[currentImageIndex]}
-                  alt={`${selectedItem?.title} - Image ${currentImageIndex + 1}`}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.05 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="w-full h-full object-contain max-h-[60vh]"
-                />
-              </AnimatePresence>
+          {/* Left Column: Images (Fixed) */}
+          <div className="relative h-[40vh] md:h-full bg-black/5 dark:bg-black/20 flex flex-col justify-center p-4 md:p-6 order-1 border-b md:border-b-0 md:border-r border-border/50">
+            <div className="relative w-full h-full flex flex-col justify-center group">
+              {/* Main Image */}
+              <div className="relative flex-1 min-h-0 flex items-center justify-center w-full">
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={currentImageIndex}
+                    src={selectedItem?.images[currentImageIndex]}
+                    alt={`${selectedItem?.title} - Image ${currentImageIndex + 1}`}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.05 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                    className="w-full h-full object-contain max-h-full"
+                  />
+                </AnimatePresence>
 
-              {/* Navigation Buttons */}
+                {/* Navigation Buttons */}
+                {selectedItem && selectedItem.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setCurrentImageIndex((prev) =>
+                        prev === 0 ? selectedItem.images.length - 1 : prev - 1
+                      )}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-md hover:bg-primary hover:text-primary-foreground text-foreground p-3 rounded-full transition-all duration-300 shadow-lg border border-border/50 group-hover:opacity-100 opacity-0 translate-x-[-10px] group-hover:translate-x-0"
+                      data-testid="button-prev-image"
+                    >
+                      <i className="fas fa-chevron-left text-lg"></i>
+                    </button>
+                    <button
+                      onClick={() => setCurrentImageIndex((prev) =>
+                        prev === selectedItem.images.length - 1 ? 0 : prev + 1
+                      )}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-md hover:bg-primary hover:text-primary-foreground text-foreground p-3 rounded-full transition-all duration-300 shadow-lg border border-border/50 group-hover:opacity-100 opacity-0 translate-x-[10px] group-hover:translate-x-0"
+                      data-testid="button-next-image"
+                    >
+                      <i className="fas fa-chevron-right text-lg"></i>
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* Thumbnails */}
               {selectedItem && selectedItem.images.length > 1 && (
-                <>
-                  <button
-                    onClick={() => setCurrentImageIndex((prev) =>
-                      prev === 0 ? selectedItem.images.length - 1 : prev - 1
-                    )}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-md hover:bg-primary hover:text-primary-foreground text-foreground p-3 rounded-full transition-all duration-300 shadow-lg border border-border/50 group-hover:opacity-100 opacity-0 translate-x-[-10px] group-hover:translate-x-0"
-                    data-testid="button-prev-image"
-                  >
-                    <i className="fas fa-chevron-left text-lg"></i>
-                  </button>
-                  <button
-                    onClick={() => setCurrentImageIndex((prev) =>
-                      prev === selectedItem.images.length - 1 ? 0 : prev + 1
-                    )}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-md hover:bg-primary hover:text-primary-foreground text-foreground p-3 rounded-full transition-all duration-300 shadow-lg border border-border/50 group-hover:opacity-100 opacity-0 translate-x-[10px] group-hover:translate-x-0"
-                    data-testid="button-next-image"
-                  >
-                    <i className="fas fa-chevron-right text-lg"></i>
-                  </button>
+                <div className="mt-4 flex gap-3 overflow-x-auto pb-2 px-1 scrollbar-hide justify-center shrink-0">
+                  {selectedItem.images.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentImageIndex(idx)}
+                      className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 bg-muted/30 relative ${idx === currentImageIndex
+                        ? 'border-primary ring-2 ring-primary/30 scale-105 shadow-md'
+                        : 'border-transparent hover:border-primary/50 opacity-70 hover:opacity-100'
+                        }`}
+                      data-testid={`thumbnail-${idx}`}
+                    >
+                      <img
+                        src={img}
+                        alt={`Thumbnail ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      {idx === currentImageIndex && (
+                        <div className="absolute inset-0 bg-primary/10"></div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
 
-                  {/* Image Counter */}
-                  <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-medium text-white border border-white/10 shadow-lg">
-                    <i className="fas fa-images mr-2 text-primary"></i>
-                    {currentImageIndex + 1} / {selectedItem.images.length}
-                  </div>
-                </>
+              {/* Image Counter */}
+              {selectedItem && selectedItem.images.length > 1 && (
+                <div className="absolute top-4 right-4 bg-black/70 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium text-white border border-white/10 shadow-lg">
+                  <i className="fas fa-images mr-2 text-primary"></i>
+                  {currentImageIndex + 1} / {selectedItem.images.length}
+                </div>
               )}
             </div>
+          </div>
 
-            {/* Thumbnail Navigation */}
-            {selectedItem && selectedItem.images.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pb-2 px-1 scrollbar-hide justify-center">
-                {selectedItem.images.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentImageIndex(idx)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 bg-muted/30 relative ${idx === currentImageIndex
-                      ? 'border-primary ring-2 ring-primary/30 scale-105 shadow-md'
-                      : 'border-transparent hover:border-primary/50 opacity-70 hover:opacity-100'
-                      }`}
-                    data-testid={`thumbnail-${idx}`}
-                  >
-                    <img
-                      src={img}
-                      alt={`Thumbnail ${idx + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                    {idx === currentImageIndex && (
-                      <div className="absolute inset-0 bg-primary/10"></div>
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Right Column: Details (Scrollable) */}
+          <div className="flex flex-col h-full overflow-y-auto p-6 md:p-8 order-2 bg-card">
+            <DialogHeader className="p-0 mb-6 text-left">
+              <DialogTitle className="text-2xl md:text-3xl font-bold text-foreground flex items-start gap-3">
+                <i className="fas fa-info-circle mt-1 text-primary shrink-0"></i>
+                {selectedItem?.title}
+              </DialogTitle>
+            </DialogHeader>
 
-            <div className="grid md:grid-cols-3 gap-8 mt-6">
-              <div className="md:col-span-2 space-y-6">
-                {/* Description */}
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2 flex items-center">
-                    <i className="fas fa-align-left mr-2 text-primary"></i>
-                    Overview
-                  </h3>
-                  <DialogDescription className="text-muted-foreground text-base leading-relaxed">
-                    {selectedItem?.description}
-                  </DialogDescription>
-                </div>
-
-                {/* Detailed Information */}
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
-                    <i className="fas fa-list-ul mr-2 text-accent"></i>
-                    Key Highlights
-                  </h3>
-                  <ul className="space-y-3">
-                    {selectedItem?.details.map((detail, index) => (
-                      <li key={index} className="flex items-start text-muted-foreground group">
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-custom mr-3 group-hover:scale-125 transition-transform duration-300"></span>
-                        <span className="leading-relaxed">{detail}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+            <div className="space-y-8">
+              {/* Description */}
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+                  <i className="fas fa-align-left mr-2 text-primary"></i>
+                  Overview
+                </h3>
+                <DialogDescription className="text-muted-foreground text-base leading-relaxed">
+                  {selectedItem?.description}
+                </DialogDescription>
               </div>
 
-              <div className="space-y-6">
-                {/* Technologies Used */}
-                <div className="bg-muted/30 p-5 rounded-xl border border-border/50">
-                  <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
-                    <i className="fas fa-tools mr-2 text-primary"></i>
-                    Technologies
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedItem?.technologies.map((tech, index) => {
-                      const colors = [
-                        'bg-primary/10 text-primary border-primary/20',
-                        'bg-accent/10 text-accent border-accent/20',
-                        'bg-emerald-custom/10 text-emerald-custom border-emerald-custom/20',
-                        'bg-purple-600/10 text-purple-600 border-purple-600/20',
-                        'bg-earth-gray/10 text-earth-gray border-earth-gray/20'
-                      ];
-                      return (
-                        <span
-                          key={index}
-                          className={`${colors[index % colors.length]} px-3 py-1.5 rounded-md text-xs font-medium border transition-all hover:scale-105 cursor-default`}
-                        >
-                          {tech}
-                        </span>
-                      );
-                    })}
-                  </div>
+              {/* Detailed Information */}
+              <div>
+                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+                  <i className="fas fa-list-ul mr-2 text-accent"></i>
+                  Key Highlights
+                </h3>
+                <ul className="space-y-3">
+                  {selectedItem?.details.map((detail, index) => (
+                    <li key={index} className="flex items-start text-muted-foreground group">
+                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-custom mr-3 group-hover:scale-125 transition-transform duration-300 shrink-0"></span>
+                      <span className="leading-relaxed">{detail}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Technologies Used */}
+              <div className="bg-muted/30 p-5 rounded-xl border border-border/50">
+                <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+                  <i className="fas fa-tools mr-2 text-primary"></i>
+                  Technologies
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {selectedItem?.technologies.map((tech, index) => {
+                    const colors = [
+                      'bg-primary/10 text-primary border-primary/20',
+                      'bg-accent/10 text-accent border-accent/20',
+                      'bg-emerald-custom/10 text-emerald-custom border-emerald-custom/20',
+                      'bg-purple-600/10 text-purple-600 border-purple-600/20',
+                      'bg-earth-gray/10 text-earth-gray border-earth-gray/20'
+                    ];
+                    return (
+                      <span
+                        key={index}
+                        className={`${colors[index % colors.length]} px-3 py-1.5 rounded-md text-xs font-medium border transition-all hover:scale-105 cursor-default`}
+                      >
+                        {tech}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             </div>
