@@ -120,7 +120,7 @@ export default function Home() {
     {
       id: "khaderi-alert",
       title: "Khaderi-Alert (Drought Monitoring System)",
-      description: "Automated drought early warning system using SPI and SPEI indices for agricultural risk assessment across Nepal.",
+      description: "Integrated multi-source Earth Observation and meteorological data for real-time drought modeling; developed modular systems for drought severity assessment, hotspot mapping, and risk ranking.",
       images: [
         khaderi1,
         khaderi2,
@@ -128,47 +128,43 @@ export default function Home() {
         khaderi4
       ],
       details: [
-        "Developed automated drought monitoring system processing 20+ years of precipitation and evapotranspiration data",
-        "Implemented Standardized Precipitation Index (SPI) and SPEI calculations using Python and GeoPandas for district-level analysis",
-        "Built WebGIS dashboard with interactive maps showing drought severity classifications across agricultural zones",
-        "Integrated automated alert system for stakeholders when drought thresholds are exceeded",
-        "Deployed on AWS with PostGIS database for temporal-spatial drought pattern analysis"
+        "Integrated multi-source Earth Observation and meteorological data for real-time drought modeling.",
+        "Developed modular systems for drought severity assessment, hotspot mapping, and risk ranking.",
+        "Created interactive Web-GIS platform with real-time alerts.",
+        "Website: https://naxa.com.np"
       ],
       technologies: ["Python", "GeoPandas", "PostGIS", "Django", "Leaflet", "AWS", "Time-Series Analysis"]
     },
     {
       id: "dmaps",
       title: "DMAPS (AI & Urban Planning Analyst)",
-      description: "Geospatial AI platform for urban analytics using machine learning on satellite imagery and cadastral data.",
+      description: "Used AI and EO data to digitize urban landscapes and generate spatial models; engineered backend systems using PostGIS and GIST indexing.",
       images: [
         dmsps1,
         dmaps2,
         dmaps3
       ],
       details: [
-        "Developed AI-powered urban planning analysis tool integrating Sentinel-2 satellite imagery with municipal cadastral data",
-        "Implemented Random Forest classifier for automated land use classification achieving 87% accuracy across 8 urban categories",
-        "Built FastAPI backend processing 50+ GB of raster data using GDAL and distributed computing with Celery",
-        "Created interactive WebGIS interface for urban planners to visualize growth patterns and infrastructure gaps",
-        "Contributed to evidence-based urban policy decisions for 5+ municipalities in Nepal"
+        "Used AI and EO data to digitize urban landscapes and generate spatial models.",
+        "Engineered backend systems using PostGIS and GIST indexing.",
+        "Developed geospatial tools for sustainable urban planning including Janakpur (8,932 buildings) and Bheemdatta (36,139 buildings).",
+        "Website: https://naxa.com.np"
       ],
       technologies: ["GeoAI", "Random Forest", "Sentinel-2", "FastAPI", "GDAL", "PostGIS", "React", "Celery"]
     },
     {
       id: "fmtm-hotosm",
-      title: "FMTM - Field Mapping Tasking Manager (HOT)",
-      description: "Contribution to Humanitarian OpenStreetMap Team's field mapping coordination platform for disaster response and development.",
+      title: "FMTM-HOTSOM (Open Source Contribution)",
+      description: "Integrated geospatial data using Python and PostGIS; collaborated with international teams to improve system usability, reliability, and scalability.",
       images: [
         "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
         "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
         "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
       ],
       details: [
-        "Contributed to HOT's open-source FMTM project for coordinating field data collection across multiple mappers",
-        "Developed backend features for task assignment, validation workflows, and data sync with OpenStreetMap using FastAPI",
-        "Implemented offline-first mobile data collection integration with ODK (Open Data Kit) forms",
-        "Optimized PostGIS queries for spatial task grid generation reducing API response time by 40%",
-        "Collaborated with international contributors on GitHub, participating in code reviews and documentation"
+        "Integrated geospatial data using Python and PostGIS.",
+        "Collaborated with international teams to improve system usability, reliability, and scalability for urban and disaster mapping.",
+        "Website: https://naxa.com.np"
       ],
       technologies: ["FastAPI", "PostGIS", "OpenStreetMap", "ODK", "Docker", "PostgreSQL", "Python"]
     },
