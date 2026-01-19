@@ -30,6 +30,7 @@ import satelliteBandCombo from '../assets/satellite_band_combo.jpeg';
 import terrain from '../assets/terrain.gif';
 import vectorStats from '../assets/vector_stats.gif';
 import volume from '../assets/volume.gif';
+import CV from '../assets/CV.pdf';
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
@@ -244,6 +245,14 @@ export default function Home() {
                   {item.label}
                 </button>
               ))}
+              <a
+                href={CV}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 font-medium text-sm border border-primary/20 hover:border-primary"
+              >
+                CV
+              </a>
             </div>
             <div className="md:hidden flex items-center">
               <button
@@ -270,6 +279,14 @@ export default function Home() {
                     {item.label}
                   </button>
                 ))}
+                <a
+                  href={CV}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-left py-2 transition-all duration-300 hover:scale-105 text-muted-foreground hover:text-primary font-medium"
+                >
+                  View CV
+                </a>
               </div>
             </div>
           )}
@@ -367,6 +384,37 @@ export default function Home() {
                   <i className="fab fa-linkedin"></i>
                   <span>LinkedIn</span>
                 </a>
+              </div>
+
+              {/* CV Actions */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-white/10">
+                <a
+                  href={CV}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group bg-emerald-custom text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-600 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-emerald-500/20 transform hover:-translate-y-0.5"
+                  data-testid="btn-view-cv"
+                >
+                  <i className="fas fa-eye group-hover:scale-110 transition-transform"></i>
+                  <span>View CV</span>
+                </a>
+                <a
+                  href={CV}
+                  download="Roshan_Kafle_CV.pdf"
+                  className="group bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/20 transition-all duration-300 flex items-center justify-center space-x-2 border border-white/20 hover:border-white/40 shadow-lg transform hover:-translate-y-0.5"
+                  data-testid="btn-download-cv"
+                >
+                  <i className="fas fa-download group-hover:translate-y-1 transition-transform"></i>
+                  <span>Download</span>
+                </a>
+                <div className="hidden sm:flex flex-col justify-center text-xs text-white/60 font-mono ml-2">
+                  <span className="flex items-center gap-1.5">
+                    <i className="fas fa-file-pdf text-red-400"></i> PDF Format
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <i className="fas fa-clock text-blue-400"></i> Updated Jan 2026
+                  </span>
+                </div>
               </div>
             </div>
             <div className="hidden lg:block">
