@@ -16,6 +16,19 @@ import khaderi1 from '../assets/khaderi_alert1.png';
 import khaderi2 from '../assets/khaderi_alert2.png';
 import khaderi3 from '../assets/khaderi_alert3.png';
 import khaderi4 from '../assets/khaderi_alert4.png';
+import heatmap from '../assets/heatmap.gif';
+import magicWand from '../assets/magic_wand.gif';
+import multispec from '../assets/multispec.jpeg';
+import multispec2 from '../assets/multispec_2.gif';
+import polygonSplits from '../assets/polygon_splits.gif';
+import randomForest from '../assets/random_forest.gif';
+import randomForestSanky from '../assets/random_forest_sanky.gif';
+import rasterStats from '../assets/raster_stats.jpeg';
+import rasterStats2 from '../assets/raster_stats2.jpeg';
+import satelliteBandCombo from '../assets/satellite_band_combo.jpeg';
+import terrain from '../assets/terrain.gif';
+import vectorStats from '../assets/vector_stats.gif';
+import volume from '../assets/volume.gif';
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
@@ -56,9 +69,19 @@ export default function Home() {
       period: "Dec 2023 - Present",
       description: "International Earth Observation Platform - Backend Developer for real-time geospatial data processing and visualization.",
       images: [
-        "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
-        "https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
-        "https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
+        heatmap,
+        magicWand,
+        multispec,
+        multispec2,
+        polygonSplits,
+        randomForest,
+        randomForestSanky,
+        rasterStats,
+        rasterStats2,
+        satelliteBandCombo,
+        terrain,
+        vectorStats,
+        volume
       ],
       details: [
         "Built high-performance backend for Cloud Optimized GeoTIFF (COG) processing and real-time visualization using FastAPI and AWS S3",
