@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { GeospatialPreloader } from "@/components/ui/geospatial-preloader";
 import {
@@ -71,7 +72,7 @@ export default function Home() {
       images: [
         randomForest,
         randomForestSanky,
-        volume
+        volume,
         heatmap,
         terrain,
         magicWand,
@@ -168,24 +169,7 @@ export default function Home() {
       ],
       technologies: ["FastAPI", "PostGIS", "OpenStreetMap", "ODK", "Docker", "PostgreSQL", "Python"]
     },
-    {
-      id: "digital-addressing",
-      title: "Digital Addressing System (Municipal GIS)",
-      description: "Comprehensive geospatial addressing platform for smart city initiatives, integrating building registry with navigation services.",
-      images: [
-        "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
-        "https://images.unsplash.com/photo-1524661135-423995f22d0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
-        "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
-      ],
-      details: [
-        "Architected end-to-end digital house numbering system serving 50,000+ properties across multiple municipalities",
-        "Developed REST API using Django and FastAPI with PostGIS for geocoding, reverse geocoding, and spatial search",
-        "Built Progressive Web App (PWA) with React and Leaflet for field data collection and address validation",
-        "Implemented spatial indexing with R-trees achieving sub-100ms query performance for address lookups",
-        "Integrated with national logistics and emergency services improving response times by 25%"
-      ],
-      technologies: ["Django", "FastAPI", "PostGIS", "React", "Leaflet", "Docker", "PWA", "Geocoding"]
-    }
+
   ];
 
   useEffect(() => {
@@ -870,28 +854,30 @@ export default function Home() {
       </footer >
 
       {/* Details Dialog */}
-      < Dialog open={selectedItem !== null
-      } onOpenChange={(open) => !open && setSelectedItem(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+      <Dialog open={selectedItem !== null} onOpenChange={(open) => !open && setSelectedItem(null)}>
+        <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto p-0 gap-0 bg-card border-border">
+          <DialogHeader className="p-6 pb-2">
             <DialogTitle className="text-2xl font-bold text-foreground flex items-center">
               <i className="fas fa-info-circle mr-3 text-primary"></i>
               {selectedItem?.title}
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground">
-              {selectedItem?.description}
-            </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-6">
+          <div className="space-y-6 p-6 pt-2">
             {/* Image Carousel */}
-            <div className="relative rounded-lg overflow-hidden group bg-muted/30">
-              <img
-                src={selectedItem?.images[currentImageIndex]}
-                alt={`${selectedItem?.title} - Image ${currentImageIndex + 1}`}
-                className="w-full h-80 object-contain"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+            <div className="relative rounded-xl overflow-hidden group bg-black/5 dark:bg-black/20 border border-border/50 aspect-video flex items-center justify-center">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={currentImageIndex}
+                  src={selectedItem?.images[currentImageIndex]}
+                  alt={`${selectedItem?.title} - Image ${currentImageIndex + 1}`}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.05 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="w-full h-full object-contain max-h-[60vh]"
+                />
+              </AnimatePresence>
 
               {/* Navigation Buttons */}
               {selectedItem && selectedItem.images.length > 1 && (
@@ -900,24 +886,24 @@ export default function Home() {
                     onClick={() => setCurrentImageIndex((prev) =>
                       prev === 0 ? selectedItem.images.length - 1 : prev - 1
                     )}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm hover:bg-background/95 text-foreground p-3 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-md hover:bg-primary hover:text-primary-foreground text-foreground p-3 rounded-full transition-all duration-300 shadow-lg border border-border/50 group-hover:opacity-100 opacity-0 translate-x-[-10px] group-hover:translate-x-0"
                     data-testid="button-prev-image"
                   >
-                    <i className="fas fa-chevron-left"></i>
+                    <i className="fas fa-chevron-left text-lg"></i>
                   </button>
                   <button
                     onClick={() => setCurrentImageIndex((prev) =>
                       prev === selectedItem.images.length - 1 ? 0 : prev + 1
                     )}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm hover:bg-background/95 text-foreground p-3 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-md hover:bg-primary hover:text-primary-foreground text-foreground p-3 rounded-full transition-all duration-300 shadow-lg border border-border/50 group-hover:opacity-100 opacity-0 translate-x-[10px] group-hover:translate-x-0"
                     data-testid="button-next-image"
                   >
-                    <i className="fas fa-chevron-right"></i>
+                    <i className="fas fa-chevron-right text-lg"></i>
                   </button>
 
                   {/* Image Counter */}
-                  <div className="absolute bottom-4 right-4 bg-background/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-foreground">
-                    <i className="fas fa-images mr-2"></i>
+                  <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-medium text-white border border-white/10 shadow-lg">
+                    <i className="fas fa-images mr-2 text-primary"></i>
                     {currentImageIndex + 1} / {selectedItem.images.length}
                   </div>
                 </>
@@ -926,72 +912,92 @@ export default function Home() {
 
             {/* Thumbnail Navigation */}
             {selectedItem && selectedItem.images.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
+              <div className="flex gap-3 overflow-x-auto pb-2 px-1 scrollbar-hide justify-center">
                 {selectedItem.images.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentImageIndex(idx)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 bg-muted/30 ${idx === currentImageIndex
-                      ? 'border-primary ring-2 ring-primary/50'
-                      : 'border-border hover:border-primary/50'
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 bg-muted/30 relative ${idx === currentImageIndex
+                      ? 'border-primary ring-2 ring-primary/30 scale-105 shadow-md'
+                      : 'border-transparent hover:border-primary/50 opacity-70 hover:opacity-100'
                       }`}
                     data-testid={`thumbnail-${idx}`}
                   >
                     <img
                       src={img}
                       alt={`Thumbnail ${idx + 1}`}
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-cover"
                     />
+                    {idx === currentImageIndex && (
+                      <div className="absolute inset-0 bg-primary/10"></div>
+                    )}
                   </button>
                 ))}
               </div>
             )}
 
-            {/* Detailed Information */}
-            <div>
-              <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
-                <i className="fas fa-list-ul mr-2 text-accent"></i>
-                Key Highlights
-              </h3>
-              <ul className="space-y-2">
-                {selectedItem?.details.map((detail, index) => (
-                  <li key={index} className="flex items-start text-muted-foreground">
-                    <i className="fas fa-check-circle text-emerald-custom mr-3 mt-1 flex-shrink-0"></i>
-                    <span>{detail}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <div className="grid md:grid-cols-3 gap-8 mt-6">
+              <div className="md:col-span-2 space-y-6">
+                {/* Description */}
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground mb-2 flex items-center">
+                    <i className="fas fa-align-left mr-2 text-primary"></i>
+                    Overview
+                  </h3>
+                  <DialogDescription className="text-muted-foreground text-base leading-relaxed">
+                    {selectedItem?.description}
+                  </DialogDescription>
+                </div>
 
-            {/* Technologies Used */}
-            <div>
-              <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
-                <i className="fas fa-tools mr-2 text-primary"></i>
-                Technologies Used
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {selectedItem?.technologies.map((tech, index) => {
-                  const colors = [
-                    'bg-primary/20 text-primary',
-                    'bg-accent/20 text-accent',
-                    'bg-emerald-custom/20 text-emerald-custom',
-                    'bg-purple-600/20 text-purple-600',
-                    'bg-earth-gray/20 text-earth-gray'
-                  ];
-                  return (
-                    <span
-                      key={index}
-                      className={`${colors[index % colors.length]} px-4 py-2 rounded-full text-sm font-medium`}
-                    >
-                      {tech}
-                    </span>
-                  );
-                })}
+                {/* Detailed Information */}
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+                    <i className="fas fa-list-ul mr-2 text-accent"></i>
+                    Key Highlights
+                  </h3>
+                  <ul className="space-y-3">
+                    {selectedItem?.details.map((detail, index) => (
+                      <li key={index} className="flex items-start text-muted-foreground group">
+                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-custom mr-3 group-hover:scale-125 transition-transform duration-300"></span>
+                        <span className="leading-relaxed">{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {/* Technologies Used */}
+                <div className="bg-muted/30 p-5 rounded-xl border border-border/50">
+                  <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
+                    <i className="fas fa-tools mr-2 text-primary"></i>
+                    Technologies
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedItem?.technologies.map((tech, index) => {
+                      const colors = [
+                        'bg-primary/10 text-primary border-primary/20',
+                        'bg-accent/10 text-accent border-accent/20',
+                        'bg-emerald-custom/10 text-emerald-custom border-emerald-custom/20',
+                        'bg-purple-600/10 text-purple-600 border-purple-600/20',
+                        'bg-earth-gray/10 text-earth-gray border-earth-gray/20'
+                      ];
+                      return (
+                        <span
+                          key={index}
+                          className={`${colors[index % colors.length]} px-3 py-1.5 rounded-md text-xs font-medium border transition-all hover:scale-105 cursor-default`}
+                        >
+                          {tech}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </DialogContent>
-      </Dialog >
-    </div >
+      </Dialog>
+    </div>
   );
 }
