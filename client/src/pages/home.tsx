@@ -450,7 +450,11 @@ export default function Home() {
             <div className="space-y-6">
               <p className="text-lg text-foreground leading-relaxed">
                 <i className="fas fa-satellite mr-2 text-primary"></i>
-                WebGIS and Backend Engineer specializing in scalable geospatial platforms, Earth observation data processing, and GeoAI solutions. Expert in integrating UAV imagery with Sentinel satellite data Fusion for multi-source Earth observation analytics and environmental monitoring.
+                Certified Geomatics Engineer and Backend/WebGIS Developer at NAXA where I build tools for AI-based Earth Observation, spatial
+data processing, and decision-support systems. Experienced in GeoAI, combining drone and Sentinel data and have worked with
+international projects like GeoNadir. Focused on applying AI with EO technologies to monitor land and environmental change,
+with a focus on sustainable solutions for the Global South. Outside of work, I enjoy hiking, meeting new people, sharing ideas, and
+collaborating across cultures.
               </p>
               <p className="text-muted-foreground leading-relaxed">
                 <i className="fas fa-code mr-2 text-accent"></i>
