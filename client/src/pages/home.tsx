@@ -595,11 +595,11 @@ export default function Home() {
                   data-testid={`card-experience-${exp.id}`}
                 >
                   {/* Thumbnail Section */}
-                  <div className="relative w-full md:w-1/3 h-48 md:h-auto overflow-hidden">
+                  <div className="relative w-full md:w-1/3 h-48 md:h-auto overflow-hidden bg-muted/30">
                     <img
                       src={exp.images[0]}
                       alt={exp.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-300"></div>
 
@@ -686,11 +686,11 @@ export default function Home() {
                   className="group bg-card dark:bg-card rounded-xl overflow-hidden border border-border hover:border-primary/50 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer flex flex-col"
                   data-testid={`card-project-${project.id}`}
                 >
-                  <div className="relative h-48 overflow-hidden">
+                  <div className="relative h-48 overflow-hidden bg-muted/30">
                     <img
                       src={project.images[0]}
                       alt={project.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-300"></div>
 
@@ -885,11 +885,11 @@ export default function Home() {
 
           <div className="space-y-6">
             {/* Image Carousel */}
-            <div className="relative rounded-lg overflow-hidden group">
+            <div className="relative rounded-lg overflow-hidden group bg-muted/30">
               <img
                 src={selectedItem?.images[currentImageIndex]}
                 alt={`${selectedItem?.title} - Image ${currentImageIndex + 1}`}
-                className="w-full h-80 object-cover"
+                className="w-full h-80 object-contain"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
 
@@ -931,7 +931,7 @@ export default function Home() {
                   <button
                     key={idx}
                     onClick={() => setCurrentImageIndex(idx)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 ${idx === currentImageIndex
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 bg-muted/30 ${idx === currentImageIndex
                       ? 'border-primary ring-2 ring-primary/50'
                       : 'border-border hover:border-primary/50'
                       }`}
@@ -940,7 +940,7 @@ export default function Home() {
                     <img
                       src={img}
                       alt={`Thumbnail ${idx + 1}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </button>
                 ))}
