@@ -9,6 +9,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import RoshanImg from "../assets/roshan.png"
+import precision1 from '../assets/precision_agriculture1.png';
+import precision2 from '../assets/precision_agriculture2.png';
+import precision3 from '../assets/precision_agriculture3.png';
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
@@ -70,9 +73,9 @@ export default function Home() {
       title: "Precision Agriculture AI (Tomato Nutrient Classification)",
       description: "Deep learning-based nutrient deficiency detection system achieving 92% accuracy, enabling data-driven fertilizer management for farmers.",
       images: [
-        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
-        "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
-        "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
+        precision1,
+        precision2,
+        precision3
       ],
       details: [
         "Developed CNN-based deep learning model achieving 92% accuracy in classifying nitrogen, phosphorus, and potassium deficiencies in tomato leaves",
