@@ -390,7 +390,7 @@ export default function Home() {
                   href={CV}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-500 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-red-500/20 transform hover:-translate-y-0.5"
+                  className="group bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-600 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-emerald-500/20 transform hover:-translate-y-0.5"
                   data-testid="btn-view-cv"
                 >
                   <i className="fas fa-eye group-hover:scale-110 transition-transform"></i>
