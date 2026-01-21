@@ -496,7 +496,7 @@ export default function Home() {
           </div>
           <div className="max-w-3xl mx-auto space-y-8 text-center">
             <div className="space-y-6">
-              <p className="text-lg text-foreground leading-relaxed">
+              <p className="text-lg text-foreground leading-relaxed text-justify">
                 <i className="fas fa-satellite mr-2 text-primary"></i>
                 Certified Geomatics Engineer and Backend/WebGIS Developer at NAXA where I build tools for AI-based Earth Observation, spatial
                 data processing, and decision-support systems. Experienced in GeoAI, combining drone and Sentinel data and have worked with
@@ -504,7 +504,7 @@ export default function Home() {
                 with a focus on sustainable solutions for the Global South. Outside of work, I enjoy hiking, meeting new people, sharing ideas, and
                 collaborating across cultures.
               </p>
-              <p className="text-muted-foreground leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed text-justify">
                 <i className="fas fa-code mr-2 text-accent"></i>
                 I architect production-ready backends using Django, FastAPI, and Docker, deploying on AWS infrastructure with PostGIS spatial databases and GeoServer tile services. My work spans international collaborations including HOT's humanitarian mapping platform (FMTM) and Copernicus Earth observation data integration with GeoNadir's real-time processing pipelines.
               </p>
@@ -718,7 +718,7 @@ export default function Home() {
                       </div>
                     </div>
 
-                    <p className="text-muted-foreground mt-3 mb-4 line-clamp-2 text-sm md:text-base leading-relaxed">
+                    <p className="text-muted-foreground mt-3 mb-4 line-clamp-2 text-sm md:text-base leading-relaxed text-justify">
                       {exp.description}
                     </p>
 
@@ -798,7 +798,7 @@ export default function Home() {
                       {project.title}
                     </h3>
 
-                    <p className="text-muted-foreground mb-4 line-clamp-3 text-sm leading-relaxed">
+                    <p className="text-muted-foreground text-sm line-clamp-3 mb-4 text-justify">
                       {project.description}
                     </p>
 
@@ -894,7 +894,7 @@ export default function Home() {
                     {category.title}
                   </h3>
 
-                  <p className="text-muted-foreground mb-4 line-clamp-2 text-sm leading-relaxed">
+                  <p className="text-muted-foreground text-sm mb-6 text-justify">
                     {category.description}
                   </p>
 
@@ -1138,7 +1138,7 @@ export default function Home() {
                   <i className="fas fa-align-left mr-2 text-primary"></i>
                   Overview
                 </h3>
-                <DialogDescription className="text-foreground/90 text-base leading-relaxed">
+                <DialogDescription className="text-foreground/90 text-base leading-relaxed text-justify">
                   {selectedItem?.description}
                 </DialogDescription>
               </div>
@@ -1149,14 +1149,16 @@ export default function Home() {
                   <i className="fas fa-list-ul mr-2 text-accent"></i>
                   Key Highlights
                 </h3>
-                <ul className="space-y-3">
-                  {selectedItem?.details.map((detail, index) => (
-                    <li key={index} className="flex items-start text-muted-foreground group">
-                      <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-custom mr-3 group-hover:scale-125 transition-transform duration-300 shrink-0"></span>
-                      <span className="leading-relaxed">{detail}</span>
-                    </li>
+                <div className="space-y-4 mb-8">
+                  {selectedItem?.details.map((detail, i) => (
+                    <div key={i} className="flex items-start gap-3 group/item">
+                      <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0 group-hover/item:scale-125 transition-transform"></div>
+                      <p className="text-muted-foreground leading-relaxed text-justify">
+                        {detail}
+                      </p>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
 
               {/* Technologies Used */}
