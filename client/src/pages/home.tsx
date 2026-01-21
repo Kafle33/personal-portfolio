@@ -189,7 +189,7 @@ export default function Home() {
     {
       id: 'online-courses',
       title: 'Online Courses',
-      description: 'Esri, Udemy, and AI Certifications',
+      description: 'Esri, Udemy, EO and AI Certifications',
       images: [udemyAiC, udemyDlC, esriSarC, esriMultiC, esriDlC, eoUrbanC, eoMlC],
       details: [
         'Automated Sentinel-1 SAR workflows in ArcGIS Notebooks using Python for preprocessing, filtering, and feature extraction.',
