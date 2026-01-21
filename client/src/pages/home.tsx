@@ -1058,7 +1058,7 @@ export default function Home() {
             <div className="border-t border-primary-foreground/20 pt-6">
               <p className="text-primary-foreground/60 text-sm flex items-center justify-center">
                 <i className="fas fa-map-pin mr-2"></i>
-                © 2024 Roshan Kafle. All rights reserved. | Pokhara, Nepal
+                © 2026 Roshan Kafle. All rights reserved. | Pokhara, Nepal
               </p>
             </div>
           </div>
