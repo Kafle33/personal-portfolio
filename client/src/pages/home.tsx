@@ -446,7 +446,7 @@ export default function Home() {
                   data-testid="btn-download-cv"
                 >
                   <i className="fas fa-download group-hover:translate-y-1 transition-transform"></i>
-                  <span>Download</span>
+                  <span>Download CV</span>
                 </a>
                 <div className="hidden sm:flex flex-col justify-center text-xs text-white/60 font-mono ml-2">
                   <span className="flex items-center gap-1.5">
