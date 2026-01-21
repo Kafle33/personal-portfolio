@@ -46,6 +46,7 @@ import ws3 from '../assets/courses_ws3.png';
 import ws4 from '../assets/courses_ws4.png';
 import ws5 from '../assets/courses_ws5.png';
 import ws6 from '../assets/courses_ws6.png';
+import ws7 from '../assets/courses_ws7.png';
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
@@ -200,7 +201,7 @@ export default function Home() {
       id: 'workshops',
       title: 'Workshops & Seminars',
       description: 'Attended hands-on workshops on advanced surveying techniques and participated in technical seminars on GeoAI and Earth observation.',
-      images: [ws1, ws2, ws3, ws4, ws5, ws6],
+      images: [ws7, ws1, ws5, ws4, ws2, ws3, ws6],
       details: [
         'Attended hands-on workshops on advanced surveying techniques',
         'Participated in technical seminars on GeoAI and Earth observation',
