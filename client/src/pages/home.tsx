@@ -482,14 +482,7 @@ export default function Home() {
             </h2>
             <div className="w-24 h-1 bg-primary mx-auto rounded"></div>
           </div>
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="relative">
-              <img
-                src={RoshanImg}
-                alt="Geospatial data analysis and satellite imagery"
-                className="rounded-xl shadow-lg w-full h-auto relative z-10 transform hover:scale-105 transition-transform duration-500"
-              />
-            </div>
+          <div className="max-w-3xl mx-auto space-y-8 text-center">
             <div className="space-y-6">
               <p className="text-lg text-foreground leading-relaxed">
                 <i className="fas fa-satellite mr-2 text-primary"></i>
@@ -503,7 +496,7 @@ export default function Home() {
                 <i className="fas fa-code mr-2 text-accent"></i>
                 I architect production-ready backends using Django, FastAPI, and Docker, deploying on AWS infrastructure with PostGIS spatial databases and GeoServer tile services. My work spans international collaborations including HOT's humanitarian mapping platform (FMTM) and Copernicus Earth observation data integration with GeoNadir's real-time processing pipelines.
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-4 justify-center">
                 <div className="bg-primary/10 dark:bg-primary/20 px-4 py-2 rounded-full hover:scale-105 transition-transform duration-300 relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transform -translate-x-full hover:translate-x-full transition-transform duration-1000"></div>
                   <span className="text-primary font-medium relative z-10">
