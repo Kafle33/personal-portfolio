@@ -59,10 +59,6 @@ export default function Home() {
     technologies: string[];
   } | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [selectedCertificate, setSelectedCertificate] = useState<{
-    title: string;
-    image: string;
-  } | null>(null);
 
   const experiencesData = [
     {
@@ -186,21 +182,32 @@ export default function Home() {
     },
   ];
 
-  // Certificate data for Professional Development section
-  const onlineCoursesCertificates = [
-    { id: 'gnss-cert', title: 'GNSS Training Certificate', image: gnssC },
-    { id: 'nges-cert', title: 'NGES Certificate', image: ngesC },
-    { id: 'geodata-cert', title: 'GeoData Scout Certificate', image: geodataScoutC },
-    { id: 'mathathon-cert', title: 'Mathathon Certificate', image: mathathonC },
-  ];
-
-  const workshopCertificates = [
-    { id: 'ws1', title: 'Workshop Certificate 1', image: ws1 },
-    { id: 'ws2', title: 'Workshop Certificate 2', image: ws2 },
-    { id: 'ws3', title: 'Workshop Certificate 3', image: ws3 },
-    { id: 'ws4', title: 'Workshop Certificate 4', image: ws4 },
-    { id: 'ws5', title: 'Workshop Certificate 5', image: ws5 },
-    { id: 'ws6', title: 'Workshop Certificate 6', image: ws6 },
+  // Certification Categories for Professional Development section
+  const certificationCategories = [
+    {
+      id: 'online-courses',
+      title: 'Online Courses',
+      description: 'Completed various online courses in geospatial technologies, remote sensing, and data analysis from recognized platforms.',
+      images: [gnssC, ngesC, geodataScoutC, mathathonC],
+      details: [
+        'Completed various online courses in geospatial technologies',
+        'Earned certifications in GIS, remote sensing, and data analysis',
+        'Self-paced learning from recognized platforms'
+      ],
+      technologies: ['GIS', 'Remote Sensing', 'Data Analysis', 'Python']
+    },
+    {
+      id: 'workshops',
+      title: 'Workshops & Seminars',
+      description: 'Attended hands-on workshops on advanced surveying techniques and participated in technical seminars on GeoAI and Earth observation.',
+      images: [ws1, ws2, ws3, ws4, ws5, ws6],
+      details: [
+        'Attended hands-on workshops on advanced surveying techniques',
+        'Participated in technical seminars on GeoAI and Earth observation',
+        'Collaborated with industry experts during intensive training sessions'
+      ],
+      technologies: ['Surveying', 'GeoAI', 'Earth Observation', 'UAV']
+    }
   ];
 
   useEffect(() => {
@@ -938,111 +945,72 @@ export default function Home() {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-12">
-            {/* Online Courses Card */}
-            <Card className="bg-card dark:bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-xl transition-all duration-300">
-              <div className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="bg-primary/10 dark:bg-primary/20 w-12 h-12 rounded-full flex items-center justify-center mr-4">
-                    <i className="fas fa-laptop-code text-xl text-primary floating-animation"></i>
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground">Online Courses</h3>
-                </div>
-                <ul className="text-muted-foreground text-sm space-y-2 mb-6">
-                  <li className="flex items-start">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary mr-3 shrink-0"></span>
-                    <span>Completed various online courses in geospatial technologies</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary mr-3 shrink-0"></span>
-                    <span>Earned certifications in GIS, remote sensing, and data analysis</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary mr-3 shrink-0"></span>
-                    <span>Self-paced learning from recognized platforms</span>
-                  </li>
-                </ul>
-
-                {/* Certificate Preview Grid */}
-                <div className="grid grid-cols-2 gap-4">
-                  {onlineCoursesCertificates.map((cert) => (
-                    <motion.div
-                      key={cert.id}
-                      whileHover={{ y: -3 }}
-                      onClick={() => setSelectedCertificate(cert)}
-                      className="group cursor-pointer bg-muted/30 rounded-lg overflow-hidden border border-border hover:border-primary/50 shadow-sm hover:shadow-lg transition-all duration-300"
-                    >
-                      <div className="relative h-28 overflow-hidden">
+            {certificationCategories.map((category, index) => (
+              <Card
+                key={category.id}
+                onClick={() => setSelectedItem(category)}
+                className="group bg-card dark:bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer flex flex-col"
+              >
+                <div className="relative h-64 overflow-hidden bg-muted/30 p-4">
+                  {/* Preview Grid (2x2) */}
+                  <div className="grid grid-cols-2 grid-rows-2 gap-2 h-full">
+                    {category.images.slice(0, 4).map((img, i) => (
+                      <div key={i} className="relative overflow-hidden rounded-lg border border-border/50">
                         <img
-                          src={cert.image}
-                          alt={cert.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          src={img}
+                          alt={`${category.title} preview ${i + 1}`}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         />
-                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-300"></div>
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <div className="bg-primary text-primary-foreground px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
-                            <i className="fas fa-expand"></i>
-                            <span>View</span>
-                          </div>
-                        </div>
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </Card>
-
-            {/* Workshops & Seminars Card */}
-            <Card className="bg-card dark:bg-card rounded-xl overflow-hidden border border-border shadow-sm hover:shadow-xl transition-all duration-300">
-              <div className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="bg-accent/10 dark:bg-accent/20 w-12 h-12 rounded-full flex items-center justify-center mr-4">
-                    <i className="fas fa-chalkboard-teacher text-xl text-accent floating-animation" style={{ animationDelay: '0.5s' }}></i>
+                    ))}
+                    {/* Overlay for more images if applicable */}
+                    {category.images.length > 4 && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        {/* This is just visual, the whole card is clickable */}
+                      </div>
+                    )}
                   </div>
-                  <h3 className="text-xl font-bold text-foreground">Workshops & Seminars</h3>
-                </div>
-                <ul className="text-muted-foreground text-sm space-y-2 mb-6">
-                  <li className="flex items-start">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-accent mr-3 shrink-0"></span>
-                    <span>Attended hands-on workshops on advanced surveying techniques</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-accent mr-3 shrink-0"></span>
-                    <span>Participated in technical seminars on GeoAI and Earth observation</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-accent mr-3 shrink-0"></span>
-                    <span>Collaborated with industry experts during intensive training sessions</span>
-                  </li>
-                </ul>
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-300"></div>
 
-                {/* Certificate Preview Grid */}
-                <div className="grid grid-cols-2 gap-4">
-                  {workshopCertificates.map((cert) => (
-                    <motion.div
-                      key={cert.id}
-                      whileHover={{ y: -3 }}
-                      onClick={() => setSelectedCertificate(cert)}
-                      className="group cursor-pointer bg-muted/30 rounded-lg overflow-hidden border border-border hover:border-accent/50 shadow-sm hover:shadow-lg transition-all duration-300"
-                    >
-                      <div className="relative h-28 overflow-hidden">
-                        <img
-                          src={cert.image}
-                          alt={cert.title}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-300"></div>
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <div className="bg-accent text-accent-foreground px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5">
-                            <i className="fas fa-expand"></i>
-                            <span>View</span>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
+                  {/* Gallery Badge */}
+                  <div className="absolute bottom-6 right-6 bg-black/60 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 border border-white/20">
+                    <i className="fas fa-images"></i>
+                    <span>{category.images.length}</span>
+                  </div>
+
+                  {/* Category Icon Overlay */}
+                  <div className="absolute top-6 left-6 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm p-2 rounded-lg shadow-sm">
+                    <i className={`fas ${category.id === 'online-courses' ? 'fa-laptop-code text-primary' : 'fa-chalkboard-teacher text-accent'} text-lg`}></i>
+                  </div>
                 </div>
-              </div>
-            </Card>
+
+                <div className="p-6 flex-1 flex flex-col relative">
+                  {/* Hover Indicator */}
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <i className="fas fa-external-link-alt text-primary"></i>
+                  </div>
+
+                  <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">
+                    {category.title}
+                  </h3>
+
+                  <p className="text-muted-foreground mb-4 line-clamp-2 text-sm leading-relaxed">
+                    {category.description}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2 mt-auto">
+                    {category.technologies.map((tech, i) => (
+                      <span
+                        key={i}
+                        className="px-2.5 py-1 rounded-md text-xs font-medium bg-primary/5 text-primary border border-primary/10 group-hover:border-primary/20 transition-colors"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -1299,33 +1267,6 @@ export default function Home() {
                   })}
                 </div>
               </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Certificate Modal */}
-      <Dialog open={selectedCertificate !== null} onOpenChange={(open) => !open && setSelectedCertificate(null)}>
-        <DialogContent className="max-w-4xl h-auto max-h-[90vh] p-0 gap-0 bg-card border-border overflow-hidden">
-          <div className="relative w-full h-full flex flex-col">
-            {/* Header */}
-            <DialogHeader className="p-4 border-b border-border/50 bg-muted/30">
-              <DialogTitle className="text-lg font-bold text-foreground flex items-center gap-2">
-                <i className="fas fa-certificate text-primary"></i>
-                {selectedCertificate?.title}
-              </DialogTitle>
-            </DialogHeader>
-
-            {/* Certificate Image */}
-            <div className="flex-1 p-4 flex items-center justify-center bg-black/5 dark:bg-black/20 overflow-auto">
-              <motion.img
-                src={selectedCertificate?.image}
-                alt={selectedCertificate?.title}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
-              />
             </div>
           </div>
         </DialogContent>
