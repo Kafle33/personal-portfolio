@@ -425,6 +425,16 @@ export default function Home() {
                   <i className="fab fa-linkedin"></i>
                   <span>LinkedIn</span>
                 </a>
+                <a
+                  href="https://www.researchgate.net/profile/Roshan-Kafle-2"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#00ccbb] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#00b3a4] transition-all duration-300 flex items-center space-x-2 transform hover:scale-105 hover:shadow-lg"
+                  data-testid="link-researchgate-hero"
+                >
+                  <i className="fab fa-researchgate text-lg"></i>
+                  <span>ResearchGate</span>
+                </a>
               </div>
 
               {/* CV Actions */}
@@ -917,7 +927,7 @@ export default function Home() {
               Ready to collaborate on innovative geospatial solutions? Let's discuss how we can work together.
             </p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
             <div className="text-center card-hover">
               <div className="bg-primary/10 dark:bg-primary/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 floating-animation">
                 <i className="fas fa-envelope text-2xl text-primary"></i>
@@ -972,6 +982,21 @@ export default function Home() {
                 Connect
               </a>
             </div>
+            <div className="text-center card-hover">
+              <div className="bg-[#00ccbb]/10 dark:bg-[#00ccbb]/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 floating-animation" style={{ animationDelay: '2s' }}>
+                <i className="fab fa-researchgate text-2xl text-[#00ccbb]"></i>
+              </div>
+              <h3 className="font-semibold text-foreground mb-2">ResearchGate</h3>
+              <a
+                href="https://www.researchgate.net/profile/Roshan-Kafle-2"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-[#00ccbb] transition-colors hover:underline"
+                data-testid="link-researchgate-contact"
+              >
+                View Publications
+              </a>
+            </div>
           </div>
         </div>
       </section >
@@ -994,6 +1019,9 @@ export default function Home() {
               </a>
               <a href="https://www.linkedin.com/in/roshan-kafle-908101277/" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/60 hover:text-white transition-all duration-300 transform hover:scale-110" data-testid="link-linkedin-footer">
                 <i className="fab fa-linkedin text-2xl"></i>
+              </a>
+              <a href="https://www.researchgate.net/profile/Roshan-Kafle-2" target="_blank" rel="noopener noreferrer" className="text-primary-foreground/60 hover:text-white transition-all duration-300 transform hover:scale-110" data-testid="link-researchgate-footer">
+                <i className="fab fa-researchgate text-2xl"></i>
               </a>
               <a href="mailto:roshankafle33@gmail.com" className="text-primary-foreground/60 hover:text-white transition-all duration-300 transform hover:scale-110" data-testid="link-email-footer">
                 <i className="fas fa-envelope text-2xl"></i>
