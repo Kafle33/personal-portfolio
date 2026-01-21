@@ -202,7 +202,7 @@ export default function Home() {
     {
       id: 'workshops',
       title: 'Workshops & Seminars',
-      description: 'Attended hands-on workshops on advanced surveying techniques and participated in technical seminars and hackathons on GeoAI and Earth observation.',
+      description: 'Attended workshops on advanced surveying techniques and participated in technical seminars and hackathons on GeoAI and Earth observation.',
       images: [geodataScoutC, mathathonC, gnssC, ngesC],
       details: [
         'Practical training on Differential GPS (DGPS) and Terrestrial LiDAR Scanner for high-resolution terrain mapping and accurate surveying.',
