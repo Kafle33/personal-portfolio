@@ -190,7 +190,7 @@ export default function Home() {
       id: 'online-courses',
       title: 'Online Courses',
       description: 'Completed various online courses and technical labs in geospatial technologies, remote sensing, and AI from recognized platforms like Udemy, ESRI, and EO College.',
-      images: [eoUrbanC, eoMlC, udemyAiC, udemyDlC, esriSarC, esriMultiC, esriDlC],
+      images: [udemyAiC, udemyDlC, esriSarC, esriMultiC, esriDlC, eoUrbanC, eoMlC],
       details: [
         'Completed specialized courses in Deep Learning and AI for Earth Observation',
         'Earned certifications in Urban Remote Sensing and Machine Learning',
