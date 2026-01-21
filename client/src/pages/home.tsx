@@ -35,18 +35,19 @@ import dmsps1 from '../assets/dmaps1.png';
 import dmaps2 from '../assets/dmaps2.png';
 import dmaps3 from '../assets/dmaps3.png';
 // Certificate imports - Online Courses
-import gnssC from '../assets/GNSS_certificate.png';
-import ngesC from '../assets/NGES_certificate.png';
-import geodataScoutC from '../assets/geodata_scout_certificate.png';
-import mathathonC from '../assets/mathathon_certificate.png';
+import eoUrbanC from '../assets/eo_college_urban_spaces.png';
+import eoMlC from '../assets/eo_college_ml_eo.png';
+import udemyAiC from '../assets/udemy_ai_gee.png';
+import udemyDlC from '../assets/udemy_deep_learning_eo.png';
+import geodataScoutC from '../assets/geodata_scout_appreciation.png';
+import mathathonC from '../assets/hackathon_field_mapping.png';
+
 // Certificate imports - Workshops & Seminars
-import ws1 from '../assets/courses_ws1.png';
-import ws2 from '../assets/courses_ws2.png';
-import ws3 from '../assets/courses_ws3.png';
-import ws4 from '../assets/courses_ws4.png';
-import ws5 from '../assets/courses_ws5.png';
-import ws6 from '../assets/courses_ws6.png';
-import ws7 from '../assets/courses_ws7.png';
+import gnssC from '../assets/gnss_training.png';
+import esriSarC from '../assets/esri_sar_notebooks.png';
+import esriMultiC from '../assets/esri_multidimensional_data.png';
+import esriDlC from '../assets/esri_deep_learning_pro.png';
+import ngesC from '../assets/nges_membership.png';
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
@@ -188,26 +189,28 @@ export default function Home() {
     {
       id: 'online-courses',
       title: 'Online Courses',
-      description: 'Completed various online courses in geospatial technologies, remote sensing, and data analysis from recognized platforms.',
-      images: [gnssC, ngesC, geodataScoutC, mathathonC],
+      description: 'Completed various online courses in geospatial technologies, remote sensing, and data analysis from recognized platforms like Udemy and EO College.',
+      images: [eoUrbanC, eoMlC, udemyAiC, udemyDlC, geodataScoutC, mathathonC],
       details: [
-        'Completed various online courses in geospatial technologies',
-        'Earned certifications in GIS, remote sensing, and data analysis',
-        'Self-paced learning from recognized platforms'
+        'Completed specialized courses in Deep Learning and AI for Earth Observation',
+        'Earned certifications in Urban Remote Sensing and Machine Learning',
+        'Participated in geospatial hackathons and remote mapping projects',
+        'Self-paced learning from recognized global platforms'
       ],
-      technologies: ['GIS', 'Remote Sensing', 'Data Analysis', 'Python']
+      technologies: ['Deep Learning', 'AI', 'Google Earth Engine', 'Remote Sensing', 'Python']
     },
     {
       id: 'workshops',
       title: 'Workshops & Seminars',
       description: 'Attended hands-on workshops on advanced surveying techniques and participated in technical seminars on GeoAI and Earth observation.',
-      images: [ws7, ws1, ws5, ws4, ws2, ws3, ws6],
+      images: [gnssC, esriSarC, esriMultiC, esriDlC, ngesC],
       details: [
-        'Attended hands-on workshops on advanced surveying techniques',
-        'Participated in technical seminars on GeoAI and Earth observation',
-        'Collaborated with industry experts during intensive training sessions'
+        'Attended hands-on workshops on advanced GNSS and surveying techniques',
+        'Completed ArcGIS Labs for SAR data processing and multidimensional analysis',
+        'Participated in technical seminars on GeoAI and Deep Learning in ArcGIS Pro',
+        'Active member of professional geomatics engineering societies'
       ],
-      technologies: ['Surveying', 'GeoAI', 'Earth Observation', 'UAV']
+      technologies: ['GNSS', 'ArcGIS Pro', 'SAR', 'GeoAI', 'Surveying']
     }
   ];
 
