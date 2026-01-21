@@ -189,13 +189,13 @@ export default function Home() {
     {
       id: 'online-courses',
       title: 'Online Courses',
-      description: 'Completed various online courses and technical labs in geospatial technologies, remote sensing, and AI from recognized platforms like Udemy, ESRI, and EO College.',
+      description: 'Esri, Udemy, and AI Certifications',
       images: [udemyAiC, udemyDlC, esriSarC, esriMultiC, esriDlC, eoUrbanC, eoMlC],
       details: [
-        'Completed specialized courses in Deep Learning and AI for Earth Observation',
-        'Earned certifications in Urban Remote Sensing and Machine Learning',
-        'Completed advanced ArcGIS Labs for SAR data processing and multidimensional analysis',
-        'Self-paced learning from recognized global geospatial platforms'
+        'Automated Sentinel-1 SAR workflows in ArcGIS Notebooks using Python for preprocessing, filtering, and feature extraction.',
+        'Used deep learning methods in ArcGIS Pro for object detection and image classification with CNN and transfer learning.',
+        'Did predictive modeling and spatiotemporal trend analysis of raster data in ArcGIS Online using harmonic regression and Mann-Kendall trend model.',
+        'Completed Udemy courses on Deep Learning Applications for Earth Observation and Mastering Earth Observation with AI and Google Earth Engine, focused on AI-based EO analysis and Google Earth Engine automation.'
       ],
       technologies: ['Deep Learning', 'AI', 'Google Earth Engine', 'ArcGIS Pro', 'SAR', 'Python']
     },
@@ -205,10 +205,12 @@ export default function Home() {
       description: 'Attended hands-on workshops on advanced surveying techniques and participated in technical seminars and hackathons on GeoAI and Earth observation.',
       images: [geodataScoutC, mathathonC, gnssC, ngesC],
       details: [
-        'Attended hands-on workshops on advanced GNSS and surveying techniques',
-        'Participated in geospatial hackathons and remote mapping projects',
-        'Contributed to urban resilience studies through field mapping and data scouting',
-        'Active member of professional geomatics engineering societies'
+        'Practical training on Differential GPS (DGPS) and Terrestrial LiDAR Scanner for high-resolution terrain mapping and accurate surveying.',
+        'Collected, processed, and interpreted data using DGPS receiver, LiDAR scanner, and point cloud processing software for 3D model creation.',
+        'Improved skills in using DGPS and LiDAR workflow for field geomatics work and spatial data analysis.',
+        'Learned principles of GNSS, satellite constellations (GPS, GLONASS, Galileo, BeiDou, QZSS, IRNSS), positioning methods (Absolute, DGNSS, RTK, PPP), and error mitigation techniques.',
+        'Field data collection with GNSS receivers, post-processing workflows, accuracy assessment, and integration with GIS, remote sensing, and geodetic reference frames (ITRF, WGS84).',
+        'Emerging trends: multi-frequency and multi-constellation systems, GNSS–IMU integration, and applications in autonomous systems, precision mapping, and disaster management.'
       ],
       technologies: ['GNSS', 'Field Mapping', 'GeoAI', 'Surveying', 'OpenStreetMap']
     }
