@@ -67,6 +67,7 @@ export default function Home() {
       id: "naxa",
       title: "NAXA Pvt. Ltd.",
       period: "May 2023 - Dec 2023",
+      link: "https://naxa.com.np",
       description: "WebGIS Developer & Backend Engineer specializing in geospatial solutions, Earth observation data processing, and AI-driven analytics.",
       images: [
         "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
@@ -85,6 +86,7 @@ export default function Home() {
       id: "geonadir",
       title: "GeoNadir – Queensland, Australia",
       period: "1 Jan 2024 – Current",
+      link: "https://geonadir.com/",
       description: "Integrated Copernicus satellite data in GeoNadir’s drone mapping platform for a globally accessible EO system.",
       images: [
         randomForest,
@@ -118,6 +120,7 @@ export default function Home() {
       id: "precision-farming",
       title: "Precision Agriculture",
       period: "1 May 2022 – 3 Apr 2023",
+      link: "https://github.com/Kafle33/fastapi-tomato-classifier",
       description: "Developed an image classification model using TensorFlow and MobileNetV2 to detect nutrient deficiencies in tomato leaves, trained with 1,500+ labeled images.",
       images: [
         precision1,
@@ -134,6 +137,7 @@ export default function Home() {
     {
       id: "khaderi-alert",
       title: "Khaderi-Alert (Drought Monitoring System)",
+      link: "https://khaderi.anticipatoryaction.org/",
       description: "Integrated multi-source Earth Observation and meteorological data for real-time drought modeling; developed modular systems for drought severity assessment, hotspot mapping, and risk ranking.",
       images: [
         khaderi1,
@@ -152,6 +156,7 @@ export default function Home() {
     {
       id: "dmaps",
       title: "DMAPS (AI & Urban Planning Analyst)",
+      link: "https://dmaps.org/",
       description: "Used AI and EO data to digitize urban landscapes and generate spatial models; engineered backend systems using PostGIS and GIST indexing.",
       images: [
         dmsps1,
@@ -169,6 +174,7 @@ export default function Home() {
     {
       id: "fmtm-hotosm",
       title: "FMTM-HOTSOM (Open Source Contribution)",
+      link: "https://fmtm.hotosm.org/",
       description: "Integrated geospatial data using Python and PostGIS; collaborated with international teams to improve system usability, reliability, and scalability.",
       images: [
         "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
@@ -706,7 +712,17 @@ export default function Home() {
 
                     <div className="mb-1">
                       <h3 className="text-xl md:text-2xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
-                        {exp.title}
+                        {exp.link ? (
+                          <a
+                            href={exp.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {exp.title}
+                          </a>
+                        ) : exp.title}
                       </h3>
                       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm">
                         <span className="font-semibold text-muted-foreground">{exp.id === 'naxa' ? 'WebGIS Developer' : exp.id === 'geonadir' ? 'Backend Developer' : 'Role'}</span>
@@ -795,7 +811,17 @@ export default function Home() {
                     </div>
 
                     <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors duration-300">
-                      {project.title}
+                      {project.link ? (
+                        <a
+                          href={project.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {project.title}
+                        </a>
+                      ) : project.title}
                     </h3>
 
                     <p className="text-muted-foreground text-sm line-clamp-3 mb-4 text-justify">
@@ -1125,9 +1151,17 @@ export default function Home() {
           {/* Right Column: Details (Scrollable) */}
           <div className="flex flex-col h-full overflow-y-auto p-6 order-2 bg-card">
             <DialogHeader className="p-0 mb-6 text-left">
-              <DialogTitle className="text-2xl md:text-3xl font-bold text-foreground flex items-start gap-3">
-                <i className="fas fa-info-circle mt-1 text-primary shrink-0"></i>
-                {selectedItem?.title}
+              <DialogTitle className="text-2xl md:text-3xl font-bold text-foreground">
+                {selectedItem?.link ? (
+                  <a
+                    href={selectedItem.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-primary transition-colors hover:underline"
+                  >
+                    {selectedItem.title}
+                  </a>
+                ) : selectedItem?.title}
               </DialogTitle>
             </DialogHeader>
 
