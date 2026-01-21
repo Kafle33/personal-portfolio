@@ -66,7 +66,7 @@ export default function Home() {
     {
       id: "naxa",
       title: "NAXA Pvt. Ltd.",
-      period: "2023 - Present",
+      period: "May 2023 - Dec 2023",
       description: "WebGIS Developer & Backend Engineer specializing in geospatial solutions, Earth observation data processing, and AI-driven analytics.",
       images: [
         "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
