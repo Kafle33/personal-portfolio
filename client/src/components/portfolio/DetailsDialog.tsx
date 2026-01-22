@@ -16,12 +16,37 @@ interface DetailsDialogProps {
 
 export const DetailsDialog = ({ item, onClose }: DetailsDialogProps) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [enterDirection, setEnterDirection] = useState<'prev' | 'next'>('prev');
 
     useEffect(() => {
         if (item) {
             setCurrentImageIndex(0);
+            setEnterDirection('prev');
         }
     }, [item]);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (!item || item.images.length <= 1) return;
+
+            if (e.key === "ArrowRight") {
+                setCurrentImageIndex((prev) => (prev === item.images.length - 1 ? 0 : prev + 1));
+                setEnterDirection('next');
+            } else if (e.key === "ArrowLeft") {
+                setCurrentImageIndex((prev) => (prev === 0 ? item.images.length - 1 : prev - 1));
+                setEnterDirection('prev');
+            } else if (e.key === "Enter") {
+                if (enterDirection === 'next') {
+                    setCurrentImageIndex((prev) => (prev === item.images.length - 1 ? 0 : prev + 1));
+                } else {
+                    setCurrentImageIndex((prev) => (prev === 0 ? item.images.length - 1 : prev - 1));
+                }
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [item, enterDirection]);
 
     if (!item) return null;
 
@@ -51,18 +76,24 @@ export const DetailsDialog = ({ item, onClose }: DetailsDialogProps) => {
                             {item.images.length > 1 && (
                                 <>
                                     <button
-                                        onClick={() => setCurrentImageIndex((prev) =>
-                                            prev === 0 ? item.images.length - 1 : prev - 1
-                                        )}
+                                        onClick={() => {
+                                            setCurrentImageIndex((prev) =>
+                                                prev === 0 ? item.images.length - 1 : prev - 1
+                                            );
+                                            setEnterDirection('prev');
+                                        }}
                                         className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-md hover:bg-primary hover:text-primary-foreground text-foreground p-4 rounded-full transition-all duration-300 shadow-xl border border-border/50 group-hover:opacity-100 opacity-0 translate-x-[-10px] group-hover:translate-x-0"
                                         aria-label="Previous Image"
                                     >
                                         <i className="fas fa-chevron-left text-lg"></i>
                                     </button>
                                     <button
-                                        onClick={() => setCurrentImageIndex((prev) =>
-                                            prev === item.images.length - 1 ? 0 : prev + 1
-                                        )}
+                                        onClick={() => {
+                                            setCurrentImageIndex((prev) =>
+                                                prev === item.images.length - 1 ? 0 : prev + 1
+                                            );
+                                            setEnterDirection('next');
+                                        }}
                                         className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-md hover:bg-primary hover:text-primary-foreground text-foreground p-4 rounded-full transition-all duration-300 shadow-xl border border-border/50 group-hover:opacity-100 opacity-0 translate-x-[10px] group-hover:translate-x-0"
                                         aria-label="Next Image"
                                     >
@@ -80,8 +111,8 @@ export const DetailsDialog = ({ item, onClose }: DetailsDialogProps) => {
                                         key={idx}
                                         onClick={() => setCurrentImageIndex(idx)}
                                         className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 relative ${idx === currentImageIndex
-                                                ? 'border-primary ring-4 ring-primary/20 scale-110 shadow-lg'
-                                                : 'border-transparent hover:border-primary/50 opacity-50 hover:opacity-100'
+                                            ? 'border-primary ring-4 ring-primary/20 scale-110 shadow-lg'
+                                            : 'border-transparent hover:border-primary/50 opacity-50 hover:opacity-100'
                                             }`}
                                     >
                                         <img
