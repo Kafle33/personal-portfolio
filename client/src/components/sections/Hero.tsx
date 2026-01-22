@@ -63,7 +63,7 @@ export const Hero = () => {
                     >
                         <div className="space-y-4">
                             {/* Live status indicator */}
-                            <motion.div
+                            {/* <motion.div
                                 variants={itemVariants}
                                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-sm font-medium"
                             >
@@ -72,7 +72,7 @@ export const Hero = () => {
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                                 </span>
                                 <span className="text-white/80">Available for opportunities</span>
-                            </motion.div>
+                            </motion.div> */}
 
                             <motion.h1
                                 variants={itemVariants}
