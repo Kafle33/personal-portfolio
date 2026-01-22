@@ -25,7 +25,6 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
     "WEBGIS ARCHITECT",
     "SPATIAL DATA ENGINEER",
     "GEOMATICS SPECIALIST",
-    "FULL-STACK DEVELOPER",
     "MAPPING THE FUTURE"
   ];
 
