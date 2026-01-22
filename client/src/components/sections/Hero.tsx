@@ -115,7 +115,6 @@ export const Hero = () => {
                             <CTAButton href={personalInfo.github} icon="fab fa-github" label="GitHub" variant="white" />
                             <CTAButton href={personalInfo.linkedin} icon="fab fa-linkedin" label="LinkedIn" variant="blue" />
                             <CTAButton href={personalInfo.researchgate} icon="fab fa-researchgate" label="ResearchGate" variant="teal" />
-                            <CTAButton href="#certifications" icon="fas fa-certificate" label="Certifications" variant="purple" isInternal />
                         </motion.div>
 
                         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-white/10">
