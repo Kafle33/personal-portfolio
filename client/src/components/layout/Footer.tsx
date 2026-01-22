@@ -1,52 +1,114 @@
+import { motion } from "framer-motion";
 import { personalInfo } from "../../data/portfolio";
+import { easing, viewportOnce } from "../../lib/animations";
 
 export const Footer = () => {
+    const socials = [
+        { href: personalInfo.github, icon: "fab fa-github", label: "GitHub" },
+        { href: personalInfo.linkedin, icon: "fab fa-linkedin", label: "LinkedIn" },
+        { href: personalInfo.researchgate, icon: "fab fa-researchgate", label: "ResearchGate" },
+        { href: `mailto:${personalInfo.email}`, icon: "fas fa-envelope", label: "Email" }
+    ];
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.2
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 10 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.4, ease: easing.smooth }
+        }
+    };
+
     return (
         <footer className="bg-primary text-primary-foreground py-16 geospatial-grid relative overflow-hidden">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <motion.div
+                className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10"
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={viewportOnce}
+            >
                 <div className="text-center">
-                    <h3 className="text-2xl font-bold mb-4 flex items-center justify-center gap-3">
-                        <i className="fas fa-globe-americas text-accent floating-animation"></i>
+                    <motion.h3
+                        variants={itemVariants}
+                        className="text-2xl font-bold mb-4 flex items-center justify-center gap-3"
+                    >
+                        <motion.i
+                            className="fas fa-globe-americas text-accent"
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                        />
                         {personalInfo.name}
-                    </h3>
-                    <p className="text-primary-foreground/80 mb-8 max-w-md mx-auto">
+                    </motion.h3>
+
+                    <motion.p
+                        variants={itemVariants}
+                        className="text-primary-foreground/80 mb-8 max-w-md mx-auto"
+                    >
                         <i className="fas fa-satellite-dish mr-2 text-yellow-300"></i>
                         {personalInfo.role}
-                    </p>
+                    </motion.p>
 
-                    <div className="flex justify-center space-x-8 mb-10">
-                        {[
-                            { href: personalInfo.github, icon: "fab fa-github", label: "GitHub" },
-                            { href: personalInfo.linkedin, icon: "fab fa-linkedin", label: "LinkedIn" },
-                            { href: personalInfo.researchgate, icon: "fab fa-researchgate", label: "ResearchGate" },
-                            { href: `mailto:${personalInfo.email}`, icon: "fas fa-envelope", label: "Email" }
-                        ].map((social) => (
-                            <a
+                    <motion.div
+                        variants={itemVariants}
+                        className="flex justify-center space-x-8 mb-10"
+                    >
+                        {socials.map((social, index) => (
+                            <motion.a
                                 key={social.label}
                                 href={social.href}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-primary-foreground/60 hover:text-white transition-all duration-300 transform hover:scale-125 hover:-translate-y-1"
+                                className="text-primary-foreground/60 hover:text-white transition-colors duration-300"
                                 aria-label={social.label}
+                                whileHover={{ scale: 1.25, y: -4 }}
+                                whileTap={{ scale: 0.95 }}
+                                transition={{ duration: 0.2, ease: easing.smooth }}
+                                initial={{ opacity: 0, y: 10 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={viewportOnce}
+                                custom={index}
                             >
                                 <i className={`${social.icon} text-2xl`}></i>
-                            </a>
+                            </motion.a>
                         ))}
-                    </div>
+                    </motion.div>
 
-                    <div className="border-t border-primary-foreground/20 pt-8">
+                    <motion.div
+                        variants={itemVariants}
+                        className="border-t border-primary-foreground/20 pt-8"
+                    >
                         <p className="text-primary-foreground/60 text-sm flex items-center justify-center gap-2">
                             <i className="fas fa-map-pin text-accent"></i>
                             © {new Date().getFullYear()} {personalInfo.name}. All rights reserved. | {personalInfo.location}
                         </p>
-                    </div>
+                    </motion.div>
                 </div>
-            </div>
+            </motion.div>
 
             {/* Decorative background elements */}
             <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-                <div className="absolute top-10 left-10 w-32 h-32 border border-white rounded-full animate-pulse" />
-                <div className="absolute bottom-10 right-10 w-48 h-48 border border-white rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+                <motion.div
+                    className="absolute top-10 left-10 w-32 h-32 border border-white rounded-full"
+                    animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.5, 0.3] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <motion.div
+                    className="absolute bottom-10 right-10 w-48 h-48 border border-white rounded-full"
+                    animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.4, 0.2] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                />
             </div>
         </footer>
     );

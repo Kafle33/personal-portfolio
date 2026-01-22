@@ -2,12 +2,13 @@ import { motion } from "framer-motion";
 import { SectionHeader } from "../layout/SectionHeader";
 import { personalInfo } from "../../data/portfolio";
 import { Card } from "../ui/card";
+import { easing, viewportOnce } from "../../lib/animations";
 
 export const Contact = () => {
     const contactMethods = [
         {
             id: 'email',
-            icon: "fa-envelope",
+            icon: "fa-at",
             label: "Email",
             value: personalInfo.email,
             href: `mailto:${personalInfo.email}`,
@@ -16,7 +17,7 @@ export const Contact = () => {
         },
         {
             id: 'phone',
-            icon: "fa-phone",
+            icon: "fa-mobile-alt",
             label: "Phone",
             value: personalInfo.phone,
             href: `tel:${personalInfo.phone}`,
@@ -52,6 +53,27 @@ export const Contact = () => {
         },
     ];
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.08,
+                delayChildren: 0.1
+            }
+        }
+    };
+
+    const cardVariants = {
+        hidden: { opacity: 0, y: 20, scale: 0.95 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            transition: { duration: 0.4, ease: easing.smooth }
+        }
+    };
+
     return (
         <section id="contact" className="py-24 bg-muted/30 relative overflow-hidden">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -62,34 +84,59 @@ export const Contact = () => {
                     subtitle="Ready to collaborate on innovative geospatial solutions? Let's discuss how we can work together."
                 />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-                    {contactMethods.map((method, idx) => (
+                <motion.div
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6"
+                    variants={containerVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={viewportOnce}
+                >
+                    {contactMethods.map((method) => (
                         <motion.div
                             key={method.id}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: idx * 0.1 }}
+                            variants={cardVariants}
                         >
-                            <a href={method.href} target={method.id !== 'email' && method.id !== 'phone' ? "_blank" : undefined} rel="noopener noreferrer">
-                                <Card className="p-8 h-full flex flex-col items-center text-center bg-card border-border/50 hover:border-primary/50 hover:shadow-xl transition-all duration-500 group">
-                                    <div className={`${method.bgColor} w-16 h-16 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500 shadow-inner`}>
-                                        <i className={`${method.icon} text-2xl ${method.color}`}></i>
-                                    </div>
-                                    <h3 className="font-bold text-foreground mb-2">{method.label}</h3>
-                                    <p className="text-muted-foreground text-sm group-hover:text-primary transition-colors break-all">
-                                        {method.value}
-                                    </p>
-                                </Card>
+                            <a
+                                href={method.href}
+                                target={method.id !== 'email' && method.id !== 'phone' ? "_blank" : undefined}
+                                rel="noopener noreferrer"
+                                className="block h-full"
+                            >
+                                <motion.div
+                                    whileHover={{ y: -6, scale: 1.02 }}
+                                    transition={{ duration: 0.3, ease: easing.smooth }}
+                                >
+                                    <Card className="p-8 h-full flex flex-col items-center text-center bg-card border-border/50 hover:border-primary/40 transition-all duration-500 group shimmer-effect glow-hover">
+                                        <motion.div
+                                            className={`${method.bgColor} w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-inner`}
+                                            whileHover={{ scale: 1.1, rotate: 8 }}
+                                            transition={{ duration: 0.3, ease: easing.smooth }}
+                                        >
+                                            <i className={`${method.icon} text-2xl ${method.color}`}></i>
+                                        </motion.div>
+                                        <h3 className="font-bold text-foreground mb-2">{method.label}</h3>
+                                        <p className="text-muted-foreground text-sm group-hover:text-primary transition-colors duration-300 break-all">
+                                            {method.value}
+                                        </p>
+                                    </Card>
+                                </motion.div>
                             </a>
                         </motion.div>
                     ))}
-                </div>
+                </motion.div>
             </div>
 
-            {/* Background decoration */}
-            <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-            <div className="absolute -top-24 -left-24 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+            {/* Background decoration with breathing animation */}
+            <motion.div
+                className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl"
+                animate={{ scale: [1, 1.1, 1], opacity: [0.05, 0.08, 0.05] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div
+                className="absolute -top-24 -left-24 w-96 h-96 bg-accent/5 rounded-full blur-3xl"
+                animate={{ scale: [1, 1.15, 1], opacity: [0.05, 0.1, 0.05] }}
+                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            />
         </section>
     );
 };

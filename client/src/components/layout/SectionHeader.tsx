@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { easing, staggerItem, viewportOnce } from "../../lib/animations";
 
 interface SectionHeaderProps {
     title: string;
@@ -13,18 +14,44 @@ export const SectionHeader = ({ title, icon, iconColor = "text-primary", subtitl
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
+                viewport={viewportOnce}
+                transition={{ duration: 0.6, ease: easing.smooth }}
             >
-                <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4 flex items-center justify-center gap-3">
-                    <i className={`fas ${icon} ${iconColor}`}></i>
+                <motion.h2
+                    className="text-3xl lg:text-4xl font-bold text-foreground mb-4 flex items-center justify-center gap-3"
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={viewportOnce}
+                    transition={{ duration: 0.5, ease: easing.smooth }}
+                >
+                    <motion.i
+                        className={`fas ${icon} ${iconColor}`}
+                        initial={{ scale: 0.8, rotate: -10 }}
+                        whileInView={{ scale: 1, rotate: 0 }}
+                        viewport={viewportOnce}
+                        transition={{ duration: 0.5, ease: easing.bounce, delay: 0.1 }}
+                    />
                     {title}
-                </h2>
-                <div className="w-24 h-1.5 bg-primary mx-auto rounded-full mb-4 shadow-sm"></div>
+                </motion.h2>
+
+                {/* Animated underline */}
+                <motion.div
+                    className="h-1.5 bg-primary mx-auto rounded-full mb-4 shadow-sm"
+                    initial={{ width: 0 }}
+                    whileInView={{ width: 96 }}
+                    viewport={viewportOnce}
+                    transition={{ duration: 0.6, ease: easing.smooth, delay: 0.2 }}
+                />
+
                 {subtitle && (
-                    <p className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">
+                    <motion.p
+                        className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed"
+                        {...staggerItem}
+                        viewport={viewportOnce}
+                        transition={{ duration: 0.5, ease: easing.smooth, delay: 0.3 }}
+                    >
                         {subtitle}
-                    </p>
+                    </motion.p>
                 )}
             </motion.div>
         </div>

@@ -47,6 +47,11 @@
     font-family: 'Inter', sans-serif;
   }
 
+  /* Custom selection styling */
+  ::selection {
+    background-color: hsl(156, 81%, 29%);
+    color: white;
+  }
 }
 
 @layer components {
@@ -90,8 +95,9 @@
     @apply transition-all duration-300 transform hover:scale-110 hover:shadow-lg;
   }
 
+  /* Smooth floating animation with calm easing */
   .floating-animation {
-    animation: float 3s ease-in-out infinite;
+    animation: float 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 
   @keyframes float {
@@ -102,18 +108,110 @@
     }
 
     50% {
-      transform: translateY(-10px);
+      transform: translateY(-12px);
     }
   }
 
+  /* Gentle pulse for ambient elements */
   .pulse-slow {
-    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation: pulse-gentle 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  @keyframes pulse-gentle {
+
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.8;
+      transform: scale(1.05);
+    }
+  }
+
+  /* Premium glow effect on hover */
+  .glow-hover {
+    transition: box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glow-hover:hover {
+    box-shadow: 0 0 30px rgba(18, 194, 133, 0.15), 0 0 60px rgba(18, 194, 133, 0.08);
+  }
+
+  /* Shimmer effect for premium cards */
+  .shimmer-effect {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shimmer-effect::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+    transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .shimmer-effect:hover::after {
+    left: 150%;
   }
 
   .geospatial-grid {
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    background-size: 20px 20px;
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Section divider gradient */
+  .section-fade-top {
+    background: linear-gradient(to bottom, hsl(76, 44%, 8%), transparent);
+  }
+
+  .section-fade-bottom {
+    background: linear-gradient(to top, hsl(76, 44%, 8%), transparent);
+  }
+
+  /* Smooth underline animation for links */
+  .link-underline {
+    position: relative;
+  }
+
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: hsl(156, 81%, 29%);
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .link-underline:hover::after {
+    width: 100%;
+  }
+
+  /* Smooth icon bounce on hover */
+  .icon-bounce:hover i,
+  .icon-bounce:hover svg {
+    animation: icon-bounce 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes icon-bounce {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-4px);
+    }
   }
 }
