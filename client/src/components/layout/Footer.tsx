@@ -62,7 +62,7 @@ export const Footer = () => {
 
                     <motion.div
                         variants={itemVariants}
-                        className="flex justify-center space-x-8 mb-10"
+                        className="flex justify-center space-x-4 sm:space-x-8 mb-10"
                     >
                         {socials.map((social, index) => (
                             <motion.a
@@ -70,7 +70,7 @@ export const Footer = () => {
                                 href={social.href}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-primary-foreground/60 hover:text-white transition-colors duration-300"
+                                className="text-primary-foreground/60 hover:text-white transition-colors duration-300 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
                                 aria-label={social.label}
                                 whileHover={{ scale: 1.25, y: -4 }}
                                 whileTap={{ scale: 0.95 }}
@@ -80,7 +80,7 @@ export const Footer = () => {
                                 viewport={viewportOnce}
                                 custom={index}
                             >
-                                <i className={`${social.icon} text-2xl`}></i>
+                                <i className={`${social.icon} text-xl sm:text-2xl`}></i>
                             </motion.a>
                         ))}
                     </motion.div>
@@ -89,9 +89,13 @@ export const Footer = () => {
                         variants={itemVariants}
                         className="border-t border-primary-foreground/20 pt-8"
                     >
-                        <p className="text-primary-foreground/60 text-sm flex items-center justify-center gap-2">
-                            <i className="fas fa-map-pin text-accent"></i>
-                            © {new Date().getFullYear()} {personalInfo.name}. All rights reserved. | {personalInfo.location}
+                        <p className="text-primary-foreground/60 text-xs sm:text-sm flex flex-wrap items-center justify-center gap-2 text-center px-4">
+                            <span className="flex items-center gap-2">
+                                <i className="fas fa-map-pin text-accent"></i>
+                                © {new Date().getFullYear()} {personalInfo.name}. All rights reserved.
+                            </span>
+                            <span className="hidden sm:inline">|</span>
+                            <span>{personalInfo.location}</span>
                         </p>
                     </motion.div>
                 </div>

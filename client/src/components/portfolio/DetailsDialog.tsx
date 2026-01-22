@@ -136,7 +136,16 @@ export const DetailsDialog = ({ item, onClose }: DetailsDialogProps) => {
                 </div>
 
                 {/* Right Column: Details */}
-                <div className="flex flex-col h-full overflow-y-auto p-8 md:p-12 order-2 bg-card">
+                <div className="flex flex-col h-full overflow-y-auto p-6 sm:p-8 md:p-12 order-2 bg-card relative">
+                    {/* Mobile Close Button - Sticky at top */}
+                    <button
+                        onClick={onClose}
+                        className="sticky top-0 right-0 ml-auto mb-4 sm:mb-6 z-50 w-11 h-11 flex items-center justify-center rounded-full bg-background/90 backdrop-blur-md border-2 border-border hover:border-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 shadow-lg active:scale-95"
+                        aria-label="Close dialog"
+                    >
+                        <i className="fas fa-times text-xl"></i>
+                    </button>
+
                     <DialogHeader className="p-0 mb-8 text-left">
                         <div className="flex items-center gap-4 mb-4">
                             {item.period && (

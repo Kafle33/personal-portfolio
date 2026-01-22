@@ -34,7 +34,7 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
     return Array.from({ length: count }).map((_, i) => ({
       id: i,
       // Ensure radii are distinct and large enough to clear the Earth node
-      radius: 120 + (i * 30) + Math.random() * 15,
+      radius: 100 + (i * 30) + Math.random() * 15,
       duration: 12 + Math.random() * 8,
       direction: i % 2 === 0 ? 1 : -1,
       inclination: -30 + (i * 15) + Math.random() * 10,
@@ -47,13 +47,13 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
   useEffect(() => {
     const duration = 3000; // 3 seconds total
     const startTime = Date.now();
-    
+
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const newProgress = Math.min((elapsed / duration) * 100, 100);
-      
+
       setProgress(newProgress);
-      
+
       if (newProgress >= 100) {
         clearInterval(interval);
         setTimeout(onComplete, 300); // Brief pause before transitioning
@@ -154,28 +154,28 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
 
       {/* 4. Central Geospatial Core */}
       <div className="relative z-20 flex flex-col items-center" style={{ perspective: "1200px" }}>
-        {/* Satellite / Orbiting System */}
+        {/* Satellite / Orbiting System - Responsive sizing */}
         <div
-          className="relative w-[500px] h-[500px] mb-8 flex items-center justify-center"
+          className="relative w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px] mb-8 flex items-center justify-center"
           style={{ transformStyle: "preserve-3d" }}
         >
-          {/* Sensor Sweep (Radar) - Flat background */}
+          {/* Sensor Sweep (Radar) - Responsive */}
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="absolute w-80 h-80 rounded-full border border-primary/10"
+            className="absolute w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-full border border-primary/10"
             style={{
               background: 'conic-gradient(from 0deg, rgba(34, 197, 94, 0.1) 0deg, transparent 90deg)',
               transform: "translateZ(-10px)"
             }}
           />
 
-          {/* Central Earth Node - Participating in 3D */}
+          {/* Central Earth Node - Responsive */}
           <div className="absolute inset-0 flex items-center justify-center" style={{ transformStyle: "preserve-3d" }}>
             <motion.div
               animate={{ scale: [1, 1.02, 1] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="w-40 h-40 rounded-full border border-primary/40 bg-primary/5 backdrop-blur-md flex items-center justify-center relative overflow-hidden"
+              className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 rounded-full border border-primary/40 bg-primary/5 backdrop-blur-md flex items-center justify-center relative overflow-hidden"
               style={{ transform: "translateZ(0px)" }}
             >
               {/* Globe Grid */}
@@ -183,7 +183,7 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
                 backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
                 backgroundSize: '10px 10px'
               }} />
-              <i className="fas fa-globe-asia text-6xl text-primary/70" />
+              <i className="fas fa-globe-asia text-4xl sm:text-5xl md:text-5xl lg:text-6xl text-primary/70" />
 
               {/* Scanning Glint */}
               <motion.div

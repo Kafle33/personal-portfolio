@@ -31,22 +31,22 @@ export const Hero = () => {
 
     return (
         <section id="hero" className="gradient-bg geospatial-grid min-h-screen flex items-center pt-20 relative overflow-hidden">
-            {/* Animated Background Elements */}
+            {/* Animated Background Elements - Reduced on mobile for performance */}
             <motion.div style={{ opacity }} className="absolute inset-0 pointer-events-none">
-                <motion.div style={{ y: y1 }} className="absolute top-20 left-10 text-white/15 floating-animation">
-                    <i className="fas fa-satellite text-4xl"></i>
+                <motion.div style={{ y: y1 }} className="absolute top-20 left-10 text-white/15 floating-animation hidden sm:block">
+                    <i className="fas fa-satellite text-2xl md:text-3xl lg:text-4xl"></i>
                 </motion.div>
-                <motion.div style={{ y: y2 }} className="absolute top-40 right-20 text-yellow-300/20 floating-animation" >
-                    <i className="fas fa-broadcast-tower text-3xl" style={{ animationDelay: '0.5s' }}></i>
+                <motion.div style={{ y: y2 }} className="absolute top-40 right-20 text-yellow-300/20 floating-animation hidden md:block" >
+                    <i className="fas fa-broadcast-tower text-2xl lg:text-3xl" style={{ animationDelay: '0.5s' }}></i>
                 </motion.div>
-                <div className="absolute bottom-32 left-1/4 text-blue-300/20 floating-animation" style={{ animationDelay: '1s' }}>
-                    <i className="fas fa-helicopter text-2xl"></i>
+                <div className="absolute bottom-32 left-1/4 text-blue-300/20 floating-animation hidden lg:block" style={{ animationDelay: '1s' }}>
+                    <i className="fas fa-helicopter text-xl lg:text-2xl"></i>
                 </div>
-                <div className="absolute top-1/3 right-1/3 text-green-300/15 floating-animation" style={{ animationDelay: '1.5s' }}>
-                    <i className="fas fa-plane text-3xl"></i>
+                <div className="absolute top-1/3 right-1/3 text-green-300/15 floating-animation hidden lg:block" style={{ animationDelay: '1.5s' }}>
+                    <i className="fas fa-plane text-2xl lg:text-3xl"></i>
                 </div>
-                <div className="absolute top-1/2 left-1/6 text-purple-300/20 floating-animation" style={{ animationDelay: '2s' }}>
-                    <i className="fas fa-brain text-2xl"></i>
+                <div className="absolute top-1/2 left-1/6 text-purple-300/20 floating-animation hidden lg:block" style={{ animationDelay: '2s' }}>
+                    <i className="fas fa-brain text-xl lg:text-2xl"></i>
                 </div>
             </motion.div>
 
@@ -76,14 +76,14 @@ export const Hero = () => {
 
                             <motion.h1
                                 variants={itemVariants}
-                                className="text-5xl lg:text-7xl font-bold tracking-tight text-white drop-shadow-2xl"
+                                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-white drop-shadow-2xl"
                             >
                                 {personalInfo.name}
                             </motion.h1>
 
                             <motion.h2
                                 variants={itemVariants}
-                                className="text-2xl lg:text-3xl font-medium text-white/90 flex items-center gap-3"
+                                className="text-xl sm:text-2xl md:text-2xl lg:text-3xl font-medium text-white/90 flex items-center gap-3"
                             >
                                 <i className="fas fa-satellite-dish text-yellow-300 pulse-slow"></i>
                                 {personalInfo.role}
@@ -117,12 +117,12 @@ export const Hero = () => {
                             <CTAButton href={personalInfo.researchgate} icon="fab fa-researchgate" label="ResearchGate" variant="teal" />
                         </motion.div>
 
-                        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-white/10">
+                        <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-8 border-t border-white/10">
                             <motion.a
                                 href={personalInfo.cv}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group relative px-8 py-4 bg-emerald-600 text-white rounded-xl font-bold overflow-hidden flex items-center justify-center gap-3 shimmer-effect glow-hover"
+                                className="group relative px-6 sm:px-8 py-3 sm:py-4 bg-emerald-600 text-white rounded-xl font-bold overflow-hidden flex items-center justify-center gap-3 shimmer-effect glow-hover min-h-[44px]"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 transition={{ duration: 0.2, ease: easing.smooth }}
@@ -134,7 +134,7 @@ export const Hero = () => {
                             <motion.a
                                 href={personalInfo.cv}
                                 download="Roshan_Kafle_CV.pdf"
-                                className="px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-xl font-bold border border-white/20 hover:bg-white/20 flex items-center justify-center gap-3 group transition-all duration-300"
+                                className="px-6 sm:px-8 py-3 sm:py-4 bg-white/10 backdrop-blur-md text-white rounded-xl font-bold border border-white/20 hover:bg-white/20 flex items-center justify-center gap-3 group transition-all duration-300 min-h-[44px]"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 transition={{ duration: 0.2, ease: easing.smooth }}
@@ -149,7 +149,7 @@ export const Hero = () => {
                         initial={{ opacity: 0, scale: 0.9, y: 30 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: easing.smooth, delay: 0.3 }}
-                        className="hidden lg:block relative"
+                        className="hidden md:block relative mt-8 lg:mt-0"
                     >
                         <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10 group">
                             <img
@@ -175,12 +175,12 @@ export const Hero = () => {
                 </div>
             </motion.div>
 
-            {/* Scroll Indicator */}
+            {/* Scroll Indicator - Hidden on mobile */}
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.5, duration: 0.6, ease: easing.smooth }}
-                className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40"
+                className="absolute bottom-10 left-1/2 -translate-x-1/2 flex-col items-center gap-2 text-white/40 hidden sm:flex"
             >
                 <span className="text-[10px] uppercase tracking-widest font-bold">Scroll to explore</span>
                 <motion.div
