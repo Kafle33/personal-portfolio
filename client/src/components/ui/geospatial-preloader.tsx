@@ -29,18 +29,25 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
     "MAPPING THE FUTURE"
   ];
 
+  // Satellite configurations for dynamic orbits
+  const satellites = useMemo(() => [
+    { id: 1, radius: 100, duration: 12, direction: 1, inclination: 15, initialAngle: 0 },
+    { id: 2, radius: 130, duration: 18, direction: -1, inclination: -25, initialAngle: 120 },
+    { id: 3, radius: 160, duration: 15, direction: 1, inclination: 45, initialAngle: 240 }
+  ], []);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(onComplete, 600); // Faster final transition
+          setTimeout(onComplete, 600);
           return 100;
         }
-        const increment = Math.random() * 10 + 5; // Faster progress
+        const increment = Math.random() * 10 + 5;
         return Math.min(prev + increment, 100);
       });
-    }, 150); // Shorter interval
+    }, 150);
 
     return () => clearInterval(interval);
   }, [onComplete]);
@@ -137,12 +144,12 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
       {/* 4. Central Geospatial Core */}
       <div className="relative z-20 flex flex-col items-center">
         {/* Satellite / Orbiting System */}
-        <div className="relative w-64 h-64 mb-16">
+        <div className="relative w-96 h-96 mb-8 flex items-center justify-center">
           {/* Sensor Sweep (Radar) */}
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 rounded-full border border-primary/10"
+            className="absolute w-64 h-64 rounded-full border border-primary/10"
             style={{
               background: 'conic-gradient(from 0deg, rgba(34, 197, 94, 0.15) 0deg, transparent 90deg)'
             }}
@@ -171,26 +178,45 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
             </motion.div>
           </div>
 
-          {/* Orbiting Satellites with Signal Beams */}
-          {[0, 120, 240].map((angle, i) => (
-            <motion.div
-              key={i}
-              animate={{ rotate: 360 }}
-              transition={{ duration: 10 + i * 2, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-0"
-              style={{ rotate: angle }}
+          {/* Dynamic Orbiting Satellites - Fixed Centering */}
+          {satellites.map((sat) => (
+            <div
+              key={sat.id}
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
             >
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 flex flex-col items-center">
+              <div
+                style={{
+                  transform: `rotateZ(${sat.inclination}deg)`,
+                  width: sat.radius * 2,
+                  height: sat.radius * 2
+                }}
+                className="relative flex items-center justify-center"
+              >
                 <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  animate={{ rotate: sat.direction * 360 }}
+                  initial={{ rotate: sat.initialAngle }}
+                  transition={{ duration: sat.duration, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0"
                 >
-                  <i className="fas fa-satellite text-primary text-sm drop-shadow-[0_0_8px_rgba(var(--primary),0.8)]" />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <i className="fas fa-satellite text-primary text-sm drop-shadow-[0_0_8px_rgba(var(--primary),0.8)]" />
+                    </motion.div>
+                    {/* Signal Beam to Center */}
+                    <div
+                      className="w-[1px] bg-gradient-to-b from-primary/40 to-transparent opacity-20"
+                      style={{ height: sat.radius }}
+                    />
+                  </div>
                 </motion.div>
-                {/* Signal Beam to Center */}
-                <div className="w-[1px] h-32 bg-gradient-to-b from-primary/40 to-transparent opacity-20" />
+
+                {/* Visual Orbit Path (Subtle) */}
+                <div className="absolute inset-0 border border-primary/5 rounded-full" />
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
