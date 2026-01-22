@@ -207,31 +207,31 @@ export const skillsData = [
         category: "Programming",
         icon: "fa-code",
         color: "text-primary",
-        skills: ["Python", "Django", "FastAPI", "Flask", "JavaScript", "HTML", "CSS"]
+        skills: ["Python", "Django", "FastAPI", "Flask", "JavaScript", "React"]
     },
     {
         category: "Geospatial Tools",
         icon: "fa-globe",
         color: "text-accent",
-        skills: ["ArcGIS", "QGIS", "GeoServer", "PostGIS", "UAV", "SAR", "LiDAR"]
+        skills: ["ArcGIS", "QGIS", "GeoServer", "PostGIS", "UAV", "SAR"]
     },
     {
-        category: "Cloud",
+        category: "Cloud & DevOps",
         icon: "fa-cloud",
         color: "text-emerald-custom",
-        skills: ["AWS EC2", "AWS ECS", "AWS S3", "AWS Lambda", "AWS RDS"]
+        skills: ["AWS S3", "AWS EC2", "Docker", "PostgreSQL", "Git", "GitHub"]
     },
     {
-        category: "Version Control",
-        icon: "fa-code-branch",
-        color: "text-earth-gray",
-        skills: ["Git", "GitHub"]
-    },
-    {
-        category: "AI/ML & Drones",
-        icon: "fa-robot",
+        category: "AI/ML",
+        icon: "fa-brain",
         color: "text-purple-600",
-        skills: ["TensorFlow", "PyTorch", "Scikit-learn", "OpenCV", "UAV Photogrammetry", "Drone Mapping", "Computer Vision"]
+        skills: ["TensorFlow", "PyTorch", "Scikit-learn", "OpenCV", "CNN", "LiDAR"]
+    },
+    {
+        category: "Drone & Mapping",
+        icon: "fa-helicopter",
+        color: "text-earth-gray",
+        skills: ["Photogrammetry", "DEM/DTM", "Drone Mapping", "GDAL", "ODM", "WebGIS"]
     }
 ];
 

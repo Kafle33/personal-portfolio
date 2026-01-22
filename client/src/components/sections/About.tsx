@@ -27,7 +27,6 @@ export const About = () => {
                         className="space-y-8"
                     >
                         <div className="relative p-8 rounded-3xl bg-muted/30 border border-border/50 backdrop-blur-sm">
-                            <i className="fas fa-quote-left absolute top-6 left-6 text-primary/10 text-6xl -z-10"></i>
 
                             <div className="space-y-6 text-lg leading-relaxed text-foreground/90">
                                 <p className="text-justify">

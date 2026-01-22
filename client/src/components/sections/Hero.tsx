@@ -148,7 +148,7 @@ export const Hero = () => {
 
 const CTAButton = ({ href, icon, label, variant }: { href: string; icon: string; label: string; variant: 'white' | 'blue' | 'teal' }) => {
     const variants = {
-        white: "bg-white text-forest hover:bg-gray-100",
+        white: "bg-white text-gray-900 hover:bg-gray-100",
         blue: "bg-[#0077b5] text-white hover:bg-[#006396]",
         teal: "bg-[#00ccbb] text-white hover:bg-[#00b3a4]"
     };
