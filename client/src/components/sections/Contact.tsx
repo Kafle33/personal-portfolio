@@ -8,7 +8,7 @@ export const Contact = () => {
     const contactMethods = [
         {
             id: 'email',
-            icon: "fa-at",
+            icon: "fas fa-envelope",
             label: "Email",
             value: personalInfo.email,
             href: `mailto:${personalInfo.email}`,
@@ -17,7 +17,7 @@ export const Contact = () => {
         },
         {
             id: 'phone',
-            icon: "fa-mobile-alt",
+            icon: "fas fa-phone-alt",
             label: "Phone",
             value: personalInfo.phone,
             href: `tel:${personalInfo.phone}`,
@@ -106,7 +106,7 @@ export const Contact = () => {
                                     whileHover={{ y: -6, scale: 1.02 }}
                                     transition={{ duration: 0.3, ease: easing.smooth }}
                                 >
-                                    <Card className="p-8 h-full flex flex-col items-center text-center bg-card border-border/50 hover:border-primary/40 transition-all duration-500 group shimmer-effect glow-hover">
+                                    <Card className="p-6 h-full flex flex-col items-center text-center bg-card border-border/50 hover:border-primary/40 transition-all duration-500 group shimmer-effect glow-hover overflow-hidden">
                                         <motion.div
                                             className={`${method.bgColor} w-16 h-16 rounded-2xl flex items-center justify-center mb-6 shadow-inner`}
                                             whileHover={{ scale: 1.1, rotate: 8 }}
@@ -115,7 +115,10 @@ export const Contact = () => {
                                             <i className={`${method.icon} text-2xl ${method.color}`}></i>
                                         </motion.div>
                                         <h3 className="font-bold text-foreground mb-2">{method.label}</h3>
-                                        <p className="text-muted-foreground text-sm group-hover:text-primary transition-colors duration-300 break-all">
+                                        <p
+                                            className="text-muted-foreground text-sm group-hover:text-primary transition-colors duration-300 w-full truncate px-2"
+                                            title={method.value}
+                                        >
                                             {method.value}
                                         </p>
                                     </Card>
