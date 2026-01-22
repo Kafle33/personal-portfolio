@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "../ui/card";
 import { PortfolioItem } from "../../data/portfolio";
 import { easing, viewportOnce } from "../../lib/animations";
@@ -11,6 +12,33 @@ interface PortfolioCardProps {
 }
 
 export const PortfolioCard = ({ item, onClick, index, type }: PortfolioCardProps) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    useEffect(() => {
+        let timeoutId: NodeJS.Timeout;
+        let intervalId: NodeJS.Timeout;
+
+        if (isHovered && item.images.length > 1) {
+            // First transition after 1 second
+            timeoutId = setTimeout(() => {
+                setCurrentImageIndex(1 % item.images.length);
+
+                // Subsequent transitions every 2 seconds
+                intervalId = setInterval(() => {
+                    setCurrentImageIndex((prev) => (prev + 1) % item.images.length);
+                }, 2000);
+            }, 1000);
+        } else {
+            setCurrentImageIndex(0);
+        }
+
+        return () => {
+            if (timeoutId) clearTimeout(timeoutId);
+            if (intervalId) clearInterval(intervalId);
+        };
+    }, [isHovered, item.images.length]);
+
     const icons = {
         experience: ['fa-building', 'fa-satellite-dish', 'fa-exclamation-triangle', 'fa-home'],
         project: ['fa-seedling', 'fa-map-signs', 'fa-globe', 'fa-map', 'fa-city'],
@@ -50,17 +78,24 @@ export const PortfolioCard = ({ item, onClick, index, type }: PortfolioCardProps
         >
             <Card
                 onClick={onClick}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
                 className="group cursor-pointer bg-card border-border/50 hover:border-primary/40 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden flex flex-col h-full shimmer-effect glow-hover"
             >
                 {/* Image Section */}
                 <div className="relative h-52 overflow-hidden bg-muted/20">
-                    <motion.img
-                        src={item.images[0]}
-                        alt={item.title}
-                        className="w-full h-full object-cover"
-                        whileHover={{ scale: 1.08 }}
-                        transition={{ duration: 0.6, ease: easing.smooth }}
-                    />
+                    <AnimatePresence mode="wait">
+                        <motion.img
+                            key={currentImageIndex}
+                            src={item.images[currentImageIndex]}
+                            alt={`${item.title} - ${currentImageIndex + 1}`}
+                            className="w-full h-full object-cover absolute inset-0"
+                            initial={{ opacity: 0, scale: 1.1 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.6, ease: easing.smooth }}
+                        />
+                    </AnimatePresence>
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-50 group-hover:opacity-30 transition-opacity duration-500" />
 
                     {/* Badges */}
