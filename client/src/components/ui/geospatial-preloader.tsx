@@ -29,11 +29,20 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
   ];
 
   // Satellite configurations for dynamic orbits
-  const satellites = useMemo(() => [
-    { id: 1, radius: 100, duration: 12, direction: 1, inclination: 15, initialAngle: 0 },
-    { id: 2, radius: 130, duration: 18, direction: -1, inclination: -25, initialAngle: 120 },
-    { id: 3, radius: 160, duration: 15, direction: 1, inclination: 45, initialAngle: 240 }
-  ], []);
+  const satellites = useMemo(() => {
+    const count = 6; // Fixed number of satellites for better visual balance
+    return Array.from({ length: count }).map((_, i) => ({
+      id: i,
+      // Ensure radii are distinct and large enough to clear the Earth node
+      radius: 120 + (i * 30) + Math.random() * 15,
+      duration: 12 + Math.random() * 8,
+      direction: i % 2 === 0 ? 1 : -1,
+      inclination: -30 + (i * 15) + Math.random() * 10,
+      rotateX: -25 + Math.random() * 50,
+      rotateY: -25 + Math.random() * 50,
+      initialAngle: (i * 72) + Math.random() * 20
+    }));
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -141,32 +150,37 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
       </div>
 
       {/* 4. Central Geospatial Core */}
-      <div className="relative z-20 flex flex-col items-center">
+      <div className="relative z-20 flex flex-col items-center" style={{ perspective: "1200px" }}>
         {/* Satellite / Orbiting System */}
-        <div className="relative w-96 h-96 mb-8 flex items-center justify-center">
-          {/* Sensor Sweep (Radar) */}
+        <div
+          className="relative w-[500px] h-[500px] mb-8 flex items-center justify-center"
+          style={{ transformStyle: "preserve-3d" }}
+        >
+          {/* Sensor Sweep (Radar) - Flat background */}
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="absolute w-64 h-64 rounded-full border border-primary/10"
+            className="absolute w-80 h-80 rounded-full border border-primary/10"
             style={{
-              background: 'conic-gradient(from 0deg, rgba(34, 197, 94, 0.15) 0deg, transparent 90deg)'
+              background: 'conic-gradient(from 0deg, rgba(34, 197, 94, 0.1) 0deg, transparent 90deg)',
+              transform: "translateZ(-10px)"
             }}
           />
 
-          {/* Central Earth Node */}
-          <div className="absolute inset-0 flex items-center justify-center">
+          {/* Central Earth Node - Participating in 3D */}
+          <div className="absolute inset-0 flex items-center justify-center" style={{ transformStyle: "preserve-3d" }}>
             <motion.div
               animate={{ scale: [1, 1.02, 1] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="w-32 h-32 rounded-full border border-primary/40 bg-primary/5 backdrop-blur-md flex items-center justify-center relative overflow-hidden"
+              className="w-40 h-40 rounded-full border border-primary/40 bg-primary/5 backdrop-blur-md flex items-center justify-center relative overflow-hidden"
+              style={{ transform: "translateZ(0px)" }}
             >
               {/* Globe Grid */}
               <div className="absolute inset-0 opacity-20" style={{
                 backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
                 backgroundSize: '10px 10px'
               }} />
-              <i className="fas fa-globe-asia text-5xl text-primary/70" />
+              <i className="fas fa-globe-asia text-6xl text-primary/70" />
 
               {/* Scanning Glint */}
               <motion.div
@@ -177,44 +191,99 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
             </motion.div>
           </div>
 
-          {/* Dynamic Orbiting Satellites - Fixed Centering */}
+          {/* Dynamic Orbiting Satellites */}
           {satellites.map((sat) => (
             <div
               key={sat.id}
               className="absolute inset-0 flex items-center justify-center pointer-events-none"
+              style={{
+                transformStyle: "preserve-3d",
+                transform: `rotateX(${sat.rotateX}deg) rotateY(${sat.rotateY}deg) rotateZ(${sat.inclination}deg)`
+              }}
             >
+              {/* Visual Orbit Path - Increased visibility */}
               <div
+                className="absolute border border-primary/20 rounded-full"
                 style={{
-                  transform: `rotateZ(${sat.inclination}deg)`,
                   width: sat.radius * 2,
-                  height: sat.radius * 2
+                  height: sat.radius * 2,
+                  transform: "translateZ(0px)"
                 }}
-                className="relative flex items-center justify-center"
-              >
-                <motion.div
-                  animate={{ rotate: sat.direction * 360 }}
-                  initial={{ rotate: sat.initialAngle }}
-                  transition={{ duration: sat.duration, repeat: Infinity, ease: "linear" }}
-                  className="absolute inset-0"
-                >
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                    <motion.div
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      <i className="fas fa-satellite text-primary text-sm drop-shadow-[0_0_8px_rgba(var(--primary),0.8)]" />
-                    </motion.div>
-                    {/* Signal Beam to Center */}
-                    <div
-                      className="w-[1px] bg-gradient-to-b from-primary/40 to-transparent opacity-20"
-                      style={{ height: sat.radius }}
-                    />
-                  </div>
-                </motion.div>
+              />
 
-                {/* Visual Orbit Path (Subtle) */}
-                <div className="absolute inset-0 border border-primary/5 rounded-full" />
-              </div>
+              {/* Satellite Container */}
+              <motion.div
+                animate={{ rotate: sat.direction * 360 }}
+                initial={{ rotate: sat.initialAngle }}
+                transition={{ duration: sat.duration, repeat: Infinity, ease: "linear" }}
+                className="absolute"
+                style={{
+                  width: sat.radius * 2,
+                  height: sat.radius * 2,
+                  transformStyle: "preserve-3d"
+                }}
+              >
+                <div
+                  className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
+                  style={{
+                    transform: "rotateX(-90deg) translateZ(2px)", // Slightly above the orbit line
+                    transformStyle: "preserve-3d"
+                  }}
+                >
+                  {/* Detailed Satellite Representation */}
+                  <motion.div
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    className="relative"
+                  >
+                    {/* Satellite Body & Solar Panels - More technical look */}
+                    <svg width="48" height="32" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_10px_rgba(34,197,94,0.8)]">
+                      {/* Left Solar Panel Array */}
+                      <g opacity="0.8">
+                        <rect x="2" y="10" width="14" height="12" rx="1" fill="#1a3a2a" stroke="currentColor" strokeWidth="1" />
+                        <line x1="2" y1="14" x2="16" y2="14" stroke="currentColor" strokeWidth="0.5" />
+                        <line x1="2" y1="18" x2="16" y2="18" stroke="currentColor" strokeWidth="0.5" />
+                        <line x1="9" y1="10" x2="9" y2="22" stroke="currentColor" strokeWidth="0.5" />
+                      </g>
+
+                      {/* Right Solar Panel Array */}
+                      <g opacity="0.8">
+                        <rect x="32" y="10" width="14" height="12" rx="1" fill="#1a3a2a" stroke="currentColor" strokeWidth="1" />
+                        <line x1="32" y1="14" x2="46" y2="14" stroke="currentColor" strokeWidth="0.5" />
+                        <line x1="32" y1="18" x2="46" y2="18" stroke="currentColor" strokeWidth="0.5" />
+                        <line x1="39" y1="10" x2="39" y2="22" stroke="currentColor" strokeWidth="0.5" />
+                      </g>
+
+                      {/* Connection Struts */}
+                      <rect x="16" y="15" width="4" height="2" fill="currentColor" />
+                      <rect x="28" y="15" width="4" height="2" fill="currentColor" />
+
+                      {/* Main Bus (Body) */}
+                      <rect x="20" y="8" width="8" height="16" rx="1" fill="currentColor" stroke="currentColor" strokeWidth="1" />
+
+                      {/* High-Gain Antenna */}
+                      <path d="M24 8V2" stroke="currentColor" strokeWidth="1.5" />
+                      <path d="M20 4C20 4 22 2 24 2C26 2 28 4 28 4" stroke="currentColor" strokeWidth="1" fill="none" />
+
+                      {/* Sensor Lens */}
+                      <circle cx="24" cy="20" r="2" fill="#020406" stroke="currentColor" strokeWidth="0.5" />
+                    </svg>
+
+                    {/* Signal Pulse */}
+                    <motion.div
+                      animate={{ scale: [1, 2.5], opacity: [0.6, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border border-primary/50"
+                    />
+                  </motion.div>
+
+                  {/* Signal Beam to Center */}
+                  <div
+                    className="w-[1px] bg-gradient-to-b from-primary/60 to-transparent opacity-40"
+                    style={{ height: sat.radius, transform: "translateY(16px)" }}
+                  />
+                </div>
+              </motion.div>
             </div>
           ))}
         </div>
