@@ -34,6 +34,11 @@ import CV from '../assets/CV.pdf';
 import dmsps1 from '../assets/dmaps1.png';
 import dmaps2 from '../assets/dmaps2.png';
 import dmaps3 from '../assets/dmaps3.png';
+import naxa1 from '../assets/naxa1.png';
+import naxa2 from '../assets/naxa2.png';
+import naxa3 from '../assets/naxa3.png';
+import hot1 from '../assets/hot1.png';
+import hot2 from '../assets/hot2.png';
 // Certificate imports - Online Courses
 import eoUrbanC from '../assets/eo_college_urban_spaces.png';
 import eoMlC from '../assets/eo_college_ml_eo.png';
@@ -70,9 +75,9 @@ export default function Home() {
       link: "https://naxa.com.np",
       description: "WebGIS Developer & Backend Engineer specializing in geospatial solutions, Earth observation data processing, and AI-driven analytics.",
       images: [
-        "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
-        "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
-        "https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
+        naxa1,
+        naxa3,
+        naxa2
       ],
       details: [
         "Khaderi-Alert (Drought Monitoring System): Integrated multi-source Earth Observation and meteorological data for real-time drought modeling; developed modular systems for drought severity assessment, hotspot mapping, and risk ranking; created interactive Web-GIS platform with real-time alerts.",
@@ -177,9 +182,8 @@ export default function Home() {
       link: "https://fmtm.hotosm.org/",
       description: "Integrated geospatial data using Python and PostGIS; collaborated with international teams to improve system usability, reliability, and scalability.",
       images: [
-        "https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
-        "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500",
-        "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=500"
+        hot1,
+        hot2
       ],
       details: [
         "Integrated geospatial data using Python and PostGIS.",
