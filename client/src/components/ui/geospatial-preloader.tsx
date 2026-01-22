@@ -21,8 +21,8 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
   ];
 
   const thematicTitles = [
-    "ROSHAN KAFLE | PORTFOLIO",
-    "WEBGIS ARCHITECT",
+    "ROSHAN KAFLE",
+    "WEBGIS  Developer",
     "SPATIAL DATA ENGINEER",
     "GEOMATICS SPECIALIST",
     "MAPPING THE FUTURE"
