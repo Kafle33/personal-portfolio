@@ -45,17 +45,20 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
   }, []);
 
   useEffect(() => {
+    const duration = 3000; // 3 seconds total
+    const startTime = Date.now();
+    
     const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(onComplete, 600);
-          return 100;
-        }
-        const increment = Math.random() * 10 + 5;
-        return Math.min(prev + increment, 100);
-      });
-    }, 150);
+      const elapsed = Date.now() - startTime;
+      const newProgress = Math.min((elapsed / duration) * 100, 100);
+      
+      setProgress(newProgress);
+      
+      if (newProgress >= 100) {
+        clearInterval(interval);
+        setTimeout(onComplete, 300); // Brief pause before transitioning
+      }
+    }, 30); // Update every 30ms for smooth animation
 
     return () => clearInterval(interval);
   }, [onComplete]);
