@@ -70,7 +70,7 @@ export const PortfolioCard = ({ item, onClick, index, type }: PortfolioCardProps
                             whileHover={{ scale: 1.1, rotate: 5 }}
                             transition={{ duration: 0.2, ease: easing.smooth }}
                         >
-                            <i className={`fas ${icon} ${color} text-lg`}></i>
+                            <i className={`fas ${icon} ${item.id === 'precision-farming' ? 'text-emerald-500' : color} text-lg`}></i>
                         </motion.div>
                     </div>
 
