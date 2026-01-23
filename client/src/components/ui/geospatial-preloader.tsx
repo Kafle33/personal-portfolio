@@ -28,19 +28,22 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
     "MAPPING THE FUTURE"
   ];
 
-  // Satellite configurations for dynamic orbits
+  // Satellite configurations for truly randomized, distinct orbits
   const satellites = useMemo(() => {
-    const count = 6; // Fixed number of satellites for better visual balance
+    // Randomize number of satellites between 4 and 8
+    const count = Math.floor(Math.random() * 5) + 4;
     return Array.from({ length: count }).map((_, i) => ({
       id: i,
-      // Ensure radii are distinct and large enough to clear the Earth node
-      radius: 100 + (i * 30) + Math.random() * 15,
-      duration: 12 + Math.random() * 8,
-      direction: i % 2 === 0 ? 1 : -1,
-      inclination: -30 + (i * 15) + Math.random() * 10,
-      rotateX: -25 + Math.random() * 50,
-      rotateY: -25 + Math.random() * 50,
-      initialAngle: (i * 72) + Math.random() * 20
+      // Strictly distinct radii with a random offset to ensure no overlapping orbits
+      radius: 120 + (i * 35) + (Math.random() * 15),
+      // Random speed (10s to 30s) and direction
+      duration: 10 + Math.random() * 20,
+      direction: Math.random() > 0.5 ? 1 : -1,
+      // Random orbital orientation (full 360 degree range)
+      rotateX: Math.random() * 360,
+      rotateY: Math.random() * 360,
+      inclination: Math.random() * 360,
+      initialAngle: Math.random() * 360
     }));
   }, []);
 
@@ -159,16 +162,6 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
           className="relative w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px] mb-8 flex items-center justify-center"
           style={{ transformStyle: "preserve-3d" }}
         >
-          {/* Sensor Sweep (Radar) - Responsive */}
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-            className="absolute w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-full border border-primary/10"
-            style={{
-              background: 'conic-gradient(from 0deg, rgba(34, 197, 94, 0.1) 0deg, transparent 90deg)',
-              transform: "translateZ(-10px)"
-            }}
-          />
 
           {/* Central Earth Node - Responsive */}
           <div className="absolute inset-0 flex items-center justify-center" style={{ transformStyle: "preserve-3d" }}>
