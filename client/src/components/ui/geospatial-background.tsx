@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
-const SatelliteTrack = ({ delay = 0, duration = 20, top = "20%" }) => {
+const SatelliteTrack = ({ delay = 0, duration = 20, top = "20%" }: { delay?: number; duration?: number; top?: string }) => {
     return (
         <motion.div
             className="absolute h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent w-full"
@@ -20,7 +20,7 @@ const SatelliteTrack = ({ delay = 0, duration = 20, top = "20%" }) => {
     );
 };
 
-const NetworkNode = ({ x, y, delay = 0 }) => {
+const NetworkNode = ({ x, y, delay = 0 }: { x: number; y: number; delay?: number }) => {
     return (
         <div className="absolute" style={{ left: `${x}%`, top: `${y}%` }}>
             <motion.div
@@ -39,19 +39,71 @@ const NetworkNode = ({ x, y, delay = 0 }) => {
     );
 };
 
+const ContourIsland = ({ x, y, scale = 1, levels = 6 }: { x: number; y: number; scale?: number; levels?: number }) => {
+    const paths = React.useMemo(() => {
+        const generatedPaths = [];
+        const pointsCount = 12;
+
+        // Generate base offsets for irregularity
+        const baseOffsets = Array.from({ length: pointsCount }).map(() => 0.7 + Math.random() * 0.6);
+
+        for (let level = 0; level < levels; level++) {
+            const radius = (level + 1) * 20 * scale;
+            const pts: { x: number; y: number }[] = [];
+
+            for (let i = 0; i < pointsCount; i++) {
+                const angle = (i / pointsCount) * Math.PI * 2;
+                // Add level-specific noise to make nested lines slightly different but following the same trend
+                const r = radius * (baseOffsets[i] + (Math.random() * 0.1 - 0.05));
+                pts.push({
+                    x: Math.cos(angle) * r,
+                    y: Math.sin(angle) * r
+                });
+            }
+
+            // Create smooth SVG path using Quadratic Bezier curves
+            // We use midpoints as start/end and the actual points as control points
+            let d = "";
+            for (let i = 0; i < pts.length; i++) {
+                const p0 = pts[i];
+                const p1 = pts[(i + 1) % pts.length];
+                const midX = (p0.x + p1.x) / 2;
+                const midY = (p0.y + p1.y) / 2;
+
+                if (i === 0) {
+                    const prevP = pts[pts.length - 1];
+                    const startMidX = (prevP.x + p0.x) / 2;
+                    const startMidY = (prevP.y + p0.y) / 2;
+                    d += `M ${startMidX},${startMidY} `;
+                }
+                d += `Q ${p0.x},${p0.y} ${midX},${midY} `;
+            }
+            generatedPaths.push(d + " Z");
+        }
+        return generatedPaths;
+    }, [scale, levels]);
+
+    return (
+        <g transform={`translate(${x}, ${y})`}>
+            {paths.map((d, i) => (
+                <path
+                    key={i}
+                    d={d}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={i % 5 === 0 ? "1.2" : "0.6"}
+                    className="text-primary"
+                    style={{ opacity: i % 5 === 0 ? 0.25 : 0.12 }}
+                />
+            ))}
+        </g>
+    );
+};
+
 export const GeospatialBackground = () => {
     const { scrollY } = useScroll();
     const y1 = useTransform(scrollY, [0, 1000], [0, -50]);
     const y2 = useTransform(scrollY, [0, 1000], [0, -100]);
-
-    // Simplified world map paths (approximate continents)
-    const mapPaths = [
-        "M 200,100 Q 250,80 300,120 T 350,150 T 300,200 T 200,180 Z", // North America
-        "M 350,250 Q 400,280 380,350 T 320,400 T 280,350 Z", // South America
-        "M 500,100 Q 550,80 650,100 T 750,150 T 700,250 T 600,200 Z", // Eurasia
-        "M 550,250 Q 600,280 620,350 T 580,420 T 520,350 Z", // Africa
-        "M 750,350 Q 800,380 780,420 T 720,450 T 680,400 Z", // Australia
-    ];
 
     return (
         <div className="fixed inset-0 -z-10 overflow-hidden bg-background pointer-events-none">
@@ -70,12 +122,14 @@ export const GeospatialBackground = () => {
                 </svg>
             </motion.div>
 
-            {/* World Map Contours */}
-            <motion.div style={{ y: y2 }} className="absolute inset-0 opacity-[0.08] flex items-center justify-center">
-                <svg viewBox="0 0 1000 500" className="w-full h-full max-w-6xl">
-                    {mapPaths.map((path, i) => (
-                        <path key={i} d={path} fill="none" stroke="currentColor" strokeWidth="1" className="text-primary" />
-                    ))}
+            {/* Topographic Contours */}
+            <motion.div style={{ y: y2 }} className="absolute inset-0 flex items-center justify-center">
+                <svg viewBox="0 0 1000 1000" className="w-full h-full opacity-40">
+                    <ContourIsland x={200} y={200} scale={1.2} levels={8} />
+                    <ContourIsland x={700} y={150} scale={0.8} levels={6} />
+                    <ContourIsland x={400} y={500} scale={1.5} levels={10} />
+                    <ContourIsland x={800} y={700} scale={1.1} levels={7} />
+                    <ContourIsland x={150} y={800} scale={0.9} levels={5} />
                 </svg>
             </motion.div>
 
