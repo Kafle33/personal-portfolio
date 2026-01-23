@@ -8,7 +8,7 @@ interface CertificationsProps {
 
 export const Certifications = ({ onItemClick }: CertificationsProps) => {
     return (
-        <section id="certifications" className="py-24 bg-background">
+        <section id="certifications" className="py-24">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <SectionHeader
                     title="Professional Development"

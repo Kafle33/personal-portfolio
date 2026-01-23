@@ -8,7 +8,7 @@ interface ExperienceProps {
 
 export const Experience = ({ onItemClick }: ExperienceProps) => {
     return (
-        <section id="experience" className="py-24 bg-background">
+        <section id="experience" className="py-24">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <SectionHeader
                     title="Professional Experience"

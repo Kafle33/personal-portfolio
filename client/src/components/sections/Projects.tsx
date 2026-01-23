@@ -8,7 +8,7 @@ interface ProjectsProps {
 
 export const Projects = ({ onItemClick }: ProjectsProps) => {
     return (
-        <section id="projects" className="py-24 bg-muted/30">
+        <section id="projects" className="py-24">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <SectionHeader
                     title="Research & Projects"

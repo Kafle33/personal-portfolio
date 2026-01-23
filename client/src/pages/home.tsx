@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { GeospatialPreloader } from "@/components/ui/geospatial-preloader";
 import { PortfolioItem } from "../data/portfolio";
+import { GeospatialBackground } from "@/components/ui/geospatial-background";
 
 // Layout Components
 import { Navbar } from "../components/layout/Navbar";
@@ -57,7 +58,8 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background transition-colors duration-300">
+    <div className="min-h-screen transition-colors duration-300 relative">
+      <GeospatialBackground />
       <Navbar activeSection={activeSection} scrollToSection={scrollToSection} />
 
       <main>

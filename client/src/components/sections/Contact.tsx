@@ -75,7 +75,7 @@ export const Contact = () => {
     };
 
     return (
-        <section id="contact" className="py-24 bg-muted/30 relative overflow-hidden">
+        <section id="contact" className="py-24 relative overflow-hidden">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <SectionHeader
                     title="Get In Touch"

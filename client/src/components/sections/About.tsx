@@ -44,7 +44,7 @@ export const About = () => {
     };
 
     return (
-        <section id="about" className="py-24 bg-background relative overflow-hidden">
+        <section id="about" className="py-24 relative overflow-hidden">
             {/* Subtle section divider at top */}
             <div className="absolute top-0 left-0 right-0 h-24 section-fade-top pointer-events-none" />
 

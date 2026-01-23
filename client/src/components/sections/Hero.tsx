@@ -30,7 +30,7 @@ export const Hero = () => {
     };
 
     return (
-        <section id="hero" className="gradient-bg geospatial-grid min-h-screen flex items-center pt-20 relative overflow-hidden">
+        <section id="hero" className="geospatial-grid min-h-screen flex items-center pt-20 relative overflow-hidden">
             {/* Animated Background Elements - Reduced on mobile for performance */}
             <motion.div style={{ opacity }} className="absolute inset-0 pointer-events-none">
                 <motion.div style={{ y: y1 }} className="absolute top-20 left-10 text-white/15 floating-animation hidden sm:block">
