@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
-const SatelliteTrack = ({ delay = 0, duration = 20, top = "20%" }: { delay?: number; duration?: number; top?: string }) => {
+const SatelliteTrack = React.memo(({ delay = 0, duration = 20, top = "20%" }: { delay?: number; duration?: number; top?: string }) => {
     return (
         <motion.div
             className="absolute h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent w-full"
-            style={{ top }}
+            style={{ top, willChange: "transform" }}
             initial={{ x: "-100%" }}
             animate={{ x: "100%" }}
             transition={{
@@ -18,9 +18,9 @@ const SatelliteTrack = ({ delay = 0, duration = 20, top = "20%" }: { delay?: num
             <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-1 bg-primary rounded-full shadow-[0_0_8px_rgba(18,194,133,0.8)]" />
         </motion.div>
     );
-};
+});
 
-const NetworkNode = ({ x, y, delay = 0 }: { x: number; y: number; delay?: number }) => {
+const NetworkNode = React.memo(({ x, y, delay = 0 }: { x: number; y: number; delay?: number }) => {
     return (
         <div className="absolute" style={{ left: `${x}%`, top: `${y}%` }}>
             <motion.div
@@ -34,12 +34,13 @@ const NetworkNode = ({ x, y, delay = 0 }: { x: number; y: number; delay?: number
                     repeat: Infinity,
                     delay,
                 }}
+                style={{ willChange: "transform, opacity" }}
             />
         </div>
     );
-};
+});
 
-const ContourIsland = ({ x, y, scale = 1, levels = 6 }: { x: number; y: number; scale?: number; levels?: number }) => {
+const ContourIsland = React.memo(({ x, y, scale = 1, levels = 6 }: { x: number; y: number; scale?: number; levels?: number }) => {
     const paths = React.useMemo(() => {
         const generatedPaths = [];
         const pointsCount = 12;
@@ -98,7 +99,7 @@ const ContourIsland = ({ x, y, scale = 1, levels = 6 }: { x: number; y: number; 
             ))}
         </g>
     );
-};
+});
 
 export const GeospatialBackground = () => {
     const { scrollY } = useScroll();
@@ -111,7 +112,7 @@ export const GeospatialBackground = () => {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(18,194,133,0.05)_0%,transparent_70%)]" />
 
             {/* Lat/Long Grid */}
-            <motion.div style={{ y: y1 }} className="absolute inset-0 opacity-20">
+            <motion.div style={{ y: y1, willChange: "transform" }} className="absolute inset-0 opacity-20">
                 <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
@@ -123,7 +124,7 @@ export const GeospatialBackground = () => {
             </motion.div>
 
             {/* Topographic Contours */}
-            <motion.div style={{ y: y2 }} className="absolute inset-0 flex items-center justify-center">
+            <motion.div style={{ y: y2, willChange: "transform" }} className="absolute inset-0 flex items-center justify-center">
                 <svg viewBox="0 0 1000 1000" className="w-full h-full opacity-40">
                     <ContourIsland x={200} y={200} scale={1.2} levels={8} />
                     <ContourIsland x={700} y={150} scale={0.8} levels={6} />
@@ -150,6 +151,7 @@ export const GeospatialBackground = () => {
                 className="absolute w-full h-[2px] bg-primary/5"
                 animate={{ top: ["0%", "100%"] }}
                 transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                style={{ willChange: "top" }}
             />
         </div>
     );

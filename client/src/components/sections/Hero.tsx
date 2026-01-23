@@ -128,7 +128,7 @@ export const Hero = () => {
                                 transition={{ duration: 0.2, ease: easing.smooth }}
                             >
                                 <i className="fas fa-eye group-hover:scale-110 transition-transform duration-300"></i>
-                                <span>View Portfolio CV</span>
+                                <span>View CV</span>
                             </motion.a>
 
                             <motion.a
