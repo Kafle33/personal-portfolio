@@ -52,6 +52,54 @@
     background-color: hsl(156, 81%, 29%);
     color: white;
   }
+
+  /* High-Fidelity 3D Wireframe Globe Styles */
+  .wireframe-globe {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    perspective: 1200px;
+    animation: rotate-wireframe 20s linear infinite;
+  }
+
+  .globe-ring {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    backface-visibility: visible;
+  }
+
+  .globe-shading {
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, transparent 50%, rgba(0, 0, 0, 0.4) 100%);
+    pointer-events: none;
+    z-index: -1;
+    /* Move behind rings but keep sphere shape */
+  }
+
+  .globe-highlight {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 11;
+  }
+
+  @keyframes rotate-wireframe {
+    from {
+      transform: rotateX(20deg) rotateY(0deg);
+    }
+
+    to {
+      transform: rotateX(20deg) rotateY(360deg);
+    }
+  }
 }
 
 @layer components {

@@ -83,10 +83,15 @@ export const Hero = () => {
 
                             <motion.h2
                                 variants={itemVariants}
-                                className="text-xl sm:text-2xl md:text-2xl lg:text-3xl font-medium text-white/90 flex items-center gap-3"
+                                className="text-xl sm:text-2xl md:text-2xl lg:text-3xl font-medium text-white/90 flex flex-col gap-1"
                             >
-                                <i className="fas fa-satellite-dish text-yellow-300 pulse-slow"></i>
-                                {personalInfo.role}
+                                <div className="flex items-center gap-3">
+                                    <i className="fas fa-satellite-dish text-yellow-300 pulse-slow"></i>
+                                    <span>{personalInfo.role[0]}</span>
+                                </div>
+                                <div className="pl-8 text-lg sm:text-xl md:text-xl lg:text-2xl text-white/70">
+                                    {personalInfo.role[1]}
+                                </div>
                             </motion.h2>
                         </div>
 

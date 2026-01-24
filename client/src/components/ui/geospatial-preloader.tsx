@@ -171,19 +171,40 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
               className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 rounded-full border border-primary/40 bg-primary/5 backdrop-blur-md flex items-center justify-center relative overflow-hidden"
               style={{ transform: "translateZ(0px)" }}
             >
-              {/* Globe Grid */}
-              <div className="absolute inset-0 opacity-20" style={{
-                backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
-                backgroundSize: '10px 10px'
-              }} />
-              <i className="fas fa-globe-asia text-4xl sm:text-5xl md:text-5xl lg:text-6xl text-primary/70" />
+              {/* High-Fidelity 3D Wireframe Globe */}
+              <div className="wireframe-globe">
+                <div className="globe-shading" />
+                <div className="globe-highlight" />
 
-              {/* Scanning Glint */}
-              <motion.div
-                animate={{ top: ["-100%", "200%"] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/10 to-transparent"
-              />
+                {/* Longitude Rings (Vertical) */}
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <div
+                    key={`lon-${i}`}
+                    className="globe-ring"
+                    style={{ transform: `rotateY(${i * 15}deg)` }}
+                  />
+                ))}
+
+                {/* Latitude Rings (Horizontal) */}
+                {[-75, -60, -45, -30, -15, 0, 15, 30, 45, 60, 75].map((lat) => {
+                  const scale = Math.cos((lat * Math.PI) / 180);
+                  const y = Math.sin((lat * Math.PI) / 180) * 50; // 50% radius
+                  const isEquator = lat === 0;
+                  return (
+                    <div
+                      key={`lat-${lat}`}
+                      className="globe-ring"
+                      style={{
+                        transform: `translateY(${-y}%) rotateX(90deg) scale(${scale})`,
+                        opacity: isEquator ? 0.8 : 0.4,
+                        borderWidth: isEquator ? '1.5px' : '1px',
+                        borderColor: 'rgba(34, 197, 94, 0.5)',
+                        boxShadow: isEquator ? '0 0 8px rgba(34, 197, 94, 0.3)' : 'none'
+                      }}
+                    />
+                  );
+                })}
+              </div>
             </motion.div>
           </div>
 

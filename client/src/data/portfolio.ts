@@ -238,7 +238,7 @@ export const skillsData = [
 
 export const personalInfo = {
     name: "Roshan Kafle",
-    role: "Geospatial Engineer | WebGIS & Backend Developer",
+    role: ["Geospatial Engineer", "WebGIS & Backend Developer"],
     location: "Pokhara, Gandaki, Nepal",
     coordinates: "28.2096°N, 83.9856°E",
     email: "roshankafle33@gmail.com",

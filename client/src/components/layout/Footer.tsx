@@ -54,10 +54,15 @@ export const Footer = () => {
 
                     <motion.p
                         variants={itemVariants}
-                        className="text-primary-foreground/80 mb-8 max-w-md mx-auto"
+                        className="text-primary-foreground/80 mb-8 max-w-md mx-auto flex flex-col gap-1"
                     >
-                        <i className="fas fa-satellite-dish mr-2 text-yellow-300"></i>
-                        {personalInfo.role}
+                        <div className="flex items-center justify-center gap-2">
+                            <i className="fas fa-satellite-dish text-yellow-300"></i>
+                            <span>{personalInfo.role[0]}</span>
+                        </div>
+                        <div className="text-sm opacity-70">
+                            {personalInfo.role[1]}
+                        </div>
                     </motion.p>
 
                     <motion.div
