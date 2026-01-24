@@ -1,8 +1,150 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface GeospatialPreloaderProps {
   onComplete: () => void;
+}
+
+import { CONTINENTS } from "./continents-data";
+
+function CanvasGlobe() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rotationRef = useRef(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationFrameId: number;
+
+    const render = () => {
+      rotationRef.current += 0.005;
+      const rotation = rotationRef.current;
+
+      const width = canvas.width;
+      const height = canvas.height;
+      const radius = width / 2 - 5;
+      const centerX = width / 2;
+      const centerY = height / 2;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Helper for orthographic projection
+      const project = (lat: number, lon: number) => {
+        const phi = (lat * Math.PI) / 180;
+        const lambda = (lon * Math.PI) / 180 + rotation;
+
+        // Orthographic projection math
+        const x = radius * Math.cos(phi) * Math.sin(lambda);
+        const y = -radius * Math.sin(phi);
+        const z = radius * Math.cos(phi) * Math.cos(lambda);
+
+        return { x: centerX + x, y: centerY + y, visible: z > 0 };
+      };
+
+      // Draw Grid Lines (Longitude)
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(34, 197, 94, 0.15)";
+      ctx.lineWidth = 0.5;
+      for (let lon = -180; lon < 180; lon += 30) {
+        let first = true;
+        for (let lat = -90; lat <= 90; lat += 5) {
+          const p = project(lat, lon);
+          if (p.visible) {
+            if (first) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
+            first = false;
+          } else {
+            first = true;
+          }
+        }
+      }
+      ctx.stroke();
+
+      // Draw Grid Lines (Latitude)
+      ctx.beginPath();
+      for (let lat = -60; lat <= 60; lat += 30) {
+        let first = true;
+        for (let lon = -180; lon <= 180; lon += 5) {
+          const p = project(lat, lon);
+          if (p.visible) {
+            if (first) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
+            first = false;
+          } else {
+            first = true;
+          }
+        }
+      }
+      ctx.stroke();
+
+      // Draw Equator (Highlight)
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(34, 197, 94, 0.4)";
+      ctx.lineWidth = 1;
+      let firstEq = true;
+      for (let lon = -180; lon <= 180; lon += 5) {
+        const p = project(0, lon);
+        if (p.visible) {
+          if (firstEq) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+          firstEq = false;
+        } else {
+          firstEq = true;
+        }
+      }
+      ctx.stroke();
+
+      // Draw Continents
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(34, 197, 94, 0.7)";
+      ctx.lineWidth = 1;
+      ctx.lineJoin = "round";
+
+      for (let i = 0; i < CONTINENTS.length; i++) {
+        const polygon = CONTINENTS[i];
+        let first = true;
+        for (let j = 0; j < polygon.length; j++) {
+          const [lat, lon] = polygon[j];
+          const p = project(lat, lon);
+          if (p.visible) {
+            if (first) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
+            first = false;
+          } else {
+            first = true;
+          }
+        }
+      }
+      ctx.stroke();
+
+      // Add atmospheric glow/shading
+      const gradient = ctx.createRadialGradient(centerX, centerY, radius * 0.8, centerX, centerY, radius);
+      gradient.addColorStop(0, "rgba(2, 4, 6, 0)");
+      gradient.addColorStop(1, "rgba(34, 197, 94, 0.1)");
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+    return () => cancelAnimationFrame(animationFrameId);
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      width={400}
+      height={400}
+      className="w-full h-full opacity-80"
+    />
+  );
 }
 
 export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
@@ -171,40 +313,8 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
               className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 rounded-full border border-primary/40 bg-primary/5 backdrop-blur-md flex items-center justify-center relative overflow-hidden"
               style={{ transform: "translateZ(0px)" }}
             >
-              {/* High-Fidelity 3D Wireframe Globe */}
-              <div className="wireframe-globe">
-                <div className="globe-shading" />
-                <div className="globe-highlight" />
-
-                {/* Longitude Rings (Vertical) */}
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <div
-                    key={`lon-${i}`}
-                    className="globe-ring"
-                    style={{ transform: `rotateY(${i * 15}deg)` }}
-                  />
-                ))}
-
-                {/* Latitude Rings (Horizontal) */}
-                {[-75, -60, -45, -30, -15, 0, 15, 30, 45, 60, 75].map((lat) => {
-                  const scale = Math.cos((lat * Math.PI) / 180);
-                  const y = Math.sin((lat * Math.PI) / 180) * 50; // 50% radius
-                  const isEquator = lat === 0;
-                  return (
-                    <div
-                      key={`lat-${lat}`}
-                      className="globe-ring"
-                      style={{
-                        transform: `translateY(${-y}%) rotateX(90deg) scale(${scale})`,
-                        opacity: isEquator ? 0.8 : 0.4,
-                        borderWidth: isEquator ? '1.5px' : '1px',
-                        borderColor: 'rgba(34, 197, 94, 0.5)',
-                        boxShadow: isEquator ? '0 0 8px rgba(34, 197, 94, 0.3)' : 'none'
-                      }}
-                    />
-                  );
-                })}
-              </div>
+              {/* High-Fidelity Canvas-based 3D Globe */}
+              <CanvasGlobe />
             </motion.div>
           </div>
 
