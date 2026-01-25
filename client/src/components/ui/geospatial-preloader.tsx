@@ -6,10 +6,11 @@ interface GeospatialPreloaderProps {
 }
 
 import { CONTINENTS } from "./continents-data";
+import { NEPAL_BORDER } from "./nepal-data";
 
 function CanvasGlobe() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rotationRef = useRef(0);
+  const rotationRef = useRef(-84 * Math.PI / 180); // Center Nepal (84°E) at start
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -32,15 +33,32 @@ function CanvasGlobe() {
 
       ctx.clearRect(0, 0, width, height);
 
-      // Helper for orthographic projection
-      const project = (lat: number, lon: number) => {
+      // Draw Base Sphere for "solid" look
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(2, 4, 6, 0.95)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(34, 197, 94, 0.2)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Helper for orthographic projection with axial tilt
+      // To center Nepal (28.2°N), we tilt by -28.2 degrees
+      const tilt = (-28.2 * Math.PI) / 180;
+      const project = (lat: number, lon: number, alt: number = 0) => {
         const phi = (lat * Math.PI) / 180;
         const lambda = (lon * Math.PI) / 180 + rotation;
+        const r = radius + alt;
 
-        // Orthographic projection math
-        const x = radius * Math.cos(phi) * Math.sin(lambda);
-        const y = -radius * Math.sin(phi);
-        const z = radius * Math.cos(phi) * Math.cos(lambda);
+        // 1. Initial 3D coordinates
+        const x0 = r * Math.cos(phi) * Math.sin(lambda);
+        const y0 = -r * Math.sin(phi);
+        const z0 = r * Math.cos(phi) * Math.cos(lambda);
+
+        // 2. Apply axial tilt (rotation around X axis)
+        const x = x0;
+        const y = y0 * Math.cos(tilt) - z0 * Math.sin(tilt);
+        const z = y0 * Math.sin(tilt) + z0 * Math.cos(tilt);
 
         return { x: centerX + x, y: centerY + y, visible: z > 0 };
       };
@@ -120,6 +138,47 @@ function CanvasGlobe() {
         }
       }
       ctx.stroke();
+
+      // Draw Nepal Border (Pulsating)
+      const borderPulse = (Math.sin(Date.now() / 500) + 1) / 2;
+      ctx.beginPath();
+      ctx.strokeStyle = `rgba(34, 197, 94, ${0.7 + borderPulse * 0.3})`;
+      ctx.lineWidth = 1.5 + borderPulse * 0.5;
+      let firstNepal = true;
+      for (let i = 0; i < NEPAL_BORDER.length; i++) {
+        const [lat, lon] = NEPAL_BORDER[i];
+        const p = project(lat, lon);
+        if (p.visible) {
+          if (firstNepal) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+          firstNepal = false;
+        } else {
+          firstNepal = true;
+        }
+      }
+      ctx.stroke();
+
+      // Draw Nepal Center Marker (Pulsing)
+      const nepalLat = 28.2096;
+      const nepalLon = 83.9856;
+      const nepal = project(nepalLat, nepalLon);
+
+      if (nepal.visible) {
+        const pulse = (Math.sin(Date.now() / 300) + 1) / 2;
+
+        // Outer glow
+        ctx.beginPath();
+        ctx.arc(nepal.x, nepal.y, 3 + pulse * 4, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(34, 197, 94, ${0.4 * (1 - pulse)})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Core dot
+        ctx.beginPath();
+        ctx.arc(nepal.x, nepal.y, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = "#22c55e";
+        ctx.fill();
+      }
 
       // Add atmospheric glow/shading
       const gradient = ctx.createRadialGradient(centerX, centerY, radius * 0.8, centerX, centerY, radius);
