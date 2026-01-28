@@ -10,7 +10,7 @@ import { NEPAL_BORDER } from "./nepal-data";
 
 function CanvasGlobe() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rotationRef = useRef(-84 * Math.PI / 180); // Center Nepal (84°E) at start
+  const rotationRef = useRef(-144 * Math.PI / 180); // Start with Nepal on the left (-60 deg relative to center)
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -555,7 +555,7 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
           </div>
         </div>
         <div className="text-[8px] text-white/20 tracking-widest uppercase">
-          © 2026 ROSHAN KAFLE | GEOSPATIAL ENGINEER
+          © 20266 ROSHAN KAFLE | GEOSPATIAL ENGINEER
         </div>
       </div>
 
