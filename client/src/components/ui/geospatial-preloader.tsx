@@ -140,7 +140,7 @@ function CanvasGlobe() {
       ctx.stroke();
 
       // Draw Nepal Border (Pulsating)
-      const borderPulse = (Math.sin(Date.now() / 500) + 1) / 2;
+      const borderPulse = (Math.sin(Date.now() / 200) + 1) / 2;
       ctx.beginPath();
       ctx.strokeStyle = `rgba(34, 197, 94, ${0.7 + borderPulse * 0.3})`;
       ctx.lineWidth = 1.5 + borderPulse * 0.5;
@@ -164,7 +164,7 @@ function CanvasGlobe() {
       const nepal = project(nepalLat, nepalLon);
 
       if (nepal.visible) {
-        const pulse = (Math.sin(Date.now() / 300) + 1) / 2;
+        const pulse = (Math.sin(Date.now() / 150) + 1) / 2;
 
         // Outer glow
         ctx.beginPath();
