@@ -191,7 +191,7 @@ export const certificationCategories: PortfolioItem[] = [
         id: 'workshops',
         title: 'Workshops & Seminars',
         description: 'Attended workshops on advanced surveying techniques and participated in technical seminars and hackathons on GeoAI and Earth observation.',
-        images: [campus_3d_modelling, geodataScoutC, mathathonC, gnssC, ngesC],
+        images: [geodataScoutC, campus_3d_modelling, mathathonC, gnssC, ngesC],
         details: [
             'Practical training on Differential GPS (DGPS) and Terrestrial LiDAR Scanner for high-resolution terrain mapping and accurate surveying.',
             'Collected, processed, and interpreted data using DGPS receiver, LiDAR scanner, and point cloud processing software for 3D model creation.',
