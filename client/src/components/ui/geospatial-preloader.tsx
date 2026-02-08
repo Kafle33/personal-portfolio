@@ -10,7 +10,7 @@ import { NEPAL_BORDER } from "./nepal-data";
 
 function CanvasGlobe() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rotationRef = useRef(-134 * Math.PI / 180); // Start with Nepal on the left (-60 deg relative to center)
+  const rotationRef = useRef(-164 * Math.PI / 180); // Start with Nepal on the left (-60 deg relative to center)
 
   useEffect(() => {
     const canvas = canvasRef.current;
