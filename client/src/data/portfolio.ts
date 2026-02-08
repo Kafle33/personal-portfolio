@@ -39,6 +39,7 @@ import esriMultiC from '../assets/esri_multidimensional_data.png';
 import esriDlC from '../assets/esri_deep_learning_pro.png';
 
 // Certificate imports - Workshops & Seminars
+import campus_3d_modelling from '../assets/3d_modelling.png';
 import geodataScoutC from '../assets/geodata_scout_appreciation.png';
 import mathathonC from '../assets/hackathon_field_mapping.png';
 import gnssC from '../assets/gnss_training.png';
@@ -190,7 +191,7 @@ export const certificationCategories: PortfolioItem[] = [
         id: 'workshops',
         title: 'Workshops & Seminars',
         description: 'Attended workshops on advanced surveying techniques and participated in technical seminars and hackathons on GeoAI and Earth observation.',
-        images: [geodataScoutC, mathathonC, gnssC, ngesC],
+        images: [campus_3d_modelling, geodataScoutC, mathathonC, gnssC, ngesC],
         details: [
             'Practical training on Differential GPS (DGPS) and Terrestrial LiDAR Scanner for high-resolution terrain mapping and accurate surveying.',
             'Collected, processed, and interpreted data using DGPS receiver, LiDAR scanner, and point cloud processing software for 3D model creation.',
