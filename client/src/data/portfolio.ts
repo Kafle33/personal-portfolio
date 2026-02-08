@@ -40,7 +40,7 @@ import esriDlC from '../assets/esri_deep_learning_pro.png';
 
 // Certificate imports - Workshops & Seminars
 import geodataScoutC from '../assets/geodata_scout_appreciation.png';
-import campus_3d_modelling from '../assets/3d_modelling.png';
+import campus_3d_modelling from '../assets/campus_3d_modelling.jpg';
 import mathathonC from '../assets/hackathon_field_mapping.png';
 import gnssC from '../assets/gnss_training.png';
 import ngesC from '../assets/nges_membership.png';
