@@ -145,7 +145,7 @@ export const Hero = () => {
                                 transition={{ duration: 0.2, ease: easing.smooth }}
                             >
                                 <i className="fas fa-download group-hover:translate-y-0.5 transition-transform duration-300"></i>
-                                <span>Download PDF</span>
+                                <span>Download CV</span>
                             </motion.a>
                         </motion.div>
                     </motion.div>
