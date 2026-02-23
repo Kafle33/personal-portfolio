@@ -54,12 +54,12 @@ export const Hero = () => {
                 style={{ scale }}
                 className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-white relative z-10"
             >
-                <div className="grid lg:grid-cols-2 gap-16 items-center">
+                <div className="grid md:grid-cols-2 gap-10 lg:gap-16 items-center">
                     <motion.div
                         variants={containerVariants}
                         initial="hidden"
                         animate="visible"
-                        className="space-y-8"
+                        className="space-y-8 order-2 md:order-1"
                     >
                         <div className="space-y-4">
                             {/* Live status indicator */}
@@ -154,25 +154,25 @@ export const Hero = () => {
                         initial={{ opacity: 0, scale: 0.9, y: 30 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: easing.smooth, delay: 0.3 }}
-                        className="hidden md:block relative mt-8 lg:mt-0"
+                        className="order-1 md:order-2 relative mt-10 md:mt-8 flex justify-center md:justify-end"
                     >
-                        <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10 group">
+                        <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl border-4 border-white/10 group w-40 h-40 sm:w-48 sm:h-48 md:w-auto md:h-auto">
                             <img
                                 src={personalInfo.profileImg}
                                 alt={personalInfo.name}
-                                className="w-full h-auto transform transition-transform duration-700 ease-out group-hover:scale-105"
+                                className="w-full h-full md:h-auto md:w-full object-cover md:object-contain transform transition-transform duration-700 ease-out group-hover:scale-105"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity duration-500" />
                         </div>
 
                         {/* Decorative elements around image */}
                         <motion.div
-                            className="absolute -top-6 -right-6 w-32 h-32 bg-accent/20 rounded-full blur-3xl"
+                            className="absolute -top-6 -right-6 w-24 h-24 sm:w-32 sm:h-32 bg-accent/20 rounded-full blur-3xl"
                             animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.3, 0.2] }}
                             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                         />
                         <motion.div
-                            className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl"
+                            className="absolute -bottom-10 -left-10 w-28 h-28 sm:w-40 sm:h-40 bg-primary/20 rounded-full blur-3xl"
                             animate={{ scale: [1, 1.15, 1], opacity: [0.2, 0.35, 0.2] }}
                             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                         />

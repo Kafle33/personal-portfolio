@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import React from "react";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 
 const SatelliteTrack = React.memo(({ delay = 0, duration = 20, top = "20%" }: { delay?: number; duration?: number; top?: string }) => {
     return (
@@ -102,9 +102,10 @@ const ContourIsland = React.memo(({ x, y, scale = 1, levels = 6 }: { x: number; 
 });
 
 export const GeospatialBackground = () => {
+    const shouldReduceMotion = useReducedMotion();
     const { scrollY } = useScroll();
-    const y1 = useTransform(scrollY, [0, 1000], [0, -50]);
-    const y2 = useTransform(scrollY, [0, 1000], [0, -100]);
+    const y1 = useTransform(scrollY, [0, 1000], [0, shouldReduceMotion ? 0 : -50]);
+    const y2 = useTransform(scrollY, [0, 1000], [0, shouldReduceMotion ? 0 : -100]);
 
     return (
         <div className="fixed inset-0 -z-10 overflow-hidden bg-background pointer-events-none">
@@ -135,24 +136,34 @@ export const GeospatialBackground = () => {
             </motion.div>
 
             {/* Satellite Tracks */}
-            <SatelliteTrack top="15%" delay={0} duration={25} />
-            <SatelliteTrack top="45%" delay={5} duration={35} />
-            <SatelliteTrack top="75%" delay={12} duration={30} />
+            {!shouldReduceMotion && (
+                <>
+                    <SatelliteTrack top="15%" delay={0} duration={25} />
+                    <SatelliteTrack top="45%" delay={5} duration={35} />
+                    <SatelliteTrack top="75%" delay={12} duration={30} />
+                </>
+            )}
 
             {/* Network Nodes */}
-            <NetworkNode x={25} y={30} delay={0} />
-            <NetworkNode x={45} y={60} delay={1} />
-            <NetworkNode x={75} y={20} delay={2} />
-            <NetworkNode x={85} y={70} delay={0.5} />
-            <NetworkNode x={15} y={80} delay={1.5} />
+            {!shouldReduceMotion && (
+                <>
+                    <NetworkNode x={25} y={30} delay={0} />
+                    <NetworkNode x={45} y={60} delay={1} />
+                    <NetworkNode x={75} y={20} delay={2} />
+                    <NetworkNode x={85} y={70} delay={0.5} />
+                    <NetworkNode x={15} y={80} delay={1.5} />
+                </>
+            )}
 
             {/* Subtle Scan Line */}
-            <motion.div
-                className="absolute w-full h-[2px] bg-primary/5"
-                animate={{ top: ["0%", "100%"] }}
-                transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                style={{ willChange: "top" }}
-            />
+            {!shouldReduceMotion && (
+                <motion.div
+                    className="absolute w-full h-[2px] bg-primary/5"
+                    animate={{ top: ["0%", "100%"] }}
+                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                    style={{ willChange: "top" }}
+                />
+            )}
         </div>
     );
 };

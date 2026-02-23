@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 interface GeospatialPreloaderProps {
   onComplete: () => void;
@@ -8,7 +8,7 @@ interface GeospatialPreloaderProps {
 import { CONTINENTS } from "./continents-data";
 import { NEPAL_BORDER } from "./nepal-data";
 
-function CanvasGlobe() {
+function CanvasGlobe({ reducedMotion }: { reducedMotion: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rotationRef = useRef(-154 * Math.PI / 180); // Start with Nepal on the left (-60 deg relative to center)
 
@@ -22,7 +22,9 @@ function CanvasGlobe() {
     let animationFrameId: number;
 
     const render = () => {
-      rotationRef.current += 0.005;
+      if (!reducedMotion) {
+        rotationRef.current += 0.005;
+      }
       const rotation = rotationRef.current;
 
       const width = canvas.width;
@@ -140,7 +142,7 @@ function CanvasGlobe() {
       ctx.stroke();
 
       // Draw Nepal Border (Pulsating)
-      const borderPulse = (Math.sin(Date.now() / 200) + 1) / 2;
+      const borderPulse = reducedMotion ? 0.5 : (Math.sin(Date.now() / 200) + 1) / 2;
       ctx.beginPath();
       ctx.strokeStyle = `rgba(34, 197, 94, ${0.7 + borderPulse * 0.3})`;
       ctx.lineWidth = 1.5 + borderPulse * 0.5;
@@ -164,7 +166,7 @@ function CanvasGlobe() {
       const nepal = project(nepalLat, nepalLon);
 
       if (nepal.visible) {
-        const pulse = (Math.sin(Date.now() / 150) + 1) / 2;
+        const pulse = reducedMotion ? 0.5 : (Math.sin(Date.now() / 150) + 1) / 2;
 
         // Outer glow
         ctx.beginPath();
@@ -189,12 +191,16 @@ function CanvasGlobe() {
       ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
       ctx.fill();
 
-      animationFrameId = requestAnimationFrame(render);
+      if (!reducedMotion) {
+        animationFrameId = requestAnimationFrame(render);
+      }
     };
 
     render();
-    return () => cancelAnimationFrame(animationFrameId);
-  }, []);
+    return () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    };
+  }, [reducedMotion]);
 
   return (
     <canvas
@@ -207,6 +213,7 @@ function CanvasGlobe() {
 }
 
 export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
+  const shouldReduceMotion = useReducedMotion();
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -231,6 +238,7 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
 
   // Satellite configurations for truly randomized, distinct orbits
   const satellites = useMemo(() => {
+    if (shouldReduceMotion) return [];
     // Randomize number of satellites between 4 and 8
     const count = Math.floor(Math.random() * 5) + 4;
     return Array.from({ length: count }).map((_, i) => ({
@@ -246,7 +254,7 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
       inclination: Math.random() * 360,
       initialAngle: Math.random() * 360
     }));
-  }, []);
+  }, [shouldReduceMotion]);
 
   useEffect(() => {
     const duration = 3000; // 3 seconds total
@@ -367,13 +375,13 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
           {/* Central Earth Node - Responsive */}
           <div className="absolute inset-0 flex items-center justify-center" style={{ transformStyle: "preserve-3d" }}>
             <motion.div
-              animate={{ scale: [1, 1.02, 1] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              animate={shouldReduceMotion ? undefined : { scale: [1, 1.02, 1] }}
+              transition={shouldReduceMotion ? undefined : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
               className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 rounded-full border border-primary/40 bg-primary/5 backdrop-blur-md flex items-center justify-center relative overflow-hidden"
               style={{ transform: "translateZ(0px)" }}
             >
               {/* High-Fidelity Canvas-based 3D Globe */}
-              <CanvasGlobe />
+              <CanvasGlobe reducedMotion={shouldReduceMotion} />
             </motion.div>
           </div>
 
@@ -418,8 +426,8 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
                 >
                   {/* Detailed Satellite Representation */}
                   <motion.div
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    animate={shouldReduceMotion ? undefined : { scale: [1, 1.1, 1] }}
+                    transition={shouldReduceMotion ? undefined : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
                     className="relative"
                   >
                     {/* Satellite Body & Solar Panels - More technical look */}
@@ -457,8 +465,8 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
 
                     {/* Signal Pulse */}
                     <motion.div
-                      animate={{ scale: [1, 2.5], opacity: [0.6, 0] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
+                      animate={shouldReduceMotion ? undefined : { scale: [1, 2.5], opacity: [0.6, 0] }}
+                      transition={shouldReduceMotion ? undefined : { duration: 2, repeat: Infinity, ease: "easeOut" }}
                       className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border border-primary/50"
                     />
                   </motion.div>
@@ -555,7 +563,7 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
           </div>
         </div>
         <div className="text-[8px] text-white/20 tracking-widest uppercase">
-          © 20266 ROSHAN KAFLE | GEOSPATIAL ENGINEER
+          © 2026 ROSHAN KAFLE | GEOSPATIAL ENGINEER
         </div>
       </div>
 

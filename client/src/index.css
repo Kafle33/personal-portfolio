@@ -228,6 +228,9 @@
       linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     background-size: 24px 24px;
+    background-position: center;
+    /* Subtle longitudinal tint for a more map-like feel */
+    background-color: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.08), transparent 55%);
   }
 
   /* Section divider gradient */
@@ -274,6 +277,20 @@
 
     50% {
       transform: translateY(-4px);
+    }
+  }
+
+  /* Respect users that prefer reduced motion by disabling non-essential animations */
+  @media (prefers-reduced-motion: reduce) {
+    .floating-animation,
+    .pulse-slow,
+    .glow-hover,
+    .shimmer-effect,
+    .icon-bounce:hover i,
+    .icon-bounce:hover svg,
+    .wireframe-globe {
+      animation: none !important;
+      transition: none !important;
     }
   }
 }
