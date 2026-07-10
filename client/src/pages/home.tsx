@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
 import { GeospatialPreloader } from "@/components/ui/geospatial-preloader";
 import { PortfolioItem } from "../data/portfolio";
 import { GeospatialBackground } from "@/components/ui/geospatial-background";
@@ -50,19 +51,22 @@ export default function Home() {
     scrollTo(`#${sectionId}`, -80);
   };
 
-  if (isLoading) {
-    return <GeospatialPreloader onComplete={() => setIsLoading(false)} />;
-  }
-
   return (
     <div className="min-h-screen transition-colors duration-300 relative">
+      {/* Page renders beneath the globe preloader; exit zoom reveals a ready hero. */}
+      <AnimatePresence>
+        {isLoading && (
+          <GeospatialPreloader onComplete={() => setIsLoading(false)} />
+        )}
+      </AnimatePresence>
+
       <GeospatialBackground />
       <Navbar activeSection={activeSection} scrollToSection={scrollToSection} />
       <FlightPathProgress activeSection={activeSection} scrollToSection={scrollToSection} />
       <CommandPalette scrollToSection={scrollToSection} />
 
       <main>
-        <Hero />
+        <Hero start={!isLoading} />
         <About />
         <Skills />
         <Experience onItemClick={setSelectedItem} />

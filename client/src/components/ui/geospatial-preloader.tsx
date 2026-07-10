@@ -8,208 +8,444 @@ interface GeospatialPreloaderProps {
 import { CONTINENTS } from "./continents-data";
 import { NEPAL_BORDER } from "./nepal-data";
 
-function CanvasGlobe({ reducedMotion }: { reducedMotion: boolean }) {
+const TAU = Math.PI * 2;
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+/**
+ * The full cinematic center stage: starfield, lit globe with atmosphere and
+ * clouds, two satellites on inclined orbits (correctly passing behind and in
+ * front of the globe), scan beams that lock onto Nepal, and a rotation that
+ * decelerates to frame Nepal center just as loading completes.
+ */
+function GlobeScene({ reducedMotion }: { reducedMotion: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rotationRef = useRef(-154 * Math.PI / 180); // Start with Nepal on the left (-60 deg relative to center)
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let animationFrameId: number;
+    let raf = 0;
+    let W = 0;
+    let H = 0;
 
-    const render = () => {
-      if (!reducedMotion) {
-        rotationRef.current += 0.005;
-      }
-      const rotation = rotationRef.current;
+    const resize = () => {
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      const rect = parent.getBoundingClientRect();
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      W = rect.width;
+      H = rect.height;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    const ro = new ResizeObserver(resize);
+    if (canvas.parentElement) ro.observe(canvas.parentElement);
 
-      const width = canvas.width;
-      const height = canvas.height;
-      const radius = width / 2 - 5;
-      const centerX = width / 2;
-      const centerY = height / 2;
+    const TILT = (-28.2 * Math.PI) / 180;
+    const NEPAL = { lat: 28.2096, lon: 83.9856 };
 
-      ctx.clearRect(0, 0, width, height);
+    // Rotation choreography: start with Nepal behind, spin just over a full
+    // turn, and decelerate so Nepal lands front-center as progress hits 100%.
+    const ROT_START = (-154 * Math.PI) / 180;
+    const ROT_END = (-NEPAL.lon * Math.PI) / 180; // Nepal at λ=0
+    const ROT_DELTA = ROT_END - ROT_START + TAU / 2; // graceful half-extra sweep
+    const SPIN_MS = 3050;
 
-      // Draw Base Sphere for "solid" look
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(2, 4, 6, 0.95)";
-      ctx.fill();
-      ctx.strokeStyle = "rgba(34, 197, 94, 0.2)";
-      ctx.lineWidth = 1;
-      ctx.stroke();
+    // Deterministic ambience
+    const stars = Array.from({ length: 90 }, (_, i) => {
+      const h1 = Math.sin(i * 127.1) * 43758.5453;
+      const h2 = Math.sin(i * 311.7) * 43758.5453;
+      const h3 = Math.sin(i * 74.7) * 43758.5453;
+      const f = (v: number) => v - Math.floor(v);
+      return {
+        x: f(h1),
+        y: f(h2),
+        r: 0.4 + f(h3) * 1.1,
+        tw: 0.0012 + f(h1 * 3) * 0.0018,
+        ph: f(h2 * 7) * TAU,
+        a: 0.2 + f(h3 * 5) * 0.45,
+      };
+    });
 
-      // Helper for orthographic projection with axial tilt
-      // To center Nepal (28.2°N), we tilt by -28.2 degrees
-      const tilt = (-28.2 * Math.PI) / 180;
-      const project = (lat: number, lon: number, alt: number = 0) => {
+    const clouds = [
+      { lat: 42, lon0: 30, w: 0.52, h: 0.14, sp: 0.000022, al: 0.06 },
+      { lat: 8, lon0: 150, w: 0.62, h: 0.18, sp: -0.000018, al: 0.05 },
+      { lat: -18, lon0: 260, w: 0.48, h: 0.13, sp: 0.000026, al: 0.055 },
+      { lat: -45, lon0: 80, w: 0.58, h: 0.16, sp: -0.000021, al: 0.05 },
+      { lat: 25, lon0: 210, w: 0.42, h: 0.12, sp: 0.00003, al: 0.045 },
+    ];
+
+    const sats = [
+      { incl: (64 * Math.PI) / 180, raan: 0.7, altF: 1.32, speed: 0.00082, a0: 0.4, scale: 1 },
+      { incl: (-38 * Math.PI) / 180, raan: -1.1, altF: 1.6, speed: -0.00048, a0: 2.6, scale: 0.78 },
+    ];
+
+    const t0 = performance.now();
+
+    /** Orbit position in view space: inclined circle → RAAN → view tilt */
+    const orbitPoint = (a: number, incl: number, raan: number, r: number) => {
+      const x1 = Math.cos(a) * r;
+      const z1 = Math.sin(a) * r;
+      const y2 = -z1 * Math.sin(incl);
+      const z2 = z1 * Math.cos(incl);
+      const x3 = x1 * Math.cos(raan) + z2 * Math.sin(raan);
+      const z3 = -x1 * Math.sin(raan) + z2 * Math.cos(raan);
+      const y = y2 * Math.cos(TILT) - z3 * Math.sin(TILT);
+      const z = y2 * Math.sin(TILT) + z3 * Math.cos(TILT);
+      return { x: x3, y, z };
+    };
+
+    const render = (now: number) => {
+      const elapsed = now - t0;
+      const cx = W / 2;
+      const cy = H / 2;
+      const spinP = Math.min(1, elapsed / SPIN_MS);
+      const rotation = reducedMotion
+        ? ROT_END
+        : ROT_START + ROT_DELTA * easeOutCubic(spinP) + Math.max(0, elapsed - SPIN_MS) * 0.00002;
+      // Slow dolly-in over the load
+      const R = Math.min(W, H) * (0.285 + 0.02 * easeOutCubic(Math.min(1, elapsed / SPIN_MS)));
+      const sceneA = reducedMotion ? 1 : Math.min(1, elapsed / 500);
+
+      const project = (lat: number, lon: number, altF = 1) => {
         const phi = (lat * Math.PI) / 180;
         const lambda = (lon * Math.PI) / 180 + rotation;
-        const r = radius + alt;
-
-        // 1. Initial 3D coordinates
+        const r = R * altF;
         const x0 = r * Math.cos(phi) * Math.sin(lambda);
         const y0 = -r * Math.sin(phi);
         const z0 = r * Math.cos(phi) * Math.cos(lambda);
-
-        // 2. Apply axial tilt (rotation around X axis)
-        const x = x0;
-        const y = y0 * Math.cos(tilt) - z0 * Math.sin(tilt);
-        const z = y0 * Math.sin(tilt) + z0 * Math.cos(tilt);
-
-        return { x: centerX + x, y: centerY + y, visible: z > 0 };
+        const y = y0 * Math.cos(TILT) - z0 * Math.sin(TILT);
+        const z = y0 * Math.sin(TILT) + z0 * Math.cos(TILT);
+        return { x: cx + x0, y: cy + y, z: z / r };
       };
 
-      // Draw Grid Lines (Longitude)
+      /** Trace lat/lon polylines, keeping only segments on the requested hemisphere */
+      const tracePolys = (polys: number[][][], front: boolean) => {
+        ctx.beginPath();
+        for (const polygon of polys) {
+          let first = true;
+          for (const [lat, lon] of polygon) {
+            const p = project(lat, lon);
+            const ok = front ? p.z > 0 : p.z <= 0;
+            if (ok) {
+              if (first) ctx.moveTo(p.x, p.y);
+              else ctx.lineTo(p.x, p.y);
+              first = false;
+            } else {
+              first = true;
+            }
+          }
+        }
+      };
+
+      const drawSatellite = (x: number, y: number, z: number, scale: number, heading: number) => {
+        const depth = 0.68 + 0.32 * ((z + 1) / 2);
+        const s = (Math.min(W, H) / 460) * scale * depth;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(heading);
+        ctx.scale(s, s);
+        ctx.globalAlpha *= 0.55 + 0.45 * ((z + 1) / 2);
+        // Solar panels
+        ctx.fillStyle = "rgba(16, 60, 40, 0.95)";
+        ctx.strokeStyle = "rgba(34, 197, 94, 0.95)";
+        ctx.lineWidth = 1;
+        [-1, 1].forEach((side) => {
+          ctx.fillRect(side * 7 - (side > 0 ? 0 : 13), -5, 13, 10);
+          ctx.strokeRect(side * 7 - (side > 0 ? 0 : 13), -5, 13, 10);
+          ctx.beginPath();
+          ctx.moveTo(side * 7 - (side > 0 ? 0 : 13), 0);
+          ctx.lineTo(side * 7 - (side > 0 ? 0 : 13) + 13, 0);
+          ctx.moveTo(side * 13.5, -5);
+          ctx.lineTo(side * 13.5, 5);
+          ctx.stroke();
+        });
+        // Struts + bus
+        ctx.fillStyle = "rgba(34, 197, 94, 1)";
+        ctx.fillRect(-7, -1, 14, 2);
+        ctx.fillRect(-3.5, -6, 7, 12);
+        // Antenna dish toward nadir
+        ctx.beginPath();
+        ctx.arc(0, 8.5, 3, Math.PI, 0);
+        ctx.strokeStyle = "rgba(34, 197, 94, 0.9)";
+        ctx.stroke();
+        ctx.restore();
+      };
+
+      ctx.clearRect(0, 0, W, H);
+      ctx.globalAlpha = sceneA;
+
+      /* Starfield */
+      for (const st of stars) {
+        const sx = st.x * W;
+        const sy = st.y * H;
+        const dx = sx - cx;
+        const dy = sy - cy;
+        if (dx * dx + dy * dy < R * R * 1.1) continue; // behind the globe
+        const tw = reducedMotion ? 0.8 : 0.55 + 0.45 * Math.sin(now * st.tw + st.ph);
+        ctx.fillStyle = `rgba(190, 230, 210, ${st.a * tw})`;
+        ctx.fillRect(sx, sy, st.r, st.r);
+      }
+
+      /* Outer atmosphere halo */
+      const halo = ctx.createRadialGradient(cx, cy, R * 0.96, cx, cy, R * 1.22);
+      halo.addColorStop(0, "rgba(34, 197, 94, 0.18)");
+      halo.addColorStop(0.5, "rgba(45, 212, 191, 0.06)");
+      halo.addColorStop(1, "rgba(34, 197, 94, 0)");
+      ctx.fillStyle = halo;
       ctx.beginPath();
-      ctx.strokeStyle = "rgba(34, 197, 94, 0.15)";
+      ctx.arc(cx, cy, R * 1.22, 0, TAU);
+      ctx.fill();
+
+      /* Satellites behind the globe (drawn before the sphere occludes them) */
+      const satScreens = sats.map((s) => {
+        const a = s.a0 + elapsed * (reducedMotion ? 0 : s.speed);
+        const p = orbitPoint(a, s.incl, s.raan, R * s.altF);
+        const p2 = orbitPoint(a + 0.03, s.incl, s.raan, R * s.altF);
+        return {
+          ...s,
+          a,
+          x: cx + p.x,
+          y: cy + p.y,
+          z: p.z / (R * s.altF),
+          heading: Math.atan2(p2.y - p.y, p2.x - p.x),
+        };
+      });
+
+      for (const s of satScreens) {
+        // Orbit trail (always drawn — reads as the orbit path)
+        for (let k = 1; k <= 14; k++) {
+          const ta = s.a - k * 0.055 * Math.sign(s.speed || 1);
+          const tp = orbitPoint(ta, s.incl, s.raan, R * s.altF);
+          const tz = tp.z / (R * s.altF);
+          const behind = tz < 0 ? 0.35 : 1;
+          ctx.fillStyle = `rgba(34, 197, 94, ${(1 - k / 14) * 0.32 * behind})`;
+          ctx.fillRect(cx + tp.x - 0.75, cy + tp.y - 0.75, 1.5, 1.5);
+        }
+        if (s.z < 0) drawSatellite(s.x, s.y, s.z, s.scale, s.heading);
+      }
+
+      /* Sphere base with day-side lighting */
+      const lightX = cx - R * 0.5;
+      const lightY = cy - R * 0.55;
+      const base = ctx.createRadialGradient(lightX, lightY, R * 0.15, cx, cy, R * 1.35);
+      base.addColorStop(0, "rgba(14, 46, 34, 0.98)");
+      base.addColorStop(0.45, "rgba(6, 20, 16, 0.98)");
+      base.addColorStop(1, "rgba(2, 5, 4, 0.99)");
+      ctx.fillStyle = base;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, TAU);
+      ctx.fill();
+
+      /* Far-side continents — faint, sells the sphere's depth */
+      tracePolys(CONTINENTS, false);
+      ctx.strokeStyle = "rgba(34, 197, 94, 0.09)";
+      ctx.lineWidth = 0.75;
+      ctx.stroke();
+
+      /* Graticule */
+      ctx.strokeStyle = "rgba(34, 197, 94, 0.14)";
       ctx.lineWidth = 0.5;
+      ctx.beginPath();
       for (let lon = -180; lon < 180; lon += 30) {
         let first = true;
         for (let lat = -90; lat <= 90; lat += 5) {
           const p = project(lat, lon);
-          if (p.visible) {
+          if (p.z > 0) {
             if (first) ctx.moveTo(p.x, p.y);
             else ctx.lineTo(p.x, p.y);
             first = false;
-          } else {
-            first = true;
-          }
+          } else first = true;
         }
       }
-      ctx.stroke();
-
-      // Draw Grid Lines (Latitude)
-      ctx.beginPath();
       for (let lat = -60; lat <= 60; lat += 30) {
         let first = true;
         for (let lon = -180; lon <= 180; lon += 5) {
           const p = project(lat, lon);
-          if (p.visible) {
+          if (p.z > 0) {
             if (first) ctx.moveTo(p.x, p.y);
             else ctx.lineTo(p.x, p.y);
             first = false;
-          } else {
-            first = true;
-          }
+          } else first = true;
         }
       }
       ctx.stroke();
 
-      // Draw Equator (Highlight)
+      /* Equator highlight */
       ctx.beginPath();
-      ctx.strokeStyle = "rgba(34, 197, 94, 0.4)";
-      ctx.lineWidth = 1;
       let firstEq = true;
       for (let lon = -180; lon <= 180; lon += 5) {
         const p = project(0, lon);
-        if (p.visible) {
+        if (p.z > 0) {
           if (firstEq) ctx.moveTo(p.x, p.y);
           else ctx.lineTo(p.x, p.y);
           firstEq = false;
-        } else {
-          firstEq = true;
-        }
+        } else firstEq = true;
       }
+      ctx.strokeStyle = "rgba(34, 197, 94, 0.32)";
+      ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Draw Continents
-      ctx.beginPath();
-      ctx.strokeStyle = "rgba(34, 197, 94, 0.7)";
+      /* Front continents */
+      tracePolys(CONTINENTS, true);
+      ctx.strokeStyle = "rgba(52, 211, 153, 0.75)";
       ctx.lineWidth = 1;
       ctx.lineJoin = "round";
-
-      for (let i = 0; i < CONTINENTS.length; i++) {
-        const polygon = CONTINENTS[i];
-        let first = true;
-        for (let j = 0; j < polygon.length; j++) {
-          const [lat, lon] = polygon[j];
-          const p = project(lat, lon);
-          if (p.visible) {
-            if (first) ctx.moveTo(p.x, p.y);
-            else ctx.lineTo(p.x, p.y);
-            first = false;
-          } else {
-            first = true;
-          }
-        }
-      }
       ctx.stroke();
 
-      // Draw Nepal Border (Pulsating)
-      const borderPulse = reducedMotion ? 0.5 : (Math.sin(Date.now() / 200) + 1) / 2;
-      ctx.beginPath();
-      ctx.strokeStyle = `rgba(34, 197, 94, ${0.7 + borderPulse * 0.3})`;
-      ctx.lineWidth = 1.5 + borderPulse * 0.5;
-      let firstNepal = true;
-      for (let i = 0; i < NEPAL_BORDER.length; i++) {
-        const [lat, lon] = NEPAL_BORDER[i];
-        const p = project(lat, lon);
-        if (p.visible) {
-          if (firstNepal) ctx.moveTo(p.x, p.y);
-          else ctx.lineTo(p.x, p.y);
-          firstNepal = false;
-        } else {
-          firstNepal = true;
-        }
-      }
-      ctx.stroke();
-
-      // Draw Nepal Center Marker (Pulsing)
-      const nepalLat = 28.2096;
-      const nepalLon = 83.9856;
-      const nepal = project(nepalLat, nepalLon);
-
-      if (nepal.visible) {
-        const pulse = reducedMotion ? 0.5 : (Math.sin(Date.now() / 150) + 1) / 2;
-
-        // Outer glow
+      /* Nepal: golden glow, pulsing border, marker, ping rings, callout */
+      const nepal = project(NEPAL.lat, NEPAL.lon);
+      if (nepal.z > 0) {
+        const vis = Math.min(1, nepal.z * 1.6);
+        const glow = ctx.createRadialGradient(nepal.x, nepal.y, 0, nepal.x, nepal.y, R * 0.22);
+        glow.addColorStop(0, `rgba(251, 191, 36, ${0.16 * vis})`);
+        glow.addColorStop(1, "rgba(251, 191, 36, 0)");
+        ctx.fillStyle = glow;
         ctx.beginPath();
-        ctx.arc(nepal.x, nepal.y, 3 + pulse * 4, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(34, 197, 94, ${0.4 * (1 - pulse)})`;
-        ctx.lineWidth = 1;
+        ctx.arc(nepal.x, nepal.y, R * 0.22, 0, TAU);
+        ctx.fill();
+
+        const borderPulse = reducedMotion ? 0.5 : (Math.sin(now / 240) + 1) / 2;
+        ctx.beginPath();
+        let firstNp = true;
+        for (const [lat, lon] of NEPAL_BORDER) {
+          const p = project(lat, lon);
+          if (p.z > 0) {
+            if (firstNp) ctx.moveTo(p.x, p.y);
+            else ctx.lineTo(p.x, p.y);
+            firstNp = false;
+          } else firstNp = true;
+        }
+        ctx.strokeStyle = `rgba(251, 191, 36, ${(0.55 + borderPulse * 0.45) * vis})`;
+        ctx.lineWidth = 1.4 + borderPulse * 0.6;
         ctx.stroke();
 
-        // Core dot
+        // Expanding ping rings
+        if (!reducedMotion) {
+          for (let k = 0; k < 2; k++) {
+            const ring = ((now / 1400 + k * 0.5) % 1);
+            ctx.beginPath();
+            ctx.arc(nepal.x, nepal.y, 3 + ring * R * 0.13, 0, TAU);
+            ctx.strokeStyle = `rgba(251, 191, 36, ${(1 - ring) * 0.5 * vis})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+
+        // Marker core
         ctx.beginPath();
-        ctx.arc(nepal.x, nepal.y, 1.5, 0, Math.PI * 2);
-        ctx.fillStyle = "#22c55e";
+        ctx.arc(nepal.x, nepal.y, 2, 0, TAU);
+        ctx.fillStyle = `rgba(251, 191, 36, ${vis})`;
+        ctx.fill();
+
+        // Leader-line callout once Nepal is well onto the visible face
+        const callA = Math.max(0, (nepal.z - 0.35) / 0.65);
+        if (callA > 0.02) {
+          const lx = nepal.x + R * 0.24;
+          const ly = nepal.y - R * 0.3;
+          ctx.strokeStyle = `rgba(251, 191, 36, ${0.55 * callA})`;
+          ctx.lineWidth = 0.75;
+          ctx.beginPath();
+          ctx.moveTo(nepal.x + 4, nepal.y - 4);
+          ctx.lineTo(lx, ly);
+          ctx.lineTo(lx + 52, ly);
+          ctx.stroke();
+          ctx.fillStyle = `rgba(251, 191, 36, ${0.95 * callA})`;
+          ctx.font = "600 9px ui-monospace, SFMono-Regular, monospace";
+          ctx.fillText("NEPAL · GS-01", lx + 3, ly - 4);
+          ctx.fillStyle = `rgba(190, 230, 210, ${0.7 * callA})`;
+          ctx.font = "8px ui-monospace, SFMono-Regular, monospace";
+          ctx.fillText("28.2096°N 83.9856°E", lx + 3, ly + 9);
+        }
+      }
+
+      /* Cloud wisps drifting over the surface */
+      for (const c of clouds) {
+        const lon = c.lon0 + (reducedMotion ? 0 : now * c.sp * 57.3);
+        const p = project(c.lat, lon % 360);
+        if (p.z <= 0.05) continue;
+        ctx.fillStyle = `rgba(220, 245, 235, ${c.al * p.z})`;
+        ctx.beginPath();
+        ctx.ellipse(p.x, p.y, R * c.w * 0.4 * p.z, R * c.h * 0.4 * p.z, 0, 0, TAU);
         ctx.fill();
       }
 
-      // Add atmospheric glow/shading
-      const gradient = ctx.createRadialGradient(centerX, centerY, radius * 0.8, centerX, centerY, radius);
-      gradient.addColorStop(0, "rgba(2, 4, 6, 0)");
-      gradient.addColorStop(1, "rgba(34, 197, 94, 0.1)");
-      ctx.fillStyle = gradient;
+      /* Terminator shading + specular, clipped to the sphere */
+      ctx.save();
       ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.arc(cx, cy, R, 0, TAU);
+      ctx.clip();
+      const shade = ctx.createRadialGradient(lightX, lightY, R * 0.3, lightX, lightY, R * 2.15);
+      shade.addColorStop(0, "rgba(0, 0, 0, 0)");
+      shade.addColorStop(0.55, "rgba(0, 0, 0, 0.08)");
+      shade.addColorStop(1, "rgba(0, 0, 0, 0.6)");
+      ctx.fillStyle = shade;
+      ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+      const spec = ctx.createRadialGradient(lightX, lightY, 0, lightX, lightY, R * 0.55);
+      spec.addColorStop(0, "rgba(230, 255, 245, 0.10)");
+      spec.addColorStop(1, "rgba(230, 255, 245, 0)");
+      ctx.fillStyle = spec;
+      ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+      ctx.restore();
+
+      /* Inner rim atmosphere */
+      const rim = ctx.createRadialGradient(cx, cy, R * 0.82, cx, cy, R);
+      rim.addColorStop(0, "rgba(34, 197, 94, 0)");
+      rim.addColorStop(1, "rgba(45, 212, 191, 0.16)");
+      ctx.fillStyle = rim;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, TAU);
       ctx.fill();
 
-      if (!reducedMotion) {
-        animationFrameId = requestAnimationFrame(render);
+      /* Front satellites + scan beams locked on Nepal */
+      for (const s of satScreens) {
+        if (s.z < 0) continue;
+        if (nepal.z > 0.1 && !reducedMotion) {
+          const beamA = Math.min(1, s.z * 1.4) * Math.min(1, nepal.z * 1.4) * 0.9;
+          const grad = ctx.createLinearGradient(s.x, s.y, nepal.x, nepal.y);
+          grad.addColorStop(0, `rgba(34, 197, 94, ${0.55 * beamA})`);
+          grad.addColorStop(1, `rgba(251, 191, 36, ${0.18 * beamA})`);
+          // Cone: narrow at the satellite, footprint at Nepal
+          const dx = nepal.x - s.x;
+          const dy = nepal.y - s.y;
+          const len = Math.hypot(dx, dy) || 1;
+          const px = (-dy / len) * 7;
+          const py = (dx / len) * 7;
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.moveTo(s.x, s.y);
+          ctx.lineTo(nepal.x + px, nepal.y + py);
+          ctx.lineTo(nepal.x - px, nepal.y - py);
+          ctx.closePath();
+          ctx.fill();
+          // Data packets travelling down the beam
+          for (let k = 0; k < 3; k++) {
+            const t = (now * 0.00055 + k / 3 + s.a0) % 1;
+            ctx.beginPath();
+            ctx.arc(s.x + dx * t, s.y + dy * t, 2.1, 0, TAU);
+            ctx.fillStyle = `rgba(190, 240, 215, ${Math.sin(t * Math.PI) * 0.9 * beamA})`;
+            ctx.fill();
+          }
+        }
+        drawSatellite(s.x, s.y, s.z, s.scale, s.heading);
       }
+
+      ctx.globalAlpha = 1;
+      if (!reducedMotion) raf = requestAnimationFrame(render);
     };
 
-    render();
+    raf = requestAnimationFrame(render);
     return () => {
-      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      cancelAnimationFrame(raf);
+      ro.disconnect();
     };
   }, [reducedMotion]);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      width={400}
-      height={400}
-      className="w-full h-full opacity-80"
-    />
-  );
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 }
 
 export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
@@ -235,26 +471,6 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
     "GEOMATICS SPECIALIST",
     "MAPPING THE FUTURE"
   ];
-
-  // Satellite configurations for truly randomized, distinct orbits
-  const satellites = useMemo(() => {
-    if (shouldReduceMotion) return [];
-    // Randomize number of satellites between 4 and 8
-    const count = Math.floor(Math.random() * 5) + 4;
-    return Array.from({ length: count }).map((_, i) => ({
-      id: i,
-      // Strictly distinct radii with a random offset to ensure no overlapping orbits
-      radius: 120 + (i * 35) + (Math.random() * 15),
-      // Random speed (10s to 30s) and direction
-      duration: 10 + Math.random() * 20,
-      direction: Math.random() > 0.5 ? 1 : -1,
-      // Random orbital orientation (full 360 degree range)
-      rotateX: Math.random() * 360,
-      rotateY: Math.random() * 360,
-      inclination: Math.random() * 360,
-      initialAngle: Math.random() * 360
-    }));
-  }, [shouldReduceMotion]);
 
   useEffect(() => {
     const duration = 3000; // 3 seconds total
@@ -295,7 +511,14 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#020406] overflow-hidden font-mono text-primary/80">
+    <motion.div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-[#020406] overflow-hidden font-mono text-primary/80"
+      style={{ transformOrigin: "50% 44%" }}
+      exit={{ scale: 1.45, opacity: 0 }}
+      transition={{ duration: 0.9, ease: [0.65, 0, 0.35, 1] }}
+      role="status"
+      aria-label="Loading portfolio"
+    >
       {/* 1. Full-screen Coordinate Grid */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Main Grid Lines */}
@@ -364,122 +587,10 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
         </div>
       </div>
 
-      {/* 4. Central Geospatial Core */}
-      <div className="relative z-20 flex flex-col items-center" style={{ perspective: "1200px" }}>
-        {/* Satellite / Orbiting System - Responsive sizing */}
-        <div
-          className="relative w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px] mb-8 flex items-center justify-center"
-          style={{ transformStyle: "preserve-3d" }}
-        >
-
-          {/* Central Earth Node - Responsive */}
-          <div className="absolute inset-0 flex items-center justify-center" style={{ transformStyle: "preserve-3d" }}>
-            <motion.div
-              animate={shouldReduceMotion ? undefined : { scale: [1, 1.02, 1] }}
-              transition={shouldReduceMotion ? undefined : { duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 rounded-full border border-primary/40 bg-primary/5 backdrop-blur-md flex items-center justify-center relative overflow-hidden"
-              style={{ transform: "translateZ(0px)" }}
-            >
-              {/* High-Fidelity Canvas-based 3D Globe */}
-              <CanvasGlobe reducedMotion={!!shouldReduceMotion} />
-            </motion.div>
-          </div>
-
-          {/* Dynamic Orbiting Satellites */}
-          {satellites.map((sat) => (
-            <div
-              key={sat.id}
-              className="absolute inset-0 flex items-center justify-center pointer-events-none"
-              style={{
-                transformStyle: "preserve-3d",
-                transform: `rotateX(${sat.rotateX}deg) rotateY(${sat.rotateY}deg) rotateZ(${sat.inclination}deg)`
-              }}
-            >
-              {/* Visual Orbit Path - Increased visibility */}
-              <div
-                className="absolute border border-primary/20 rounded-full"
-                style={{
-                  width: sat.radius * 2,
-                  height: sat.radius * 2,
-                  transform: "translateZ(0px)"
-                }}
-              />
-
-              {/* Satellite Container */}
-              <motion.div
-                animate={{ rotate: sat.direction * 360 }}
-                initial={{ rotate: sat.initialAngle }}
-                transition={{ duration: sat.duration, repeat: Infinity, ease: "linear" }}
-                className="absolute"
-                style={{
-                  width: sat.radius * 2,
-                  height: sat.radius * 2,
-                  transformStyle: "preserve-3d"
-                }}
-              >
-                <div
-                  className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
-                  style={{
-                    transform: "rotateX(-90deg) translateZ(2px)", // Slightly above the orbit line
-                    transformStyle: "preserve-3d"
-                  }}
-                >
-                  {/* Detailed Satellite Representation */}
-                  <motion.div
-                    animate={shouldReduceMotion ? undefined : { scale: [1, 1.1, 1] }}
-                    transition={shouldReduceMotion ? undefined : { duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    className="relative"
-                  >
-                    {/* Satellite Body & Solar Panels - More technical look */}
-                    <svg width="48" height="32" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-[0_0_10px_rgba(34,197,94,0.8)]">
-                      {/* Left Solar Panel Array */}
-                      <g opacity="0.8">
-                        <rect x="2" y="10" width="14" height="12" rx="1" fill="#1a3a2a" stroke="currentColor" strokeWidth="1" />
-                        <line x1="2" y1="14" x2="16" y2="14" stroke="currentColor" strokeWidth="0.5" />
-                        <line x1="2" y1="18" x2="16" y2="18" stroke="currentColor" strokeWidth="0.5" />
-                        <line x1="9" y1="10" x2="9" y2="22" stroke="currentColor" strokeWidth="0.5" />
-                      </g>
-
-                      {/* Right Solar Panel Array */}
-                      <g opacity="0.8">
-                        <rect x="32" y="10" width="14" height="12" rx="1" fill="#1a3a2a" stroke="currentColor" strokeWidth="1" />
-                        <line x1="32" y1="14" x2="46" y2="14" stroke="currentColor" strokeWidth="0.5" />
-                        <line x1="32" y1="18" x2="46" y2="18" stroke="currentColor" strokeWidth="0.5" />
-                        <line x1="39" y1="10" x2="39" y2="22" stroke="currentColor" strokeWidth="0.5" />
-                      </g>
-
-                      {/* Connection Struts */}
-                      <rect x="16" y="15" width="4" height="2" fill="currentColor" />
-                      <rect x="28" y="15" width="4" height="2" fill="currentColor" />
-
-                      {/* Main Bus (Body) */}
-                      <rect x="20" y="8" width="8" height="16" rx="1" fill="currentColor" stroke="currentColor" strokeWidth="1" />
-
-                      {/* High-Gain Antenna */}
-                      <path d="M24 8V2" stroke="currentColor" strokeWidth="1.5" />
-                      <path d="M20 4C20 4 22 2 24 2C26 2 28 4 28 4" stroke="currentColor" strokeWidth="1" fill="none" />
-
-                      {/* Sensor Lens */}
-                      <circle cx="24" cy="20" r="2" fill="#020406" stroke="currentColor" strokeWidth="0.5" />
-                    </svg>
-
-                    {/* Signal Pulse */}
-                    <motion.div
-                      animate={shouldReduceMotion ? undefined : { scale: [1, 2.5], opacity: [0.6, 0] }}
-                      transition={shouldReduceMotion ? undefined : { duration: 2, repeat: Infinity, ease: "easeOut" }}
-                      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border border-primary/50"
-                    />
-                  </motion.div>
-
-                  {/* Signal Beam to Center */}
-                  <div
-                    className="w-[1px] bg-gradient-to-b from-primary/60 to-transparent opacity-40"
-                    style={{ height: sat.radius, transform: "translateY(16px)" }}
-                  />
-                </div>
-              </motion.div>
-            </div>
-          ))}
+      {/* 4. Central Geospatial Core — unified canvas: globe, satellites, beams */}
+      <div className="relative z-20 flex flex-col items-center">
+        <div className="relative w-[280px] h-[280px] sm:w-[350px] sm:h-[350px] md:w-[400px] md:h-[400px] lg:w-[480px] lg:h-[480px] mb-4">
+          <GlobeScene reducedMotion={!!shouldReduceMotion} />
         </div>
 
         {/* 5. Tile Loading Matrix (Progress Indicator) */}
@@ -574,6 +685,6 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
       <div className="absolute top-4 right-4 w-16 h-16 border-t border-r border-primary/20" />
       <div className="absolute bottom-4 left-4 w-16 h-16 border-b border-l border-primary/20" />
       <div className="absolute bottom-4 right-4 w-16 h-16 border-b border-r border-primary/20" />
-    </div>
+    </motion.div>
   );
 }

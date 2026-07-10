@@ -4,19 +4,21 @@ import { useReducedMotion } from "framer-motion";
 interface GpsStatusLineProps {
     className?: string;
     delay?: number;
+    /** When false, holds invisible (layout preserved) until flipped true */
+    active?: boolean;
 }
 
-const STATUS_TEXT = "SIGNAL ACQUIRED · 12 SATELLITES · FIX: 3D · DATUM: WGS84";
+const STATUS_TEXT = "SIGNAL ACQUIRED · 12 SATELLITES · DATUM: WGS84";
 
 /**
  * A GPS-receiver style status line that types itself out character by character.
  */
-export const GpsStatusLine = ({ className = "", delay = 1200 }: GpsStatusLineProps) => {
+export const GpsStatusLine = ({ className = "", delay = 1200, active = true }: GpsStatusLineProps) => {
     const shouldReduceMotion = useReducedMotion();
     const [chars, setChars] = useState(shouldReduceMotion ? STATUS_TEXT.length : 0);
 
     useEffect(() => {
-        if (shouldReduceMotion) return;
+        if (shouldReduceMotion || !active) return;
         let interval: ReturnType<typeof setInterval>;
         const timeout = setTimeout(() => {
             interval = setInterval(() => {
@@ -33,7 +35,7 @@ export const GpsStatusLine = ({ className = "", delay = 1200 }: GpsStatusLinePro
             clearTimeout(timeout);
             if (interval) clearInterval(interval);
         };
-    }, [delay, shouldReduceMotion]);
+    }, [delay, shouldReduceMotion, active]);
 
     const finished = chars >= STATUS_TEXT.length;
 

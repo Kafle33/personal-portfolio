@@ -10,7 +10,12 @@ import { useToast } from "@/hooks/use-toast";
 
 const TerrainBackdrop = lazy(() => import("../three/TerrainBackdrop"));
 
-export const Hero = () => {
+interface HeroProps {
+    /** false while the preloader overlay is up — entrance animations hold until it lifts */
+    start?: boolean;
+}
+
+export const Hero = ({ start = true }: HeroProps) => {
     const sectionRef = useRef<HTMLElement>(null);
     const tier = usePerformanceTier();
     const inView = useInView(sectionRef, { margin: "200px" });
@@ -80,19 +85,23 @@ export const Hero = () => {
                     <motion.div
                         variants={containerVariants}
                         initial="hidden"
-                        animate="visible"
+                        animate={start ? "visible" : "hidden"}
                         className="space-y-8 order-2 md:order-1"
                     >
                         <div className="space-y-4">
                             <motion.div variants={itemVariants}>
-                                <GpsStatusLine delay={900} />
+                                <GpsStatusLine delay={900} active={start} />
                             </motion.div>
 
                             <motion.h1
                                 variants={itemVariants}
                                 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-white drop-shadow-2xl"
                             >
-                                <DecodeText text={personalInfo.name} delay={400} />
+                                {start ? (
+                                    <DecodeText text={personalInfo.name} delay={350} />
+                                ) : (
+                                    <span className="opacity-0">{personalInfo.name}</span>
+                                )}
                             </motion.h1>
 
                             <motion.h2
@@ -175,7 +184,7 @@ export const Hero = () => {
 
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9, y: 30 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        animate={start ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.9, y: 30 }}
                         transition={{ duration: 0.8, ease: easing.smooth, delay: 0.3 }}
                         className="order-1 md:order-2 relative mt-10 md:mt-8 flex justify-center md:justify-end"
                     >
@@ -206,7 +215,7 @@ export const Hero = () => {
             {/* Scroll Indicator - Hidden on mobile */}
             <motion.div
                 initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                animate={start ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                 transition={{ delay: 1.5, duration: 0.6, ease: easing.smooth }}
                 className="absolute bottom-10 left-1/2 -translate-x-1/2 flex-col items-center gap-2 text-white/40 hidden sm:flex"
             >
