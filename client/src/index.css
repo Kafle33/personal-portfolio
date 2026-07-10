@@ -252,6 +252,78 @@
     background: linear-gradient(to top, hsl(76, 44%, 8%), transparent);
   }
 
+  /* MapLibre project markers & popup */
+  .project-map-marker {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+
+  .project-map-marker-dot {
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: hsl(156, 81%, 45%);
+    box-shadow: 0 0 10px rgba(18, 194, 133, 0.9);
+  }
+
+  .project-map-marker-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid rgba(18, 194, 133, 0.7);
+    animation: pulse-gentle 2.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  .maplibregl-popup-content {
+    background: hsl(76, 30%, 10%) !important;
+    border: 1px solid hsl(76, 20%, 22%);
+    border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .maplibregl-popup-tip {
+    border-top-color: hsl(76, 30%, 10%) !important;
+    border-bottom-color: hsl(76, 30%, 10%) !important;
+  }
+
+  .project-map-popup-title {
+    font-weight: 700;
+    font-size: 13px;
+    color: hsl(120, 13%, 94%);
+    margin-bottom: 2px;
+  }
+
+  .project-map-popup-place {
+    font-size: 11px;
+    color: hsl(120, 8%, 65%);
+    margin-bottom: 8px;
+  }
+
+  .project-map-popup-btn {
+    font-size: 11px;
+    font-weight: 600;
+    color: hsl(156, 81%, 45%);
+    background: rgba(18, 194, 133, 0.1);
+    border: 1px solid rgba(18, 194, 133, 0.3);
+    border-radius: 8px;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: background 0.25s;
+  }
+
+  .project-map-popup-btn:hover {
+    background: rgba(18, 194, 133, 0.25);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .project-map-marker-ring {
+      animation: none;
+    }
+  }
+
   /* Radar sweep rotation */
   @keyframes radar-sweep {
     from {
