@@ -27,6 +27,18 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules/three") || id.includes("@react-three")) {
+            return "three";
+          }
+          if (id.includes("node_modules/maplibre-gl")) {
+            return "maplibre";
+          }
+        },
+      },
+    },
   },
   server: {
     fs: {

@@ -42,6 +42,16 @@
     scroll-behavior: smooth;
   }
 
+  /* Lenis owns scrolling when active — disable native smooth to avoid double easing */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
   body {
     @apply font-sans antialiased bg-background text-foreground;
     font-family: 'Inter', sans-serif;

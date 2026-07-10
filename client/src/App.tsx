@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { SmoothScrollProvider } from "@/hooks/use-smooth-scroll";
 import Home from "@/pages/home";
 
 function Router() {
@@ -19,8 +20,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark" storageKey="portfolio-theme">
         <TooltipProvider>
-          <Toaster />
-          <Router />
+          <SmoothScrollProvider>
+            <Toaster />
+            <Router />
+          </SmoothScrollProvider>
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>

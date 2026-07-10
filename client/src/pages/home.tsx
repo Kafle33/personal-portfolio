@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { GeospatialPreloader } from "@/components/ui/geospatial-preloader";
 import { PortfolioItem } from "../data/portfolio";
 import { GeospatialBackground } from "@/components/ui/geospatial-background";
+import { useSmoothScroll } from "@/hooks/use-smooth-scroll";
 
 // Layout Components
 import { Navbar } from "../components/layout/Navbar";
@@ -23,6 +24,7 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState("hero");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
+  const { scrollTo } = useSmoothScroll();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,14 +45,7 @@ export default function Home() {
   }, []);
 
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const offsetTop = element.offsetTop - 80;
-      window.scrollTo({
-        top: offsetTop,
-        behavior: "smooth"
-      });
-    }
+    scrollTo(`#${sectionId}`, -80);
   };
 
   if (isLoading) {

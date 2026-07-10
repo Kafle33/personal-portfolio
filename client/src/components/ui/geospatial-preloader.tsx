@@ -381,7 +381,7 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
               style={{ transform: "translateZ(0px)" }}
             >
               {/* High-Fidelity Canvas-based 3D Globe */}
-              <CanvasGlobe reducedMotion={shouldReduceMotion} />
+              <CanvasGlobe reducedMotion={!!shouldReduceMotion} />
             </motion.div>
           </div>
 
