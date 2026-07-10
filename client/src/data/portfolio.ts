@@ -54,6 +54,8 @@ export interface PortfolioItem {
     images: string[];
     details: string[];
     technologies: string[];
+    /** Geographic anchor for map/timeline features */
+    location?: { lat: number; lng: number; place: string };
 }
 
 export const navItems = [
@@ -72,6 +74,7 @@ export const experiencesData: PortfolioItem[] = [
         title: "NAXA Pvt. Ltd.",
         period: "May 2023 - Dec 2023",
         link: "https://naxa.com.np",
+        location: { lat: 27.7172, lng: 85.324, place: "Kathmandu, Nepal" },
         description: "WebGIS Developer & Backend Engineer specializing in geospatial solutions, Earth observation data processing, and AI-driven analytics.",
         images: [naxa1, naxa3, naxa2],
         details: [
@@ -87,6 +90,7 @@ export const experiencesData: PortfolioItem[] = [
         title: "GeoNadir – Queensland, Australia",
         period: "1 Jan 2024 – Current",
         link: "https://geonadir.com/",
+        location: { lat: -16.9186, lng: 145.7781, place: "Cairns, QLD, Australia" },
         description: "Integrated Copernicus satellite data in GeoNadir’s drone mapping platform for a globally accessible EO system.",
         images: [
             randomForest,
@@ -121,6 +125,7 @@ export const projectsData: PortfolioItem[] = [
         title: "Precision Agriculture",
         period: "1 May 2022 – 3 Apr 2023",
         link: "https://github.com/Kafle33/fastapi-tomato-classifier",
+        location: { lat: 28.2096, lng: 83.9856, place: "Pokhara, Nepal" },
         description: "Developed an image classification model using TensorFlow and MobileNetV2 to detect nutrient deficiencies in tomato leaves, trained with 1,500+ labeled images.",
         images: [precision1, precision2, precision3],
         details: [
@@ -134,6 +139,7 @@ export const projectsData: PortfolioItem[] = [
         id: "khaderi-alert",
         title: "Khaderi-Alert (Drought Monitoring System)",
         link: "https://khaderi.anticipatoryaction.org/",
+        location: { lat: 28.35, lng: 81.35, place: "Khaderi Basin, Western Terai" },
         description: "Integrated multi-source Earth Observation and meteorological data for real-time drought modeling; developed modular systems for drought severity assessment, hotspot mapping, and risk ranking.",
         images: [khaderi1, khaderi2, khaderi3, khaderi4],
         details: [
@@ -148,6 +154,7 @@ export const projectsData: PortfolioItem[] = [
         id: "dmaps",
         title: "DMAPS (AI & Urban Planning Analyst)",
         link: "https://dmaps.org/",
+        location: { lat: 26.7288, lng: 85.9266, place: "Janakpur, Nepal" },
         description: "Used AI and EO data to digitize urban landscapes and generate spatial models; engineered backend systems using PostGIS and GIST indexing.",
         images: [dmsps1, dmaps2, dmaps3],
         details: [
@@ -162,6 +169,7 @@ export const projectsData: PortfolioItem[] = [
         id: "fmtm-hotosm",
         title: "FMTM-HOTSOM (Open Source Contribution)",
         link: "https://fmtm.hotosm.org/",
+        location: { lat: 27.68, lng: 85.42, place: "Global · HOT OSM Community" },
         description: "Integrated geospatial data using Python and PostGIS; collaborated with international teams to improve system usability, reliability, and scalability.",
         images: [hot1, hot2],
         details: [

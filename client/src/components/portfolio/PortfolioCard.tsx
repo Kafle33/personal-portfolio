@@ -1,8 +1,45 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "../ui/card";
 import { PortfolioItem } from "../../data/portfolio";
 import { easing, viewportOnce } from "../../lib/animations";
+
+const TILE_COLS = 5;
+const TILE_ROWS = 3;
+
+/** Legend swatch colors cycled across tech "layers" */
+const LEGEND_COLORS = ["bg-primary", "bg-accent", "bg-emerald-400", "bg-amber-400", "bg-sky-400"];
+
+/** Map-tile loading reveal: a grid of tiles over the image that clears in random order */
+const TileReveal = () => {
+    const order = useMemo(() => {
+        const indices = Array.from({ length: TILE_COLS * TILE_ROWS }, (_, i) => i);
+        for (let i = indices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
+        return indices;
+    }, []);
+
+    return (
+        <div
+            className="absolute inset-0 grid pointer-events-none z-[1]"
+            style={{ gridTemplateColumns: `repeat(${TILE_COLS}, 1fr)`, gridTemplateRows: `repeat(${TILE_ROWS}, 1fr)` }}
+            aria-hidden
+        >
+            {order.map((delayRank, i) => (
+                <motion.div
+                    key={i}
+                    className="bg-muted border border-background/40"
+                    initial={{ opacity: 1 }}
+                    whileInView={{ opacity: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.35, ease: easing.smooth, delay: 0.15 + delayRank * 0.045 }}
+                />
+            ))}
+        </div>
+    );
+};
 
 interface PortfolioCardProps {
     item: PortfolioItem;
@@ -84,6 +121,7 @@ export const PortfolioCard = ({ item, onClick, index, type }: PortfolioCardProps
             >
                 {/* Image Section */}
                 <div className="relative h-52 overflow-hidden bg-muted/20">
+                    <TileReveal />
                     <AnimatePresence mode="wait">
                         <motion.img
                             key={currentImageIndex}
@@ -147,22 +185,30 @@ export const PortfolioCard = ({ item, onClick, index, type }: PortfolioCardProps
                         {item.description}
                     </p>
 
-                    <div className="flex flex-wrap gap-2 mt-auto">
-                        {item.technologies.slice(0, 3).map((tech, i) => (
-                            <motion.span
-                                key={i}
-                                className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-primary/5 text-primary border border-primary/10 group-hover:border-primary/30 transition-colors duration-300"
-                                whileHover={{ scale: 1.05 }}
-                                transition={{ duration: 0.2, ease: easing.smooth }}
-                            >
-                                {tech}
-                            </motion.span>
-                        ))}
-                        {item.technologies.length > 3 && (
-                            <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-muted-foreground bg-muted/50 border border-border/50">
-                                +{item.technologies.length - 3}
-                            </span>
-                        )}
+                    {/* Tech stack styled as a map layer legend */}
+                    <div className="mt-auto">
+                        <div className="font-mono text-[8px] tracking-[0.25em] text-muted-foreground/70 uppercase mb-2">
+                            Layers
+                        </div>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+                            {item.technologies.slice(0, 4).map((tech, i) => (
+                                <motion.span
+                                    key={i}
+                                    className="flex items-center gap-1.5 font-mono text-[10px] tracking-wide text-muted-foreground group-hover:text-foreground transition-colors duration-300"
+                                    whileHover={{ scale: 1.06 }}
+                                    transition={{ duration: 0.2, ease: easing.smooth }}
+                                >
+                                    <span className={`w-2 h-2 rounded-[2px] ${LEGEND_COLORS[i % LEGEND_COLORS.length]} opacity-80`} />
+                                    {tech}
+                                </motion.span>
+                            ))}
+                            {item.technologies.length > 4 && (
+                                <span className="flex items-center gap-1.5 font-mono text-[10px] text-muted-foreground/60">
+                                    <span className="w-2 h-2 rounded-[2px] border border-dashed border-muted-foreground/50" />
+                                    +{item.technologies.length - 4} layers
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
             </Card>

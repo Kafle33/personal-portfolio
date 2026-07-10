@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { SectionHeader } from "../layout/SectionHeader";
 import { skillsData } from "../../data/portfolio";
 import { Card } from "../ui/card";
+import { SkillRadar } from "../ui/skill-radar";
 import { easing, viewportOnce } from "../../lib/animations";
 
 export const Skills = () => {
@@ -46,6 +47,10 @@ export const Skills = () => {
                     iconColor="text-primary"
                     subtitle="A comprehensive toolkit for geospatial engineering and full-stack development."
                 />
+
+                <div className="mb-16">
+                    <SkillRadar />
+                </div>
 
                 <motion.div
                     className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6"
