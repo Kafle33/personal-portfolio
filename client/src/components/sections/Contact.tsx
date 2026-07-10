@@ -1,10 +1,17 @@
-import { motion } from "framer-motion";
+import { lazy, Suspense, useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { SectionHeader } from "../layout/SectionHeader";
 import { personalInfo } from "../../data/portfolio";
 import { Card } from "../ui/card";
 import { easing, viewportOnce } from "../../lib/animations";
+import { usePerformanceTier } from "../../hooks/use-performance-tier";
+
+const ContactGlobe = lazy(() => import("../three/ContactGlobe"));
 
 export const Contact = () => {
+    const sectionRef = useRef<HTMLElement>(null);
+    const tier = usePerformanceTier();
+    const nearView = useInView(sectionRef, { margin: "400px" });
     const contactMethods = [
         {
             id: 'email',
@@ -75,7 +82,7 @@ export const Contact = () => {
     };
 
     return (
-        <section id="contact" className="py-24 relative overflow-hidden">
+        <section ref={sectionRef} id="contact" className="py-24 relative overflow-hidden">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <SectionHeader
                     title="Get In Touch"
@@ -83,6 +90,12 @@ export const Contact = () => {
                     iconColor="text-accent"
                     subtitle="Ready to collaborate on innovative geospatial solutions? Let's discuss how we can work together."
                 />
+
+                {tier === "high" && nearView && (
+                    <Suspense fallback={<div className="h-24" aria-hidden />}>
+                        <ContactGlobe />
+                    </Suspense>
+                )}
 
                 <motion.div
                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6"
