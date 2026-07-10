@@ -6,6 +6,7 @@ import { DecodeText } from "../ui/decode-text";
 import { GpsStatusLine } from "../ui/gps-status-line";
 import { CrosshairOverlay } from "../ui/crosshair-overlay";
 import { usePerformanceTier } from "../../hooks/use-performance-tier";
+import { useToast } from "@/hooks/use-toast";
 
 const TerrainBackdrop = lazy(() => import("../three/TerrainBackdrop"));
 
@@ -13,6 +14,25 @@ export const Hero = () => {
     const sectionRef = useRef<HTMLElement>(null);
     const tier = usePerformanceTier();
     const inView = useInView(sectionRef, { margin: "200px" });
+    const { toast } = useToast();
+
+    const copyEmail = async () => {
+        try {
+            await navigator.clipboard.writeText(personalInfo.email);
+        } catch {
+            // Clipboard API unavailable (permissions/http) — legacy fallback
+            const input = document.createElement("textarea");
+            input.value = personalInfo.email;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand("copy");
+            input.remove();
+        }
+        toast({
+            title: "📍 Contact coordinates copied",
+            description: personalInfo.email,
+        });
+    };
 
     const { scrollY } = useScroll();
     const opacity = useTransform(scrollY, [0, 400], [1, 0]);
@@ -104,9 +124,18 @@ export const Hero = () => {
                                 <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30 transition-all duration-300">
                                     <i className="fas fa-envelope text-blue-400 group-hover:scale-110 transition-transform"></i>
                                 </div>
-                                <a href={`mailto:${personalInfo.email}`} className="hover:text-white transition-colors duration-300 link-underline">
-                                    {personalInfo.email}
-                                </a>
+                                <div className="flex items-center gap-2">
+                                    <a href={`mailto:${personalInfo.email}`} className="hover:text-white transition-colors duration-300 link-underline">
+                                        {personalInfo.email}
+                                    </a>
+                                    <button
+                                        onClick={copyEmail}
+                                        aria-label="Copy email address"
+                                        className="p-1.5 rounded-md text-white/40 hover:text-primary hover:bg-white/5 transition-colors duration-300"
+                                    >
+                                        <i className="far fa-copy text-sm" aria-hidden></i>
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
 

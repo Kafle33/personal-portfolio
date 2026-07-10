@@ -1,6 +1,15 @@
 import { motion } from "framer-motion";
 import { SectionHeader } from "../layout/SectionHeader";
+import { NumberTicker } from "../ui/number-ticker";
 import { easing, viewportOnce } from "../../lib/animations";
+
+/** Field-log statistics, counted up on scroll */
+const missionStats = [
+    { value: 3, suffix: "+", label: "Years surveying & building" },
+    { value: 45071, suffix: "", label: "Buildings digitized (DMAPS)" },
+    { value: 8, suffix: "+", label: "Geospatial systems shipped" },
+    { value: 12, suffix: "+", label: "Certifications & trainings" },
+];
 
 export const About = () => {
     const highlights = [
@@ -78,6 +87,26 @@ export const About = () => {
                                     Outside of work, I enjoy hiking, meeting new people, sharing ideas, and collaborating across cultures.
                                 </motion.p>
                             </div>
+                        </motion.div>
+
+                        {/* Mission stats with count-up tickers */}
+                        <motion.div
+                            variants={itemVariants}
+                            className="grid grid-cols-2 md:grid-cols-4 gap-4"
+                        >
+                            {missionStats.map((stat) => (
+                                <div
+                                    key={stat.label}
+                                    className="rounded-2xl border border-border/50 bg-muted/20 px-4 py-5 text-center"
+                                >
+                                    <div className="text-2xl md:text-3xl font-bold text-primary font-mono">
+                                        <NumberTicker value={stat.value} suffix={stat.suffix} />
+                                    </div>
+                                    <div className="mt-1 text-[11px] uppercase tracking-wider text-muted-foreground">
+                                        {stat.label}
+                                    </div>
+                                </div>
+                            ))}
                         </motion.div>
 
                         <motion.div

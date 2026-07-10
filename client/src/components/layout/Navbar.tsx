@@ -89,7 +89,7 @@ export const Navbar = ({ activeSection, scrollToSection }: NavbarProps) => {
                             href={personalInfo.cv}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-5 py-2 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 font-medium text-sm border border-primary/20 hover:border-primary shadow-sm"
+                            className="relative px-5 py-2 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300 font-medium text-sm border border-primary/20 hover:border-primary shadow-sm buffer-ring"
                         >
                             CV
                         </a>

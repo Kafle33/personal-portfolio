@@ -57,10 +57,10 @@
     font-family: 'Inter', sans-serif;
   }
 
-  /* Custom selection styling */
+  /* GIS rectangle-select feel: translucent fill, bright text */
   ::selection {
-    background-color: hsl(156, 81%, 29%);
-    color: white;
+    background-color: rgba(18, 194, 133, 0.35);
+    color: hsl(120, 30%, 97%);
   }
 
   /* High-Fidelity 3D Wireframe Globe Styles */
