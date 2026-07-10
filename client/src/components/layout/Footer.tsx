@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { personalInfo } from "../../data/portfolio";
 import { easing, viewportOnce } from "../../lib/animations";
+import { MapInstruments } from "./MapInstruments";
 
 export const Footer = () => {
     const socials = [
@@ -92,15 +93,12 @@ export const Footer = () => {
 
                     <motion.div
                         variants={itemVariants}
-                        className="border-t border-primary-foreground/20 pt-8"
+                        className="border-t border-primary-foreground/20"
                     >
-                        <p className="text-primary-foreground/60 text-xs sm:text-sm flex flex-wrap items-center justify-center gap-2 text-center px-4">
-                            <span className="flex items-center gap-2">
-                                <i className="fas fa-map-pin text-accent"></i>
-                                © {new Date().getFullYear()} {personalInfo.name}. All rights reserved.
-                            </span>
-                            <span className="hidden sm:inline">|</span>
-                            <span>{personalInfo.location}</span>
+                        <MapInstruments />
+                        <p className="text-primary-foreground/60 text-xs flex items-center justify-center gap-2 text-center px-4 mt-6">
+                            <i className="fas fa-map-pin text-accent"></i>
+                            <span>{personalInfo.location} · All rights reserved</span>
                         </p>
                     </motion.div>
                 </div>

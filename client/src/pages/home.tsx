@@ -7,6 +7,8 @@ import { useSmoothScroll } from "@/hooks/use-smooth-scroll";
 // Layout Components
 import { Navbar } from "../components/layout/Navbar";
 import { Footer } from "../components/layout/Footer";
+import { FlightPathProgress } from "../components/layout/FlightPathProgress";
+import { CommandPalette } from "../components/layout/CommandPalette";
 
 // Section Components
 import { Hero } from "../components/sections/Hero";
@@ -56,6 +58,8 @@ export default function Home() {
     <div className="min-h-screen transition-colors duration-300 relative">
       <GeospatialBackground />
       <Navbar activeSection={activeSection} scrollToSection={scrollToSection} />
+      <FlightPathProgress activeSection={activeSection} scrollToSection={scrollToSection} />
+      <CommandPalette scrollToSection={scrollToSection} />
 
       <main>
         <Hero />

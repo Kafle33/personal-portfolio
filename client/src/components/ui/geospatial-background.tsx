@@ -112,6 +112,18 @@ export const GeospatialBackground = () => {
             {/* Deep Space Glow */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(18,194,133,0.05)_0%,transparent_70%)]" />
 
+            {/* Graticule degree labels */}
+            <div className="absolute top-16 left-0 right-0 flex justify-around font-mono text-[8px] text-primary/30 select-none">
+                {["83.90° E", "83.94° E", "83.98° E", "84.02° E", "84.06° E"].map((label) => (
+                    <span key={label} className="hidden sm:inline">{label}</span>
+                ))}
+            </div>
+            <div className="absolute left-1.5 top-0 bottom-0 flex flex-col justify-around font-mono text-[8px] text-primary/30 select-none">
+                {["28.26° N", "28.22° N", "28.18° N", "28.14° N"].map((label) => (
+                    <span key={label} className="[writing-mode:vertical-rl] rotate-180 hidden sm:inline">{label}</span>
+                ))}
+            </div>
+
             {/* Lat/Long Grid */}
             <motion.div style={{ y: y1, willChange: "transform" }} className="absolute inset-0 opacity-20">
                 <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">

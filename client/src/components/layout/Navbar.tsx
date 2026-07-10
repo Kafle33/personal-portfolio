@@ -7,6 +7,17 @@ interface NavbarProps {
     scrollToSection: (id: string) => void;
 }
 
+/** Slippy-map zoom levels: the page reads as one long zoom from space to street */
+const ZOOM_LEVELS: Record<string, string> = {
+    hero: "z0",
+    about: "z4",
+    skills: "z8",
+    experience: "z10",
+    projects: "z12",
+    certifications: "z14",
+    contact: "z18",
+};
+
 export const Navbar = ({ activeSection, scrollToSection }: NavbarProps) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [scrollProgress, setScrollProgress] = useState(0);
@@ -53,6 +64,12 @@ export const Navbar = ({ activeSection, scrollToSection }: NavbarProps) => {
                                     }`}
                             >
                                 {item.label}
+                                <span
+                                    className={`ml-1 font-mono text-[8px] align-super transition-opacity duration-300 ${activeSection === item.id ? "opacity-70 text-primary" : "opacity-0"}`}
+                                    aria-hidden
+                                >
+                                    {ZOOM_LEVELS[item.id]}
+                                </span>
                                 {activeSection === item.id && (
                                     <motion.div
                                         layoutId="activeNav"
@@ -61,6 +78,13 @@ export const Navbar = ({ activeSection, scrollToSection }: NavbarProps) => {
                                 )}
                             </button>
                         ))}
+                        <button
+                            onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }))}
+                            className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-border text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors font-mono text-[10px]"
+                            aria-label="Open command palette"
+                        >
+                            <span>⌘K</span>
+                        </button>
                         <a
                             href={personalInfo.cv}
                             target="_blank"
