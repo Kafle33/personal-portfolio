@@ -205,9 +205,9 @@ function GlobeScene({ reducedMotion }: { reducedMotion: boolean }) {
 
       /* Outer atmosphere halo */
       const halo = ctx.createRadialGradient(cx, cy, R * 0.96, cx, cy, R * 1.22);
-      halo.addColorStop(0, "rgba(34, 197, 94, 0.18)");
-      halo.addColorStop(0.5, "rgba(45, 212, 191, 0.06)");
-      halo.addColorStop(1, "rgba(34, 197, 94, 0)");
+      halo.addColorStop(0, "rgba(34, 197, 94, 0.17)");
+      halo.addColorStop(0.5, "rgba(74, 190, 240, 0.055)");
+      halo.addColorStop(1, "rgba(56, 189, 248, 0)");
       ctx.fillStyle = halo;
       ctx.beginPath();
       ctx.arc(cx, cy, R * 1.22, 0, TAU);
@@ -312,49 +312,74 @@ function GlobeScene({ reducedMotion }: { reducedMotion: boolean }) {
       ctx.lineJoin = "round";
       ctx.stroke();
 
-      /* Nepal: golden glow, pulsing border, marker, ping rings, callout */
+      /* Nepal: GPS-beacon treatment — illuminated border, breathing emissive
+         lift, slow sonar ping, ground-station light column, cool callout.
+         Cyan instrumentation that reads as part of the globe, not a patch. */
       const nepal = project(NEPAL.lat, NEPAL.lon);
       if (nepal.z > 0) {
         const vis = Math.min(1, nepal.z * 1.6);
-        const glow = ctx.createRadialGradient(nepal.x, nepal.y, 0, nepal.x, nepal.y, R * 0.22);
-        glow.addColorStop(0, `rgba(251, 191, 36, ${0.16 * vis})`);
-        glow.addColorStop(1, "rgba(251, 191, 36, 0)");
+        const breathe = reducedMotion ? 0.7 : 0.62 + 0.38 * Math.sin(now / 950);
+
+        // Barely-there emissive lift under the region
+        const glow = ctx.createRadialGradient(nepal.x, nepal.y, 0, nepal.x, nepal.y, R * 0.15);
+        glow.addColorStop(0, `rgba(103, 232, 249, ${0.07 * vis * breathe})`);
+        glow.addColorStop(1, "rgba(103, 232, 249, 0)");
         ctx.fillStyle = glow;
         ctx.beginPath();
-        ctx.arc(nepal.x, nepal.y, R * 0.22, 0, TAU);
+        ctx.arc(nepal.x, nepal.y, R * 0.15, 0, TAU);
         ctx.fill();
 
-        const borderPulse = reducedMotion ? 0.5 : (Math.sin(now / 240) + 1) / 2;
-        ctx.beginPath();
-        let firstNp = true;
-        for (const [lat, lon] of NEPAL_BORDER) {
-          const p = project(lat, lon);
-          if (p.z > 0) {
-            if (firstNp) ctx.moveTo(p.x, p.y);
-            else ctx.lineTo(p.x, p.y);
-            firstNp = false;
-          } else firstNp = true;
-        }
-        ctx.strokeStyle = `rgba(251, 191, 36, ${(0.55 + borderPulse * 0.45) * vis})`;
-        ctx.lineWidth = 1.4 + borderPulse * 0.6;
+        // Illuminated outline: wide soft bloom pass under a thin bright pass
+        const traceNepal = () => {
+          ctx.beginPath();
+          let firstNp = true;
+          for (const [lat, lon] of NEPAL_BORDER) {
+            const p = project(lat, lon);
+            if (p.z > 0) {
+              if (firstNp) ctx.moveTo(p.x, p.y);
+              else ctx.lineTo(p.x, p.y);
+              firstNp = false;
+            } else firstNp = true;
+          }
+        };
+        traceNepal();
+        ctx.strokeStyle = `rgba(103, 232, 249, ${0.16 * vis * breathe})`;
+        ctx.lineWidth = 2.8;
+        ctx.stroke();
+        traceNepal();
+        ctx.strokeStyle = `rgba(224, 252, 255, ${(0.45 + 0.3 * breathe) * vis})`;
+        ctx.lineWidth = 0.9;
         ctx.stroke();
 
-        // Expanding ping rings
+        // Slow sonar ping — one ring, unhurried
         if (!reducedMotion) {
-          for (let k = 0; k < 2; k++) {
-            const ring = ((now / 1400 + k * 0.5) % 1);
-            ctx.beginPath();
-            ctx.arc(nepal.x, nepal.y, 3 + ring * R * 0.13, 0, TAU);
-            ctx.strokeStyle = `rgba(251, 191, 36, ${(1 - ring) * 0.5 * vis})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-          }
+          const ring = (now / 2400) % 1;
+          const fade = Math.pow(1 - ring, 1.6);
+          ctx.beginPath();
+          ctx.arc(nepal.x, nepal.y, 2 + ring * R * 0.1, 0, TAU);
+          ctx.strokeStyle = `rgba(125, 211, 252, ${fade * 0.38 * vis})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+
+        // Ground-station light column rising from the marker
+        const beaconH = R * 0.15 * (0.85 + 0.15 * breathe);
+        for (const [w, aMul] of [[3.2, 0.12], [1.1, 0.5]] as const) {
+          const col = ctx.createLinearGradient(nepal.x, nepal.y, nepal.x, nepal.y - beaconH);
+          col.addColorStop(0, `rgba(165, 243, 252, ${aMul * vis})`);
+          col.addColorStop(1, "rgba(165, 243, 252, 0)");
+          ctx.strokeStyle = col;
+          ctx.lineWidth = w;
+          ctx.beginPath();
+          ctx.moveTo(nepal.x, nepal.y);
+          ctx.lineTo(nepal.x, nepal.y - beaconH);
+          ctx.stroke();
         }
 
         // Marker core
         ctx.beginPath();
-        ctx.arc(nepal.x, nepal.y, 2, 0, TAU);
-        ctx.fillStyle = `rgba(251, 191, 36, ${vis})`;
+        ctx.arc(nepal.x, nepal.y, 1.6, 0, TAU);
+        ctx.fillStyle = `rgba(224, 252, 255, ${vis})`;
         ctx.fill();
 
         // Leader-line callout once Nepal is well onto the visible face
@@ -362,17 +387,17 @@ function GlobeScene({ reducedMotion }: { reducedMotion: boolean }) {
         if (callA > 0.02) {
           const lx = nepal.x + R * 0.24;
           const ly = nepal.y - R * 0.3;
-          ctx.strokeStyle = `rgba(251, 191, 36, ${0.55 * callA})`;
+          ctx.strokeStyle = `rgba(148, 226, 240, ${0.4 * callA})`;
           ctx.lineWidth = 0.75;
           ctx.beginPath();
           ctx.moveTo(nepal.x + 4, nepal.y - 4);
           ctx.lineTo(lx, ly);
           ctx.lineTo(lx + 52, ly);
           ctx.stroke();
-          ctx.fillStyle = `rgba(251, 191, 36, ${0.95 * callA})`;
+          ctx.fillStyle = `rgba(186, 240, 250, ${0.9 * callA})`;
           ctx.font = "600 9px ui-monospace, SFMono-Regular, monospace";
           ctx.fillText("NEPAL · GS-01", lx + 3, ly - 4);
-          ctx.fillStyle = `rgba(190, 230, 210, ${0.7 * callA})`;
+          ctx.fillStyle = `rgba(170, 205, 195, ${0.65 * callA})`;
           ctx.font = "8px ui-monospace, SFMono-Regular, monospace";
           ctx.fillText("28.2096°N 83.9856°E", lx + 3, ly + 9);
         }
@@ -416,6 +441,28 @@ function GlobeScene({ reducedMotion }: { reducedMotion: boolean }) {
       ctx.arc(cx, cy, R, 0, TAU);
       ctx.fill();
 
+      /* Sunrise glint: warm light grazing the atmosphere on the sunward limb,
+         Blue Marble style — a thin bright band hugging the rim plus a wider,
+         fainter scatter, both fading to nothing along the terminator */
+      const sunAngle = Math.atan2(lightY - cy, lightX - cx);
+      const GLINT_SPAN = Math.PI * 0.7;
+      const GLINT_SEGS = 24;
+      for (const [rr, lw, maxA, colr] of [
+        [R * 1.005, R * 0.022, 0.15, "255, 176, 110"],
+        [R * 1.03, R * 0.06, 0.045, "255, 150, 90"],
+      ] as const) {
+        for (let i = 0; i < GLINT_SEGS; i++) {
+          const f0 = i / GLINT_SEGS - 0.5;
+          const f1 = (i + 1.2) / GLINT_SEGS - 0.5;
+          const fall = Math.cos(f0 * Math.PI); // 1 at the sub-solar limb → 0 at the terminator
+          ctx.beginPath();
+          ctx.arc(cx, cy, rr, sunAngle + f0 * GLINT_SPAN, sunAngle + f1 * GLINT_SPAN);
+          ctx.strokeStyle = `rgba(${colr}, ${maxA * fall * fall})`;
+          ctx.lineWidth = lw;
+          ctx.stroke();
+        }
+      }
+
       /* Front satellites + scan beams locked on Nepal */
       for (const s of satScreens) {
         if (s.z < 0) continue;
@@ -423,7 +470,7 @@ function GlobeScene({ reducedMotion }: { reducedMotion: boolean }) {
           const beamA = Math.min(1, s.z * 1.4) * Math.min(1, nepal.z * 1.4) * 0.9;
           const grad = ctx.createLinearGradient(s.x, s.y, nepal.x, nepal.y);
           grad.addColorStop(0, `rgba(34, 197, 94, ${0.55 * beamA})`);
-          grad.addColorStop(1, `rgba(251, 191, 36, ${0.18 * beamA})`);
+          grad.addColorStop(1, `rgba(103, 232, 249, ${0.16 * beamA})`);
           // Cone: narrow at the satellite, footprint at Nepal
           const dx = nepal.x - s.x;
           const dy = nepal.y - s.y;
