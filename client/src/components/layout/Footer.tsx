@@ -52,7 +52,7 @@ export const Footer = () => {
                         {personalInfo.name}
                     </motion.h3>
 
-                    <motion.p
+                    <motion.div
                         variants={itemVariants}
                         className="text-primary-foreground/80 mb-8 max-w-md mx-auto flex flex-col gap-1"
                     >
@@ -63,7 +63,7 @@ export const Footer = () => {
                         <div className="text-sm opacity-70">
                             {personalInfo.role[1]}
                         </div>
-                    </motion.p>
+                    </motion.div>
 
                     <motion.div
                         variants={itemVariants}

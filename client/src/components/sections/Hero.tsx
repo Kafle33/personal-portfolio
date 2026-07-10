@@ -1,11 +1,20 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import { lazy, Suspense, useRef } from "react";
+import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { personalInfo } from "../../data/portfolio";
 import { easing } from "../../lib/animations";
+import { DecodeText } from "../ui/decode-text";
+import { GpsStatusLine } from "../ui/gps-status-line";
+import { CrosshairOverlay } from "../ui/crosshair-overlay";
+import { usePerformanceTier } from "../../hooks/use-performance-tier";
+
+const TerrainBackdrop = lazy(() => import("../three/TerrainBackdrop"));
 
 export const Hero = () => {
+    const sectionRef = useRef<HTMLElement>(null);
+    const tier = usePerformanceTier();
+    const inView = useInView(sectionRef, { margin: "200px" });
+
     const { scrollY } = useScroll();
-    const y1 = useTransform(scrollY, [0, 500], [0, 150]);
-    const y2 = useTransform(scrollY, [0, 500], [0, -100]);
     const opacity = useTransform(scrollY, [0, 400], [1, 0]);
     const scale = useTransform(scrollY, [0, 300], [1, 0.95]);
 
@@ -30,25 +39,18 @@ export const Hero = () => {
     };
 
     return (
-        <section id="hero" className="geospatial-grid min-h-screen flex items-center pt-20 relative overflow-hidden">
-            {/* Animated Background Elements - Reduced on mobile for performance */}
-            <motion.div style={{ opacity }} className="absolute inset-0 pointer-events-none">
-                <motion.div style={{ y: y1 }} className="absolute top-20 left-10 text-white/15 floating-animation hidden sm:block">
-                    <i className="fas fa-satellite text-2xl md:text-3xl lg:text-4xl"></i>
-                </motion.div>
-                <motion.div style={{ y: y2 }} className="absolute top-40 right-20 text-yellow-300/20 floating-animation hidden md:block" >
-                    <i className="fas fa-broadcast-tower text-2xl lg:text-3xl" style={{ animationDelay: '0.5s' }}></i>
-                </motion.div>
-                <div className="absolute bottom-32 left-1/4 text-blue-300/20 floating-animation hidden lg:block" style={{ animationDelay: '1s' }}>
-                    <i className="fas fa-helicopter text-xl lg:text-2xl"></i>
-                </div>
-                <div className="absolute top-1/3 right-1/3 text-green-300/15 floating-animation hidden lg:block" style={{ animationDelay: '1.5s' }}>
-                    <i className="fas fa-plane text-2xl lg:text-3xl"></i>
-                </div>
-                <div className="absolute top-1/2 left-1/6 text-purple-300/20 floating-animation hidden lg:block" style={{ animationDelay: '2s' }}>
-                    <i className="fas fa-brain text-xl lg:text-2xl"></i>
-                </div>
-            </motion.div>
+        <section ref={sectionRef} id="hero" className="geospatial-grid min-h-screen flex items-center pt-20 relative overflow-hidden">
+            {/* 3D wireframe terrain flyover — high-perf devices only, unmounts off-screen */}
+            {tier === "high" && inView && (
+                <Suspense fallback={null}>
+                    <motion.div style={{ opacity }} className="absolute inset-0 pointer-events-none">
+                        <TerrainBackdrop />
+                    </motion.div>
+                </Suspense>
+            )}
+
+            {/* GIS crosshair cursor tracking (desktop only) */}
+            <CrosshairOverlay containerRef={sectionRef} />
 
             <motion.div
                 style={{ scale }}
@@ -62,23 +64,15 @@ export const Hero = () => {
                         className="space-y-8 order-2 md:order-1"
                     >
                         <div className="space-y-4">
-                            {/* Live status indicator */}
-                            {/* <motion.div
-                                variants={itemVariants}
-                                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 text-sm font-medium"
-                            >
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                </span>
-                                <span className="text-white/80">Available for opportunities</span>
-                            </motion.div> */}
+                            <motion.div variants={itemVariants}>
+                                <GpsStatusLine delay={900} />
+                            </motion.div>
 
                             <motion.h1
                                 variants={itemVariants}
                                 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-white drop-shadow-2xl"
                             >
-                                {personalInfo.name}
+                                <DecodeText text={personalInfo.name} delay={400} />
                             </motion.h1>
 
                             <motion.h2
@@ -127,7 +121,7 @@ export const Hero = () => {
                                 href={personalInfo.cv}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group relative px-6 sm:px-8 py-3 sm:py-4 bg-emerald-600 text-white rounded-xl font-bold overflow-hidden flex items-center justify-center gap-3 shimmer-effect glow-hover min-h-[44px]"
+                                className="group relative px-6 sm:px-8 py-3 sm:py-4 bg-emerald-600 text-white rounded-xl font-bold overflow-hidden flex items-center justify-center gap-3 shimmer-effect glow-hover buffer-ring min-h-[44px]"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 transition={{ duration: 0.2, ease: easing.smooth }}

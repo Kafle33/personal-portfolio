@@ -498,7 +498,9 @@ export function GeospatialPreloader({ onComplete }: GeospatialPreloaderProps) {
               </motion.h2>
             </AnimatePresence>
             <div className="text-[10px] text-primary/60 tracking-widest uppercase">
-              Initializing Map Layers
+              {progress >= 100
+                ? "✓ FIX ACQUIRED — 3D POSITION LOCK"
+                : `ACQUIRING SATELLITES: ${Math.min(12, Math.floor((progress / 100) * 13))}/12`}
             </div>
           </div>
 
