@@ -27,18 +27,9 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes("node_modules/three") || id.includes("@react-three")) {
-            return "three";
-          }
-          if (id.includes("node_modules/maplibre-gl")) {
-            return "maplibre";
-          }
-        },
-      },
-    },
+    // No manualChunks: rollup derives the graph from the lazy imports, so
+    // three.js and maplibre-gl only download when their components mount.
+    chunkSizeWarningLimit: 1100,
   },
   server: {
     fs: {
