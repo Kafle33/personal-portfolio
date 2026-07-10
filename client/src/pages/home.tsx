@@ -47,6 +47,12 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Belt-and-braces with main.tsx's scrollRestoration=manual: the overlay
+  // hides this jump, so the exit always reveals the hero at the very top.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const scrollToSection = (sectionId: string) => {
     scrollTo(`#${sectionId}`, -80);
   };

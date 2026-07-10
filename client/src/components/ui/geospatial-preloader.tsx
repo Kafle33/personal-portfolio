@@ -10,6 +10,8 @@ import { NEPAL_BORDER } from "./nepal-data";
 
 const TAU = Math.PI * 2;
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+const easeInOutCubic = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 /**
  * The full cinematic center stage: starfield, lit globe with atmosphere and
@@ -48,11 +50,12 @@ function GlobeScene({ reducedMotion }: { reducedMotion: boolean }) {
     const TILT = (-28.2 * Math.PI) / 180;
     const NEPAL = { lat: 28.2096, lon: 83.9856 };
 
-    // Rotation choreography: start with Nepal behind, spin just over a full
-    // turn, and decelerate so Nepal lands front-center as progress hits 100%.
+    // Rotation choreography: one full revolution plus the offset needed so the
+    // deceleration lands Nepal exactly front-center (λ=0) as loading completes.
+    // ease-in-out: the globe spins up, sweeps around, and settles on Nepal.
     const ROT_START = (-154 * Math.PI) / 180;
-    const ROT_END = (-NEPAL.lon * Math.PI) / 180; // Nepal at λ=0
-    const ROT_DELTA = ROT_END - ROT_START + TAU / 2; // graceful half-extra sweep
+    const ROT_END = (-NEPAL.lon * Math.PI) / 180; // Nepal at λ=0 → front-center
+    const ROT_DELTA = ROT_END - ROT_START + TAU; // full extra revolution, same end
     const SPIN_MS = 3050;
 
     // Deterministic ambience
@@ -79,9 +82,18 @@ function GlobeScene({ reducedMotion }: { reducedMotion: boolean }) {
       { lat: 25, lon0: 210, w: 0.42, h: 0.12, sp: 0.00003, al: 0.045 },
     ];
 
+    // GPS/Starlink-style constellation: varied planes, altitudes, speeds.
+    // Only the two prominent low-orbit birds fire scan beams — the rest are
+    // ambient traffic so the scene reads busy without becoming noisy.
+    const deg = Math.PI / 180;
     const sats = [
-      { incl: (64 * Math.PI) / 180, raan: 0.7, altF: 1.32, speed: 0.00082, a0: 0.4, scale: 1 },
-      { incl: (-38 * Math.PI) / 180, raan: -1.1, altF: 1.6, speed: -0.00048, a0: 2.6, scale: 0.78 },
+      { incl: 64 * deg, raan: 0.7, altF: 1.3, speed: 0.00082, a0: 0.4, scale: 1, beams: true },
+      { incl: -38 * deg, raan: -1.1, altF: 1.56, speed: -0.00048, a0: 2.6, scale: 0.78, beams: true },
+      { incl: 14 * deg, raan: 0.3, altF: 1.4, speed: 0.0006, a0: 4.4, scale: 0.64, beams: false },
+      { incl: 82 * deg, raan: -0.5, altF: 1.22, speed: -0.00096, a0: 1.5, scale: 0.58, beams: false },
+      { incl: -58 * deg, raan: 1.9, altF: 1.5, speed: 0.00052, a0: 5.6, scale: 0.68, beams: false },
+      { incl: 43 * deg, raan: 2.6, altF: 1.58, speed: -0.00038, a0: 3.3, scale: 0.52, beams: false },
+      { incl: -22 * deg, raan: -2.3, altF: 1.36, speed: 0.0007, a0: 0.9, scale: 0.48, beams: false },
     ];
 
     const t0 = performance.now();
@@ -106,7 +118,7 @@ function GlobeScene({ reducedMotion }: { reducedMotion: boolean }) {
       const spinP = Math.min(1, elapsed / SPIN_MS);
       const rotation = reducedMotion
         ? ROT_END
-        : ROT_START + ROT_DELTA * easeOutCubic(spinP) + Math.max(0, elapsed - SPIN_MS) * 0.00002;
+        : ROT_START + ROT_DELTA * easeInOutCubic(spinP) + Math.max(0, elapsed - SPIN_MS) * 0.00001;
       // Slow dolly-in over the load
       const R = Math.min(W, H) * (0.285 + 0.02 * easeOutCubic(Math.min(1, elapsed / SPIN_MS)));
       const sceneA = reducedMotion ? 1 : Math.min(1, elapsed / 500);
@@ -217,13 +229,16 @@ function GlobeScene({ reducedMotion }: { reducedMotion: boolean }) {
       });
 
       for (const s of satScreens) {
-        // Orbit trail (always drawn — reads as the orbit path)
-        for (let k = 1; k <= 14; k++) {
+        // Orbit trail (always drawn — reads as the orbit path); shorter and
+        // dimmer for the small ambient birds
+        const trailLen = s.beams ? 14 : 9;
+        const trailA = s.beams ? 0.32 : 0.2;
+        for (let k = 1; k <= trailLen; k++) {
           const ta = s.a - k * 0.055 * Math.sign(s.speed || 1);
           const tp = orbitPoint(ta, s.incl, s.raan, R * s.altF);
           const tz = tp.z / (R * s.altF);
           const behind = tz < 0 ? 0.35 : 1;
-          ctx.fillStyle = `rgba(34, 197, 94, ${(1 - k / 14) * 0.32 * behind})`;
+          ctx.fillStyle = `rgba(34, 197, 94, ${(1 - k / trailLen) * trailA * behind})`;
           ctx.fillRect(cx + tp.x - 0.75, cy + tp.y - 0.75, 1.5, 1.5);
         }
         if (s.z < 0) drawSatellite(s.x, s.y, s.z, s.scale, s.heading);
@@ -404,7 +419,7 @@ function GlobeScene({ reducedMotion }: { reducedMotion: boolean }) {
       /* Front satellites + scan beams locked on Nepal */
       for (const s of satScreens) {
         if (s.z < 0) continue;
-        if (nepal.z > 0.1 && !reducedMotion) {
+        if (s.beams && nepal.z > 0.1 && !reducedMotion) {
           const beamA = Math.min(1, s.z * 1.4) * Math.min(1, nepal.z * 1.4) * 0.9;
           const grad = ctx.createLinearGradient(s.x, s.y, nepal.x, nepal.y);
           grad.addColorStop(0, `rgba(34, 197, 94, ${0.55 * beamA})`);
