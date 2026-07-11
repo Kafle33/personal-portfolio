@@ -1,4 +1,4 @@
-import{j as o,r as t}from"./index-CeFg1YMD.js";import{C as c,a as r,u as v}from"./react-three-fiber.esm-DmFnYqyC.js";const p=`
+import{j as o,r as t}from"./index-gyxmJkf0.js";import{C as c,a as r,u as v}from"./react-three-fiber.esm-DZuIH1-t.js";const p=`
     uniform float uTime;
     varying float vElevation;
     varying float vDistance;
