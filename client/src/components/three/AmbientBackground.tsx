@@ -375,19 +375,18 @@ const strokesToLineGeo = (strokes: Stroke[]): THREE.BufferGeometry => {
 };
 
 const droneStrokeSets = (): Stroke[][] => {
-    // 1 · EO satellite in action: bold bus + wings, dish, and a scanning
-    //     beam cone diverging to a ground swath below
+    // 1 · Satellite, kept iconic: panels ═ body ═ panels, nothing else to
+    //     fight the silhouette. Grid dividers sell "solar array".
     const satellite: Stroke[] = [
-        rectStroke(0, 0.8, 2.0, 2.4),                        // bus
-        [[-1.0, 0.8], [-1.6, 0.8]], [[1.0, 0.8], [1.6, 0.8]], // struts
-        rectStroke(-3.5, 0.8, 3.8, 2.1),                     // left wing
-        rectStroke(3.5, 0.8, 3.8, 2.1),                      // right wing
-        [[-5.4, 0.8], [-1.6, 0.8]], [[1.6, 0.8], [5.4, 0.8]], // wing centre lines
-        [[-3.5, -0.25], [-3.5, 1.85]], [[3.5, -0.25], [3.5, 1.85]], // wing cross lines
-        [[0, 2.0], [0, 2.5]],                                // mast
-        arcStroke(0, 2.55, 1.0, Math.PI * 0.1, Math.PI * 0.9), // dish
-        [[-0.5, -0.4], [-1.7, -3.1]], [[0.5, -0.4], [1.7, -3.1]], // scan cone
-        arcStroke(0, -3.3, 1.75, Math.PI * 0.15, Math.PI * 0.85), // ground swath
+        rectStroke(0, 0, 1.5, 2.0),                            // bus
+        [[-0.75, 0], [-1.35, 0]], [[0.75, 0], [1.35, 0]],      // struts
+        rectStroke(-3.15, 0, 3.6, 2.2),                        // left wing
+        rectStroke(3.15, 0, 3.6, 2.2),                         // right wing
+        [[-2.55, -1.1], [-2.55, 1.1]], [[-3.75, -1.1], [-3.75, 1.1]], // left dividers
+        [[2.55, -1.1], [2.55, 1.1]], [[3.75, -1.1], [3.75, 1.1]],     // right dividers
+        [[-4.95, 0], [-1.35, 0]], [[1.35, 0], [4.95, 0]],      // wing centre lines
+        [[0, 1.0], [0, 1.9]],                                  // antenna mast
+        arcStroke(0, 2.15, 0.28, 0, Math.PI * 2, 10),          // antenna tip
     ];
 
     // 2 · Total station: unmistakable A-frame tripod, instrument head,
@@ -418,6 +417,21 @@ const droneStrokeSets = (): Stroke[][] => {
     return [satellite, totalStation, ai4eo];
 };
 
+/** Soft round glow sprite — turns hard square points into drone lights */
+const makeDroneSprite = (): THREE.Texture => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 64;
+    const g = c.getContext("2d")!;
+    const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, "rgba(255,255,255,1)");
+    grad.addColorStop(0.25, "rgba(255,255,255,0.85)");
+    grad.addColorStop(0.6, "rgba(255,255,255,0.25)");
+    grad.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(c);
+};
+
 const DroneShow = ({ fades }: { fades: Fades }) => {
     const group = useRef<THREE.Group>(null);
     const { pointsMat, geo, formations, holograms } = useMemo(() => {
@@ -425,7 +439,8 @@ const DroneShow = ({ fades }: { fades: Fades }) => {
         const f = strokeSets.map((s) => sampleStrokes(s, DRONES));
         return {
             pointsMat: new THREE.PointsMaterial({
-                color: GREEN, size: 0.24, transparent: true, opacity: 0,
+                color: GREEN, size: 0.3, transparent: true, opacity: 0,
+                map: makeDroneSprite(), alphaTest: 0.01,
                 blending: THREE.AdditiveBlending, depthWrite: false,
             }),
             geo: new THREE.BufferGeometry().setFromPoints(f[0]),
