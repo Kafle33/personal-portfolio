@@ -1,9 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { AnimatePresence } from "framer-motion";
 import { GeospatialPreloader } from "@/components/ui/geospatial-preloader";
 import { PortfolioItem } from "../data/portfolio";
 import { GeospatialBackground } from "@/components/ui/geospatial-background";
 import { useSmoothScroll } from "@/hooks/use-smooth-scroll";
+import { usePerformanceTier } from "@/hooks/use-performance-tier";
+
+const AmbientBackground = lazy(() => import("../components/three/AmbientBackground"));
 
 // Layout Components
 import { Navbar } from "../components/layout/Navbar";
@@ -28,6 +31,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
   const { scrollTo } = useSmoothScroll();
+  const tier = usePerformanceTier();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,6 +71,12 @@ export default function Home() {
       </AnimatePresence>
 
       <GeospatialBackground />
+      {/* Ambient per-section 3D layer: one shared canvas, crossfades with scroll */}
+      {tier === "high" && !isLoading && (
+        <Suspense fallback={null}>
+          <AmbientBackground activeSection={activeSection} />
+        </Suspense>
+      )}
       <Navbar activeSection={activeSection} scrollToSection={scrollToSection} />
       <FlightPathProgress activeSection={activeSection} scrollToSection={scrollToSection} />
       <CommandPalette scrollToSection={scrollToSection} />
