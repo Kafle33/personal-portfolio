@@ -308,35 +308,105 @@ const PointTiles = ({ fades }: { fades: Fades }) => {
     );
 };
 
-/* ---------- Certifications: tumbling wireframe polyhedra ---------- */
-const Polyhedra = ({ fades }: { fades: Fades }) => {
-    const group = useRef<THREE.Group>(null);
-    const mat = useMemo(
-        () => new THREE.MeshBasicMaterial({ color: GREEN, wireframe: true, transparent: true, opacity: 0 }),
-        []
-    );
-    const shapes = useMemo(
-        () => [
-            { geo: new THREE.IcosahedronGeometry(1.4, 0), pos: [-8, 2.5, -5], sp: 0.1 },
-            { geo: new THREE.OctahedronGeometry(1.0, 0), pos: [7, -2, -3], sp: -0.14 },
-            { geo: new THREE.TetrahedronGeometry(0.9, 0), pos: [4, 4, -8], sp: 0.12 },
-            { geo: new THREE.IcosahedronGeometry(0.7, 0), pos: [-4, -4, -6], sp: -0.09 },
-        ] as const,
-        []
-    );
+/* ---------- Certifications: synchronized drone light show ----------
+   ~84 drone lights hold a formation, then morph in sync to the next:
+   location pin → mountain ridgeline → globe. Per-drone launch stagger
+   and hover wobble keep it organic. */
+const DRONES = 84;
 
-    useVariant(fades, "certifications", group, [mat], [0.14], (g, delta) => {
-        g.children.forEach((child, i) => {
-            child.rotation.x += delta * shapes[i].sp;
-            child.rotation.y += delta * shapes[i].sp * 0.7;
-        });
+const droneFormations = (): THREE.Vector3[][] => {
+    // 1 · Location pin: circle head with a gap, edges converging to the tip
+    const pin: THREE.Vector3[] = [];
+    for (let i = 0; i < 56; i++) {
+        const a = ((-55 + (290 * i) / 55) * Math.PI) / 180;
+        pin.push(new THREE.Vector3(Math.cos(a) * 2.1, 1.5 + Math.sin(a) * 2.1, 0));
+    }
+    const edgeStart = [
+        new THREE.Vector3(Math.cos((-55 * Math.PI) / 180) * 2.1, 1.5 + Math.sin((-55 * Math.PI) / 180) * 2.1, 0),
+        new THREE.Vector3(Math.cos((235 * Math.PI) / 180) * 2.1, 1.5 + Math.sin((235 * Math.PI) / 180) * 2.1, 0),
+    ];
+    const tip = new THREE.Vector3(0, -2.9, 0);
+    for (let side = 0; side < 2; side++) {
+        for (let i = 1; i <= 14; i++) {
+            pin.push(edgeStart[side].clone().lerp(tip, i / 14));
+        }
+    }
+
+    // 2 · Mountain ridgelines (two, offset in depth)
+    const ridge = (knots: [number, number][], z: number) => {
+        const out: THREE.Vector3[] = [];
+        const perSeg = 42 / (knots.length - 1);
+        for (let s = 0; s < knots.length - 1; s++) {
+            for (let i = 0; i < perSeg; i++) {
+                const t = i / perSeg;
+                out.push(new THREE.Vector3(
+                    knots[s][0] + (knots[s + 1][0] - knots[s][0]) * t,
+                    knots[s][1] + (knots[s + 1][1] - knots[s][1]) * t,
+                    z
+                ));
+            }
+        }
+        while (out.length < 42) out.push(out[out.length - 1].clone());
+        return out.slice(0, 42);
+    };
+    const mountains = [
+        ...ridge([[-5, -1.6], [-2.6, 1.9], [-1.2, 0.1], [0.6, 2.7], [2.1, 0.3], [3.7, 1.5], [5, -1.6]], 0),
+        ...ridge([[-5, -1.2], [-3.2, 0.9], [-0.8, -0.4], [1.4, 1.6], [3.2, -0.2], [4.4, 0.8], [5, -1.2]], -1.4),
+    ];
+
+    // 3 · Globe: Fibonacci sphere for an even swarm shell
+    const globe: THREE.Vector3[] = [];
+    const golden = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < DRONES; i++) {
+        const y = 1 - (i / (DRONES - 1)) * 2;
+        const r = Math.sqrt(1 - y * y);
+        const a = golden * i;
+        globe.push(new THREE.Vector3(Math.cos(a) * r * 2.6, y * 2.6, Math.sin(a) * r * 2.6));
+    }
+
+    return [pin, mountains, globe];
+};
+
+const DroneShow = ({ fades }: { fades: Fades }) => {
+    const group = useRef<THREE.Group>(null);
+    const { mat, geo, formations } = useMemo(() => {
+        const f = droneFormations();
+        return {
+            mat: new THREE.PointsMaterial({ color: GREEN, size: 0.22, transparent: true, opacity: 0 }),
+            geo: new THREE.BufferGeometry().setFromPoints(f[0]),
+            formations: f,
+        };
+    }, []);
+
+    const CYCLE = 6.5;
+    const MORPH = 1.8;
+
+    useVariant(fades, "certifications", group, [mat], [0.55], (_g, _d, t) => {
+        const idx = Math.floor(t / CYCLE) % formations.length;
+        const next = (idx + 1) % formations.length;
+        const local = t % CYCLE;
+        const morphStart = CYCLE - MORPH;
+        const pos = geo.attributes.position as THREE.BufferAttribute;
+        for (let i = 0; i < DRONES; i++) {
+            const stagger = hash(i, 42) * 0.5;
+            const m = Math.min(1, Math.max(0, (local - morphStart - stagger) / (MORPH - 0.6)));
+            const e = m < 0.5 ? 2 * m * m : 1 - Math.pow(-2 * m + 2, 2) / 2;
+            const a = formations[idx][i];
+            const b = formations[next][i];
+            pos.setXYZ(
+                i,
+                a.x + (b.x - a.x) * e + Math.sin(t * 1.3 + i * 1.7) * 0.06,
+                a.y + (b.y - a.y) * e + Math.cos(t * 1.1 + i * 2.3) * 0.06,
+                a.z + (b.z - a.z) * e
+            );
+        }
+        pos.needsUpdate = true;
     });
 
     return (
-        <group ref={group} visible={false}>
-            {shapes.map((s, i) => (
-                <mesh key={i} geometry={s.geo} material={mat} position={[...s.pos] as [number, number, number]} />
-            ))}
+        <group ref={group} position={[3.4, 0.8, -8]} rotation={[0, -0.25, 0]} scale={0.8} visible={false}>
+            {/* eslint-disable-next-line react/no-unknown-property */}
+            <primitive object={new THREE.Points(geo, mat)} />
         </group>
     );
 };
@@ -422,7 +492,7 @@ const AmbientScene = ({ activeRef }: { activeRef: MutableRefObject<string> }) =>
             <LayerStack fades={fades} />
             <SurveyRoute fades={fades} />
             <PointTiles fades={fades} />
-            <Polyhedra fades={fades} />
+            <DroneShow fades={fades} />
             <HorizonComms fades={fades} />
         </>
     );
