@@ -41,38 +41,75 @@ const useVariant = (
     });
 };
 
-/* ---------- About: floating contour rings with depth ---------- */
-const ContourRings = ({ fades }: { fades: Fades }) => {
+/* ---------- About: stacked-contour mountain model ----------
+   Contour slices rising to a summit — a 3D topo model of a Himalayan
+   peak (plus a shoulder peak) turning slowly on its turntable.
+   Every level shares the same wobble field so the contours nest the
+   way real terrain does. */
+const ContourPeak = ({ fades }: { fades: Fades }) => {
     const group = useRef<THREE.Group>(null);
-    const material = useMemo(
+    const lineMat = useMemo(
         () => new THREE.LineBasicMaterial({ color: GREEN, transparent: true, opacity: 0 }),
         []
     );
-    const rings = useMemo(() => {
+    const summitMat = useMemo(
+        () => new THREE.MeshBasicMaterial({ color: BLUE, transparent: true, opacity: 0 }),
+        []
+    );
+
+    const { rings, summit } = useMemo(() => {
         const list: THREE.BufferGeometry[] = [];
-        for (let r = 0; r < 7; r++) {
-            const pts: THREE.Vector3[] = [];
-            const radius = 2.2 + r * 1.15;
-            for (let i = 0; i <= 90; i++) {
-                const a = (i / 90) * Math.PI * 2;
-                const wobble = 1 + 0.16 * Math.sin(a * 3 + r * 1.7) + 0.08 * Math.sin(a * 7 + r);
-                pts.push(new THREE.Vector3(Math.cos(a) * radius * wobble, Math.sin(a) * radius * wobble, r * 0.55));
+        // Shared wobble → nested, terrain-like contours
+        const wobble = (a: number, seed: number) =>
+            1 + 0.14 * Math.sin(3 * a + 1.2 + seed) + 0.07 * Math.sin(5 * a - 0.6 + seed);
+
+        const buildPeak = (
+            cx0: number, cy0: number, baseR: number, height: number,
+            levels: number, driftX: number, driftY: number, seed: number
+        ) => {
+            let top = new THREE.Vector3();
+            for (let i = 0; i < levels; i++) {
+                const t = i / (levels - 1);
+                const radius = Math.max(0.3, baseR * Math.pow(1 - t, 0.8));
+                const cx = cx0 + driftX * t;
+                const cy = cy0 + driftY * t;
+                const pts: THREE.Vector3[] = [];
+                for (let k = 0; k <= 72; k++) {
+                    const a = (k / 72) * Math.PI * 2;
+                    const w = wobble(a, seed);
+                    // Slight ridge elongation along x
+                    pts.push(new THREE.Vector3(
+                        cx + Math.cos(a) * radius * w * 1.25,
+                        cy + Math.sin(a) * radius * w,
+                        t * height
+                    ));
+                }
+                list.push(new THREE.BufferGeometry().setFromPoints(pts));
+                if (i === levels - 1) top = new THREE.Vector3(cx, cy, t * height + 0.25);
             }
-            list.push(new THREE.BufferGeometry().setFromPoints(pts));
-        }
-        return list;
+            return top;
+        };
+
+        const main = buildPeak(0, 0, 4.6, 3.6, 10, 1.2, -0.5, 0);
+        buildPeak(4.4, -2.4, 2.2, 1.7, 5, -0.4, 0.3, 2.1);
+        return { rings: list, summit: main };
     }, []);
 
-    useVariant(fades, "about", group, [material], [0.16], (g, delta) => {
-        g.rotation.z += delta * 0.03;
+    useVariant(fades, "about", group, [lineMat, summitMat], [0.3, 0.75], (g, delta) => {
+        g.rotation.z += delta * 0.045;
     });
 
     return (
-        <group ref={group} position={[5, -1, -6]} rotation={[0.9, 0.15, 0]} visible={false}>
+        <group ref={group} position={[6, -2, -7]} rotation={[-0.78, 0.08, 0]} scale={0.85} visible={false}>
             {rings.map((geo, i) => (
                 // eslint-disable-next-line react/no-unknown-property
-                <primitive key={i} object={new THREE.LineLoop(geo, material)} />
+                <primitive key={i} object={new THREE.LineLoop(geo, lineMat)} />
             ))}
+            {/* Summit benchmark beacon */}
+            <mesh position={summit} material={summitMat}>
+                {/* eslint-disable-next-line react/no-unknown-property */}
+                <sphereGeometry args={[0.12, 8, 8]} />
+            </mesh>
         </group>
     );
 };
@@ -578,7 +615,7 @@ const AmbientScene = ({ activeRef }: { activeRef: MutableRefObject<string> }) =>
 
     return (
         <>
-            <ContourRings fades={fades} />
+            <ContourPeak fades={fades} />
             <LayerStack fades={fades} />
             <SurveyRoute fades={fades} />
             <PointTiles fades={fades} />
