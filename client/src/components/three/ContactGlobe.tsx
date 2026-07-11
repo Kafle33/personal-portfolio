@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { CONTINENTS } from "../ui/continents-data";
 import { experiencesData, projectsData } from "../../data/portfolio";
@@ -131,6 +131,48 @@ const GlobeScene = ({ visitor, reducedMotion }: {
 }) => {
     const groupRef = useRef<THREE.Group>(null);
     const dragState = useRef({ dragging: false, lastX: 0, velocity: 0.0016 });
+    const { gl } = useThree();
+
+    // Drag on the canvas DOM element, not via raycast hits on the sphere —
+    // raycast-based moves die the moment the cursor leaves the globe's
+    // silhouette, which made dragging feel broken. Pointer capture keeps
+    // the drag alive even outside the canvas.
+    useEffect(() => {
+        const el = gl.domElement;
+        el.style.cursor = "grab";
+        // Horizontal drags rotate; vertical swipes still scroll the page
+        el.style.touchAction = "pan-y";
+
+        const down = (e: PointerEvent) => {
+            dragState.current.dragging = true;
+            dragState.current.lastX = e.clientX;
+            el.setPointerCapture?.(e.pointerId);
+            el.style.cursor = "grabbing";
+        };
+        const move = (e: PointerEvent) => {
+            if (!dragState.current.dragging || !groupRef.current) return;
+            const dx = e.clientX - dragState.current.lastX;
+            dragState.current.lastX = e.clientX;
+            groupRef.current.rotation.y += dx * 0.005;
+            dragState.current.velocity = dx * 0.0009;
+        };
+        const up = (e: PointerEvent) => {
+            dragState.current.dragging = false;
+            el.releasePointerCapture?.(e.pointerId);
+            el.style.cursor = "grab";
+        };
+
+        el.addEventListener("pointerdown", down);
+        el.addEventListener("pointermove", move);
+        el.addEventListener("pointerup", up);
+        el.addEventListener("pointercancel", up);
+        return () => {
+            el.removeEventListener("pointerdown", down);
+            el.removeEventListener("pointermove", move);
+            el.removeEventListener("pointerup", up);
+            el.removeEventListener("pointercancel", up);
+        };
+    }, [gl]);
 
     const destinations = useMemo(() => {
         const seen = new Set<string>();
@@ -158,24 +200,7 @@ const GlobeScene = ({ visitor, reducedMotion }: {
     });
 
     return (
-        <group
-            ref={groupRef}
-            rotation={[0.35, 1.35, 0]}
-            onPointerDown={(e) => {
-                dragState.current.dragging = true;
-                dragState.current.lastX = e.clientX;
-                (e.target as Element).setPointerCapture?.(e.pointerId);
-            }}
-            onPointerMove={(e) => {
-                if (!dragState.current.dragging || !groupRef.current) return;
-                const dx = e.clientX - dragState.current.lastX;
-                dragState.current.lastX = e.clientX;
-                groupRef.current.rotation.y += dx * 0.005;
-                dragState.current.velocity = dx * 0.0009;
-            }}
-            onPointerUp={() => { dragState.current.dragging = false; }}
-            onPointerLeave={() => { dragState.current.dragging = false; }}
-        >
+        <group ref={groupRef} rotation={[0.35, 1.35, 0]}>
             {/* Occluder sphere hides back-side lines */}
             <mesh>
                 <sphereGeometry args={[GLOBE_RADIUS - 0.015, 48, 48]} />
