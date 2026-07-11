@@ -309,83 +309,147 @@ const PointTiles = ({ fades }: { fades: Fades }) => {
 };
 
 /* ---------- Certifications: synchronized drone light show ----------
-   ~84 drone lights hold a formation, then morph in sync to the next:
-   location pin → mountain ridgeline → globe. Per-drone launch stagger
-   and hover wobble keep it organic. */
-const DRONES = 84;
+   168 drone lights morph between mission shapes — EO satellite, total
+   station, "AI4EO" — and once settled, a cyan hologram wireframe lights
+   up along the formation, then dissolves before the next morph. */
+const DRONES = 168;
 
-const droneFormations = (): THREE.Vector3[][] => {
-    // 1 · Location pin: circle head with a gap, edges converging to the tip
-    const pin: THREE.Vector3[] = [];
-    for (let i = 0; i < 56; i++) {
-        const a = ((-55 + (290 * i) / 55) * Math.PI) / 180;
-        pin.push(new THREE.Vector3(Math.cos(a) * 2.1, 1.5 + Math.sin(a) * 2.1, 0));
+type Stroke = [number, number][];
+
+/** Polyline arc approximation */
+const arcStroke = (cx: number, cy: number, r: number, a0: number, a1: number, segs = 12): Stroke => {
+    const out: Stroke = [];
+    for (let i = 0; i <= segs; i++) {
+        const a = a0 + ((a1 - a0) * i) / segs;
+        out.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
     }
-    const edgeStart = [
-        new THREE.Vector3(Math.cos((-55 * Math.PI) / 180) * 2.1, 1.5 + Math.sin((-55 * Math.PI) / 180) * 2.1, 0),
-        new THREE.Vector3(Math.cos((235 * Math.PI) / 180) * 2.1, 1.5 + Math.sin((235 * Math.PI) / 180) * 2.1, 0),
-    ];
-    const tip = new THREE.Vector3(0, -2.9, 0);
-    for (let side = 0; side < 2; side++) {
-        for (let i = 1; i <= 14; i++) {
-            pin.push(edgeStart[side].clone().lerp(tip, i / 14));
+    return out;
+};
+
+const rectStroke = (cx: number, cy: number, w: number, h: number): Stroke => [
+    [cx - w / 2, cy - h / 2], [cx + w / 2, cy - h / 2], [cx + w / 2, cy + h / 2],
+    [cx - w / 2, cy + h / 2], [cx - w / 2, cy - h / 2],
+];
+
+/** Distribute exactly N points evenly along a set of strokes, by arc length */
+const sampleStrokes = (strokes: Stroke[], n: number): THREE.Vector3[] => {
+    const segs: { a: [number, number]; b: [number, number]; len: number }[] = [];
+    for (const stroke of strokes) {
+        for (let i = 0; i < stroke.length - 1; i++) {
+            const a = stroke[i];
+            const b = stroke[i + 1];
+            segs.push({ a, b, len: Math.hypot(b[0] - a[0], b[1] - a[1]) });
         }
     }
-
-    // 2 · Mountain ridgelines (two, offset in depth)
-    const ridge = (knots: [number, number][], z: number) => {
-        const out: THREE.Vector3[] = [];
-        const perSeg = 42 / (knots.length - 1);
-        for (let s = 0; s < knots.length - 1; s++) {
-            for (let i = 0; i < perSeg; i++) {
-                const t = i / perSeg;
-                out.push(new THREE.Vector3(
-                    knots[s][0] + (knots[s + 1][0] - knots[s][0]) * t,
-                    knots[s][1] + (knots[s + 1][1] - knots[s][1]) * t,
-                    z
-                ));
-            }
+    const total = segs.reduce((s, x) => s + x.len, 0);
+    const step = total / n;
+    const out: THREE.Vector3[] = [];
+    let carried = step / 2;
+    for (const seg of segs) {
+        while (carried <= seg.len && out.length < n) {
+            const t = carried / seg.len;
+            out.push(new THREE.Vector3(
+                seg.a[0] + (seg.b[0] - seg.a[0]) * t,
+                seg.a[1] + (seg.b[1] - seg.a[1]) * t,
+                0
+            ));
+            carried += step;
         }
-        while (out.length < 42) out.push(out[out.length - 1].clone());
-        return out.slice(0, 42);
-    };
-    const mountains = [
-        ...ridge([[-5, -1.6], [-2.6, 1.9], [-1.2, 0.1], [0.6, 2.7], [2.1, 0.3], [3.7, 1.5], [5, -1.6]], 0),
-        ...ridge([[-5, -1.2], [-3.2, 0.9], [-0.8, -0.4], [1.4, 1.6], [3.2, -0.2], [4.4, 0.8], [5, -1.2]], -1.4),
+        carried -= seg.len;
+    }
+    while (out.length < n) out.push(out[out.length - 1].clone());
+    return out;
+};
+
+/** Flatten strokes into LineSegments positions for the hologram wireframe */
+const strokesToLineGeo = (strokes: Stroke[]): THREE.BufferGeometry => {
+    const positions: number[] = [];
+    for (const stroke of strokes) {
+        for (let i = 0; i < stroke.length - 1; i++) {
+            positions.push(stroke[i][0], stroke[i][1], 0, stroke[i + 1][0], stroke[i + 1][1], 0);
+        }
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    return geo;
+};
+
+const droneStrokeSets = (): Stroke[][] => {
+    // 1 · EO satellite in action: bold bus + wings, dish, and a scanning
+    //     beam cone diverging to a ground swath below
+    const satellite: Stroke[] = [
+        rectStroke(0, 0.8, 2.0, 2.4),                        // bus
+        [[-1.0, 0.8], [-1.6, 0.8]], [[1.0, 0.8], [1.6, 0.8]], // struts
+        rectStroke(-3.5, 0.8, 3.8, 2.1),                     // left wing
+        rectStroke(3.5, 0.8, 3.8, 2.1),                      // right wing
+        [[-5.4, 0.8], [-1.6, 0.8]], [[1.6, 0.8], [5.4, 0.8]], // wing centre lines
+        [[-3.5, -0.25], [-3.5, 1.85]], [[3.5, -0.25], [3.5, 1.85]], // wing cross lines
+        [[0, 2.0], [0, 2.5]],                                // mast
+        arcStroke(0, 2.55, 1.0, Math.PI * 0.1, Math.PI * 0.9), // dish
+        [[-0.5, -0.4], [-1.7, -3.1]], [[0.5, -0.4], [1.7, -3.1]], // scan cone
+        arcStroke(0, -3.3, 1.75, Math.PI * 0.15, Math.PI * 0.85), // ground swath
     ];
 
-    // 3 · Globe: Fibonacci sphere for an even swarm shell
-    const globe: THREE.Vector3[] = [];
-    const golden = Math.PI * (3 - Math.sqrt(5));
-    for (let i = 0; i < DRONES; i++) {
-        const y = 1 - (i / (DRONES - 1)) * 2;
-        const r = Math.sqrt(1 - y * y);
-        const a = golden * i;
-        globe.push(new THREE.Vector3(Math.cos(a) * r * 2.6, y * 2.6, Math.sin(a) * r * 2.6));
-    }
+    // 2 · Total station: unmistakable A-frame tripod, instrument head,
+    //     long laser ranging ray ending in a target crosshair
+    const totalStation: Stroke[] = [
+        [[-0.2, -0.3], [-2.4, -3.2]], [[0.2, -0.3], [2.4, -3.2]], [[0, -0.3], [0.35, -3.35]], // legs
+        [[-1.3, -1.75], [1.3, -1.75]],                       // leg brace
+        rectStroke(0, -0.1, 1.1, 0.4),                       // tribrach
+        arcStroke(0, 0.75, 0.75, 0, Math.PI * 2, 20),        // instrument body
+        rectStroke(0, 1.85, 2.2, 0.75),                      // telescope barrel
+        arcStroke(0, 2.42, 0.4, 0, Math.PI),                 // carry handle
+        [[1.35, 1.85], [2.5, 1.98]], [[2.9, 2.02], [3.7, 2.11]], [[4.1, 2.16], [4.6, 2.21]], // laser ray
+        arcStroke(5.3, 2.28, 0.55, 0, Math.PI * 2, 14),      // target ring
+        [[5.3, 1.88], [5.3, 2.68]], [[4.9, 2.28], [5.7, 2.28]], // target crosshair
+    ];
 
-    return [pin, mountains, globe];
+    // 3 · "AI4EO" — the mission statement, spelled by the swarm
+    const letter = (strokes: Stroke[], dx: number): Stroke[] =>
+        strokes.map((s) => s.map(([x, y]) => [x + dx, y] as [number, number]));
+    const ai4eo: Stroke[] = [
+        ...letter([[[-0.75, -1.4], [0, 1.4], [0.75, -1.4]], [[-0.42, -0.2], [0.42, -0.2]]], -4.7), // A
+        ...letter([[[0, -1.4], [0, 1.4]], [[-0.4, 1.4], [0.4, 1.4]], [[-0.4, -1.4], [0.4, -1.4]]], -2.75), // I
+        ...letter([[[0.5, -1.4], [0.5, 1.4]], [[0.5, 1.4], [-0.7, -0.3]], [[-0.7, -0.3], [0.85, -0.3]]], -0.85), // 4
+        ...letter([[[-0.6, -1.4], [-0.6, 1.4]], [[-0.6, 1.4], [0.7, 1.4]], [[-0.6, 0], [0.5, 0]], [[-0.6, -1.4], [0.7, -1.4]]], 1.45), // E
+        ...letter([arcStroke(0, 0, 1.0, 0, Math.PI * 2, 22).map(([x, y]) => [x * 0.75, y * 1.4] as [number, number])], 3.7), // O
+    ];
+
+    return [satellite, totalStation, ai4eo];
 };
 
 const DroneShow = ({ fades }: { fades: Fades }) => {
     const group = useRef<THREE.Group>(null);
-    const { mat, geo, formations } = useMemo(() => {
-        const f = droneFormations();
+    const { pointsMat, geo, formations, holograms } = useMemo(() => {
+        const strokeSets = droneStrokeSets();
+        const f = strokeSets.map((s) => sampleStrokes(s, DRONES));
         return {
-            mat: new THREE.PointsMaterial({ color: GREEN, size: 0.22, transparent: true, opacity: 0 }),
+            pointsMat: new THREE.PointsMaterial({
+                color: GREEN, size: 0.24, transparent: true, opacity: 0,
+                blending: THREE.AdditiveBlending, depthWrite: false,
+            }),
             geo: new THREE.BufferGeometry().setFromPoints(f[0]),
             formations: f,
+            holograms: strokeSets.map((s) => ({
+                geo: strokesToLineGeo(s),
+                mat: new THREE.LineBasicMaterial({
+                    color: new THREE.Color("#67e8f9"), transparent: true, opacity: 0,
+                    blending: THREE.AdditiveBlending, depthWrite: false,
+                }),
+            })),
         };
     }, []);
 
-    const CYCLE = 6.5;
+    const CYCLE = 7;
     const MORPH = 1.8;
 
-    useVariant(fades, "certifications", group, [mat], [0.55], (_g, _d, t) => {
+    useVariant(fades, "certifications", group, [pointsMat], [0.85], (_g, _d, t) => {
+        const fade = fades.current.certifications ?? 0;
         const idx = Math.floor(t / CYCLE) % formations.length;
         const next = (idx + 1) % formations.length;
         const local = t % CYCLE;
         const morphStart = CYCLE - MORPH;
+
         const pos = geo.attributes.position as THREE.BufferAttribute;
         for (let i = 0; i < DRONES; i++) {
             const stagger = hash(i, 42) * 0.5;
@@ -395,18 +459,29 @@ const DroneShow = ({ fades }: { fades: Fades }) => {
             const b = formations[next][i];
             pos.setXYZ(
                 i,
-                a.x + (b.x - a.x) * e + Math.sin(t * 1.3 + i * 1.7) * 0.06,
-                a.y + (b.y - a.y) * e + Math.cos(t * 1.1 + i * 2.3) * 0.06,
+                a.x + (b.x - a.x) * e + Math.sin(t * 1.3 + i * 1.7) * 0.045,
+                a.y + (b.y - a.y) * e + Math.cos(t * 1.1 + i * 2.3) * 0.045,
                 a.z + (b.z - a.z) * e
             );
         }
         pos.needsUpdate = true;
+
+        // Hologram wireframe: traces in once the swarm settles, dissolves before the morph
+        const settleIn = Math.min(1, Math.max(0, (local - 0.9) / 0.9));
+        const dissolve = Math.min(1, Math.max(0, (morphStart - 0.2 - local) / 0.6));
+        holograms.forEach((h, i) => {
+            h.mat.opacity = (i === idx ? settleIn * dissolve * 0.3 : 0) * fade;
+        });
     });
 
     return (
-        <group ref={group} position={[3.4, 0.8, -8]} rotation={[0, -0.25, 0]} scale={0.8} visible={false}>
+        <group ref={group} position={[3.2, -2.2, -8]} rotation={[0, -0.18, 0]} scale={0.72} visible={false}>
             {/* eslint-disable-next-line react/no-unknown-property */}
-            <primitive object={new THREE.Points(geo, mat)} />
+            <primitive object={new THREE.Points(geo, pointsMat)} />
+            {holograms.map((h, i) => (
+                // eslint-disable-next-line react/no-unknown-property
+                <primitive key={i} object={new THREE.LineSegments(h.geo, h.mat)} />
+            ))}
         </group>
     );
 };
