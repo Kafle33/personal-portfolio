@@ -77,48 +77,140 @@ const ContourRings = ({ fades }: { fades: Fades }) => {
     );
 };
 
-/* ---------- Skills: node constellation with edges ---------- */
-const NodeNetwork = ({ fades }: { fades: Fades }) => {
+/* ---------- Skills: the classic exploded GIS layer stack ----------
+   Bottom-up: TIN terrain → coordinate grid → vector features → POI points,
+   sliding gently along corner rails. The toolkit, drawn as the diagram
+   every GIS engineer has on a slide somewhere. */
+const LayerStack = ({ fades }: { fades: Fades }) => {
     const group = useRef<THREE.Group>(null);
-    const { pointsMat, lineMat, pointsGeo, linesGeo } = useMemo(() => {
-        const nodes: THREE.Vector3[] = [];
-        for (let i = 0; i < 44; i++) {
-            nodes.push(new THREE.Vector3(
-                (hash(i) - 0.5) * 22,
-                (hash(i, 7) - 0.5) * 12,
-                (hash(i, 13) - 0.5) * 6
+    const layersRef = useRef<THREE.Object3D[]>([]);
+
+    const LAYER_W = 8;
+    const LAYER_D = 5.5;
+    const SEP = 1.5;
+
+    const { terrainMat, gridMat, vectorMat, poiMat, railMat, parts } = useMemo(() => {
+        const tMat = new THREE.MeshBasicMaterial({ color: GREEN, wireframe: true, transparent: true, opacity: 0 });
+        const gMat = new THREE.LineBasicMaterial({ color: GREEN, transparent: true, opacity: 0 });
+        const vMat = new THREE.LineBasicMaterial({ color: BLUE, transparent: true, opacity: 0 });
+        const pMat = new THREE.PointsMaterial({ color: GREEN, size: 0.14, transparent: true, opacity: 0 });
+        const rMat = new THREE.LineDashedMaterial({
+            color: GREEN, transparent: true, opacity: 0, dashSize: 0.22, gapSize: 0.18,
+        });
+
+        // Layer 0 — TIN terrain (displaced wireframe plane, echoes the hero)
+        const terrainGeo = new THREE.PlaneGeometry(LAYER_W, LAYER_D, 10, 7);
+        const pos = terrainGeo.attributes.position;
+        for (let i = 0; i < pos.count; i++) {
+            const x = pos.getX(i);
+            const y = pos.getY(i);
+            pos.setZ(i, 0.45 * Math.sin(x * 0.9 + 1) * Math.cos(y * 1.1) + 0.2 * (hash(i) - 0.5));
+        }
+        terrainGeo.computeVertexNormals();
+
+        // Layer 1 — coordinate grid (clean lines, no diagonals)
+        const gridPts: number[] = [];
+        for (let i = 0; i <= 8; i++) {
+            const x = -LAYER_W / 2 + (i / 8) * LAYER_W;
+            gridPts.push(x, -LAYER_D / 2, 0, x, LAYER_D / 2, 0);
+        }
+        for (let j = 0; j <= 5; j++) {
+            const y = -LAYER_D / 2 + (j / 5) * LAYER_D;
+            gridPts.push(-LAYER_W / 2, y, 0, LAYER_W / 2, y, 0);
+        }
+        const gridGeo = new THREE.BufferGeometry();
+        gridGeo.setAttribute("position", new THREE.Float32BufferAttribute(gridPts, 3));
+
+        // Layer 2 — vector features: a meandering river + two road polylines
+        const mkPolyline = (seed: number, segs: number) => {
+            const pts: THREE.Vector3[] = [];
+            for (let i = 0; i <= segs; i++) {
+                const t = i / segs;
+                pts.push(new THREE.Vector3(
+                    -LAYER_W / 2 + t * LAYER_W,
+                    (hash(seed) - 0.5) * LAYER_D * 0.5
+                    + Math.sin(t * Math.PI * (2 + seed * 0.6) + seed) * LAYER_D * 0.18,
+                    0
+                ));
+            }
+            return new THREE.BufferGeometry().setFromPoints(pts);
+        };
+        const vectorGeos = [mkPolyline(1, 26), mkPolyline(3, 18), mkPolyline(6, 14)];
+
+        // Layer 3 — POI points
+        const poiPts: THREE.Vector3[] = [];
+        for (let i = 0; i < 26; i++) {
+            poiPts.push(new THREE.Vector3(
+                (hash(i, 3) - 0.5) * LAYER_W * 0.92,
+                (hash(i, 11) - 0.5) * LAYER_D * 0.92,
+                0
             ));
         }
-        const pGeo = new THREE.BufferGeometry().setFromPoints(nodes);
-        const edges: number[] = [];
-        for (let i = 0; i < nodes.length; i++) {
-            for (let j = i + 1; j < nodes.length; j++) {
-                if (nodes[i].distanceTo(nodes[j]) < 4.4) {
-                    edges.push(nodes[i].x, nodes[i].y, nodes[i].z, nodes[j].x, nodes[j].y, nodes[j].z);
-                }
-            }
-        }
-        const lGeo = new THREE.BufferGeometry();
-        lGeo.setAttribute("position", new THREE.Float32BufferAttribute(edges, 3));
+        const poiGeo = new THREE.BufferGeometry().setFromPoints(poiPts);
+
+        // Corner rails the layers ride on
+        const railGeos = ([[-1, -1], [1, -1], [-1, 1], [1, 1]] as const).map(([sx, sy]) => {
+            const geo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3((sx * LAYER_W) / 2, -1.1, (sy * LAYER_D) / 2),
+                new THREE.Vector3((sx * LAYER_W) / 2, SEP * 3 + 1.1, (sy * LAYER_D) / 2),
+            ]);
+            return geo;
+        });
+
         return {
-            pointsMat: new THREE.PointsMaterial({ color: GREEN, size: 0.09, transparent: true, opacity: 0 }),
-            lineMat: new THREE.LineBasicMaterial({ color: BLUE, transparent: true, opacity: 0 }),
-            pointsGeo: pGeo,
-            linesGeo: lGeo,
+            terrainMat: tMat, gridMat: gMat, vectorMat: vMat, poiMat: pMat, railMat: rMat,
+            parts: { terrainGeo, gridGeo, vectorGeos, poiGeo, railGeos },
         };
     }, []);
 
-    useVariant(fades, "skills", group, [pointsMat, lineMat], [0.5, 0.12], (g, _d, t) => {
-        g.rotation.y = Math.sin(t * 0.08) * 0.25;
-        g.rotation.x = Math.cos(t * 0.06) * 0.12;
-    });
+    useVariant(
+        fades,
+        "skills",
+        group,
+        [terrainMat, gridMat, vectorMat, poiMat, railMat],
+        [0.2, 0.13, 0.24, 0.55, 0.12],
+        (g, _d, t) => {
+            g.rotation.y = -0.5 + Math.sin(t * 0.07) * 0.1;
+            // The stack breathes: layers drift apart and settle again
+            const sep = SEP + Math.sin(t * 0.35) * 0.14;
+            layersRef.current.forEach((layer, i) => {
+                if (layer) layer.position.y = i * sep;
+            });
+        }
+    );
+
+    const layer = (i: number) => (el: THREE.Object3D | null) => {
+        if (el) layersRef.current[i] = el;
+    };
 
     return (
-        <group ref={group} position={[0, 0, -4]} visible={false}>
-            {/* eslint-disable-next-line react/no-unknown-property */}
-            <primitive object={new THREE.Points(pointsGeo, pointsMat)} />
-            {/* eslint-disable-next-line react/no-unknown-property */}
-            <primitive object={new THREE.LineSegments(linesGeo, lineMat)} />
+        <group ref={group} position={[5.2, -3, -8]} rotation={[0.38, -0.5, 0]} scale={0.9} visible={false}>
+            {/* Rails */}
+            {parts.railGeos.map((geo, i) => {
+                const ln = new THREE.Line(geo, railMat);
+                ln.computeLineDistances();
+                // eslint-disable-next-line react/no-unknown-property
+                return <primitive key={i} object={ln} />;
+            })}
+            {/* 0 · TIN terrain */}
+            <mesh ref={layer(0)} geometry={parts.terrainGeo} material={terrainMat} rotation={[-Math.PI / 2, 0, 0]} />
+            {/* 1 · Coordinate grid */}
+            <group ref={layer(1)} rotation={[-Math.PI / 2, 0, 0]}>
+                {/* eslint-disable-next-line react/no-unknown-property */}
+                <primitive object={new THREE.LineSegments(parts.gridGeo, gridMat)} />
+            </group>
+            {/* 2 · Vector features */}
+            <group ref={layer(2)} rotation={[-Math.PI / 2, 0, 0]}>
+                {parts.vectorGeos.map((geo, i) => (
+                    // eslint-disable-next-line react/no-unknown-property
+                    <primitive key={i} object={new THREE.Line(geo, vectorMat)} />
+                ))}
+            </group>
+            {/* 3 · POI points */}
+            <group ref={layer(3)} rotation={[-Math.PI / 2, 0, 0]}>
+                {/* eslint-disable-next-line react/no-unknown-property */}
+                <primitive object={new THREE.Points(parts.poiGeo, poiMat)} />
+            </group>
         </group>
     );
 };
@@ -327,7 +419,7 @@ const AmbientScene = ({ activeRef }: { activeRef: MutableRefObject<string> }) =>
     return (
         <>
             <ContourRings fades={fades} />
-            <NodeNetwork fades={fades} />
+            <LayerStack fades={fades} />
             <SurveyRoute fades={fades} />
             <PointTiles fades={fades} />
             <Polyhedra fades={fades} />
