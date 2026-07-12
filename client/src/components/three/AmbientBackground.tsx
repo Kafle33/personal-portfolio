@@ -640,7 +640,7 @@ const AmbientBackground = ({ activeSection }: AmbientBackgroundProps) => {
                 dpr={[1, 1.5]}
                 camera={{ position: [0, 0, 11], fov: 50 }}
                 gl={{ antialias: false, alpha: true, powerPreference: "low-power" }}
-                style={{ background: "transparent" }}
+                style={{ background: "transparent", pointerEvents: "none" }}
             >
                 <AmbientScene activeRef={activeRef} />
             </Canvas>

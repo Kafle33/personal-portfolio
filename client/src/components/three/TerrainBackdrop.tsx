@@ -122,7 +122,7 @@ const TerrainBackdrop = () => {
                 dpr={[1, 1.5]}
                 camera={{ position: [0, 6.5, 14], fov: 50, near: 0.1, far: 120 }}
                 gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-                style={{ background: "transparent" }}
+                style={{ background: "transparent", pointerEvents: "none" }}
             >
                 <TerrainMesh />
             </Canvas>

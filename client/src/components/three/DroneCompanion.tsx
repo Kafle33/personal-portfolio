@@ -369,7 +369,10 @@ const DroneCompanion = ({ activeSection }: DroneCompanionProps) => {
                 dpr={[1, 1.5]}
                 camera={{ position: [0, 0, 11], fov: 50 }}
                 gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
-                style={{ background: "transparent" }}
+                // R3F sets pointer-events:auto on the canvas inline by default
+                // for its own gesture handling — override it explicitly, since
+                // this drone overlay must never intercept page interactions.
+                style={{ background: "transparent", pointerEvents: "none" }}
             >
                 {/* eslint-disable-next-line react/no-unknown-property */}
                 <ambientLight intensity={0.55} />

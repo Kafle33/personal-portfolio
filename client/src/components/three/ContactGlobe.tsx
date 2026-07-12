@@ -158,7 +158,11 @@ const GlobeScene = ({ visitor, reducedMotion }: {
         };
         const up = (e: PointerEvent) => {
             dragState.current.dragging = false;
-            el.releasePointerCapture?.(e.pointerId);
+            // releasePointerCapture throws if this id was never actually
+            // captured (e.g. capture lost mid-drag) — guard defensively
+            if (el.hasPointerCapture?.(e.pointerId)) {
+                el.releasePointerCapture(e.pointerId);
+            }
             el.style.cursor = "grab";
         };
 
