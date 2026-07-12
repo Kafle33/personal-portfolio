@@ -4,7 +4,7 @@ import { GeospatialPreloader } from "@/components/ui/geospatial-preloader";
 import { PortfolioItem } from "../data/portfolio";
 import { GeospatialBackground } from "@/components/ui/geospatial-background";
 import { useSmoothScroll } from "@/hooks/use-smooth-scroll";
-import { usePerformanceTier, useIsTouchDevice } from "@/hooks/use-performance-tier";
+import { usePerformanceTier } from "@/hooks/use-performance-tier";
 
 const AmbientBackground = lazy(() => import("../components/three/AmbientBackground"));
 const DroneCompanion = lazy(() => import("../components/three/DroneCompanion"));
@@ -33,7 +33,6 @@ export default function Home() {
   const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
   const { scrollTo } = useSmoothScroll();
   const tier = usePerformanceTier();
-  const isTouch = useIsTouchDevice();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -79,8 +78,8 @@ export default function Home() {
           <AmbientBackground activeSection={activeSection} />
         </Suspense>
       )}
-      {/* Guide drone: desktop pointers only — its cursor play means nothing on touch */}
-      {tier === "high" && !isTouch && !isLoading && (
+      {/* Guide drone: escorts on every device; cursor play activates on fine pointers */}
+      {tier === "high" && !isLoading && (
         <Suspense fallback={null}>
           <DroneCompanion activeSection={activeSection} />
         </Suspense>

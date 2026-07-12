@@ -17,15 +17,16 @@ const HULL = "#16241d";
 const GREEN = "#12c285";
 const CYAN = "#67e8f9";
 
-/** Patrol anchors per section, in viewport fractions (x from left, y from top) */
+/** Patrol anchors per section, in viewport fractions (x from left, y from top).
+    Deliberately varied — corners, heights — so the patrol never ping-pongs. */
 const ANCHORS: Record<string, [number, number]> = {
     hero: [0.62, 0.16],
-    about: [0.10, 0.62],
-    skills: [0.88, 0.50],
-    experience: [0.10, 0.42],
-    projects: [0.88, 0.26],
-    certifications: [0.12, 0.38],
-    contact: [0.86, 0.55],
+    about: [0.09, 0.78],
+    skills: [0.90, 0.18],
+    experience: [0.10, 0.26],
+    projects: [0.91, 0.74],
+    certifications: [0.08, 0.20],
+    contact: [0.15, 0.72],
 };
 
 interface DroneState {
@@ -39,6 +40,7 @@ interface DroneState {
     scanStart: number;
     holoOpacity: number;
     spawn: number;
+    jitter: THREE.Vector2;
 }
 
 const RotorPod = ({ position }: { position: [number, number, number] }) => (
@@ -195,10 +197,13 @@ const DroneRig = ({ activeRef }: { activeRef: MutableRefObject<string> }) => {
         scanStart: -10,
         holoOpacity: 0,
         spawn: -1,
+        jitter: new THREE.Vector2(),
     });
 
-    // Cursor tracked as viewport fractions; converted to world in the frame loop
+    // Cursor tracked as viewport fractions; converted to world in the frame loop.
+    // Touch devices never attach — the drone stays a pure escort there.
     useEffect(() => {
+        if (window.matchMedia("(pointer: coarse)").matches) return;
         const onMove = (e: MouseEvent) => {
             const s = state.current;
             s.hasMouse = true;
@@ -220,29 +225,44 @@ const DroneRig = ({ activeRef }: { activeRef: MutableRefObject<string> }) => {
         if (s.spawn < 0) s.spawn = t;
 
         // --- Anchor for the active section (viewport fractions → world) ---
-        const frac = ANCHORS[activeRef.current] ?? ANCHORS.hero;
-        const anchor = new THREE.Vector3((frac[0] - 0.5) * vw, (0.5 - frac[1]) * vh, 0);
-
         if (activeRef.current !== s.lastSection) {
             s.lastSection = activeRef.current;
             s.arrived = false;
             s.idleTime = 0;
+            // Fresh perch offset each visit, so the patrol never feels mechanical
+            s.jitter.set((Math.random() - 0.5) * 0.09, (Math.random() - 0.5) * 0.09);
         }
+        const frac = ANCHORS[activeRef.current] ?? ANCHORS.hero;
+        const fx = THREE.MathUtils.clamp(frac[0] + s.jitter.x, 0.05, 0.95);
+        const fy = THREE.MathUtils.clamp(frac[1] + s.jitter.y, 0.08, 0.9);
+        const anchor = new THREE.Vector3((fx - 0.5) * vw, (0.5 - fy) * vh, 0);
 
         // --- Cursor interaction ---
         const mouseWorld = new THREE.Vector3((s.mouse.x - 0.5) * vw, (0.5 - s.mouse.y) * vh, 0);
         const mouseDist = s.hasMouse ? s.pos.distanceTo(mouseWorld) : 999;
 
-        // Ease away when crowded
-        if (mouseDist < 1.6) {
-            const flee = s.pos.clone().sub(mouseWorld).normalize().multiplyScalar(4.5 * dt);
-            s.vel.add(flee);
+        // Curious-companion mode: within range, the target blends from the
+        // anchor toward a standoff point near the cursor — the drone leaves
+        // its perch and roams with you, then returns home when you leave.
+        const engage = s.hasMouse ? THREE.MathUtils.clamp((6.5 - mouseDist) / 3.2, 0, 1) : 0;
+        let target = anchor;
+        if (engage > 0.01) {
+            const away = s.pos.clone().sub(mouseWorld);
+            const dir = away.lengthSq() > 1e-4 ? away.normalize() : new THREE.Vector3(0.7, 0.7, 0);
+            const standoff = mouseWorld.clone().add(dir.multiplyScalar(2.1));
+            target = anchor.clone().lerp(standoff, engage * 0.9);
             s.idleTime = 0;
         }
 
-        // --- Spring toward anchor, damped ---
-        const toAnchor = anchor.clone().sub(s.pos);
-        s.vel.add(toAnchor.multiplyScalar(2.1 * dt));
+        // Ease away when crowded
+        if (mouseDist < 1.5) {
+            const flee = s.pos.clone().sub(mouseWorld).normalize().multiplyScalar(5 * dt);
+            s.vel.add(flee);
+        }
+
+        // --- Spring toward the target, damped ---
+        const toTarget = target.clone().sub(s.pos);
+        s.vel.add(toTarget.multiplyScalar(2.1 * dt));
         s.vel.multiplyScalar(Math.max(0, 1 - 2.6 * dt));
         s.pos.add(s.vel.clone().multiplyScalar(dt * 60 * 0.016 * 3.2));
 
@@ -250,9 +270,9 @@ const DroneRig = ({ activeRef }: { activeRef: MutableRefObject<string> }) => {
         s.pos.x = THREE.MathUtils.clamp(s.pos.x, -vw / 2 + 0.8, vw / 2 - 0.8);
         s.pos.y = THREE.MathUtils.clamp(s.pos.y, -vh / 2 + 0.8, vh / 2 - 0.8);
 
-        // Arrival → LiDAR inspection pulse
+        // Arrival at the section perch → LiDAR inspection pulse
         const distToAnchor = s.pos.distanceTo(anchor);
-        if (!s.arrived && distToAnchor < 0.5 && s.vel.length() < 0.6) {
+        if (!s.arrived && engage < 0.1 && distToAnchor < 0.5 && s.vel.length() < 0.6) {
             s.arrived = true;
             s.scanStart = t;
         }
@@ -261,9 +281,11 @@ const DroneRig = ({ activeRef }: { activeRef: MutableRefObject<string> }) => {
         const bob = Math.sin(t * 1.7) * 0.07 + Math.sin(t * 0.61) * 0.04;
         rig.position.set(s.pos.x, s.pos.y + bob, 0);
 
-        // Spawn scale-in
+        // Spawn scale-in; smaller on narrow/portrait viewports so it never
+        // dominates a phone screen
         const spawnK = THREE.MathUtils.smoothstep(Math.min(1, (t - s.spawn) / 1.2), 0, 1);
-        rig.scale.setScalar(0.55 * spawnK);
+        const sizeK = three.viewport.aspect < 0.9 ? 0.68 : three.viewport.aspect < 1.3 ? 0.85 : 1;
+        rig.scale.setScalar(0.55 * sizeK * spawnK);
 
         // --- Attitude: bank into motion, head-track the cursor nearby ---
         const speed = s.vel.length();
@@ -271,7 +293,7 @@ const DroneRig = ({ activeRef }: { activeRef: MutableRefObject<string> }) => {
         const bankX = THREE.MathUtils.clamp(s.vel.y * 0.16, -0.35, 0.35);
         let lookYaw = Math.sin(t * 0.4) * 0.18; // idle sway
         let lookPitch = 0;
-        if (mouseDist < 4.2 && s.hasMouse) {
+        if (mouseDist < 6.5 && s.hasMouse) {
             const dx = mouseWorld.x - s.pos.x;
             const dy = mouseWorld.y - s.pos.y;
             lookYaw = THREE.MathUtils.clamp(dx * 0.22, -0.65, 0.65);
@@ -308,7 +330,7 @@ const DroneRig = ({ activeRef }: { activeRef: MutableRefObject<string> }) => {
         }
 
         // Holographic readout after a few calm seconds
-        if (speed < 0.25 && mouseDist > 4.2) s.idleTime += dt;
+        if (speed < 0.25 && mouseDist > 6.5) s.idleTime += dt;
         const holoTarget = s.idleTime > 3.5 ? 1 : 0;
         s.holoOpacity += (holoTarget - s.holoOpacity) * Math.min(1, dt * 3);
         const holo = rig.getObjectByName("holo") as THREE.Group | undefined;
